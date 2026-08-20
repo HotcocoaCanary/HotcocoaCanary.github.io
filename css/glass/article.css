@@ -13,6 +13,9 @@
 #tag.glass,
 #category.glass {
   padding: var(--g-pad) calc(var(--g-pad) + 6px);
+  background: var(--g-tint);
+  box-shadow: var(--g-shine), var(--g-shadow);
+  border-radius: var(--g-radius, var(--g-r-lg));
 }
 
 /* The safe zone. Body text never comes within --g-pad of the rim, which is
