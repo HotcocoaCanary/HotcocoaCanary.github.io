@@ -1,0 +1,297 @@
+/* ==========================================================================
+   Liquid Glass Design System — Responsive, degradation, accessibility
+   --------------------------------------------------------------------------
+   Mobile does not lose the glass. It loses the expensive parts of the glass:
+   the SVG displacement pass and the heaviest blurs. What remains — tint,
+   blur, rim light, shadow — still reads as the same material.
+   ========================================================================== */
+
+/* ==========================================================================
+   Breakpoints
+   ========================================================================== */
+
+@media (max-width: 1200px) {
+  #recent-posts .recent-post-items {
+    grid-template-columns: 1fr;
+  }
+
+  :root {
+    --g-pad: 30px;
+    --g-gap: 22px;
+  }
+}
+
+@media (max-width: 900px) {
+  :root {
+    --g-pad: 22px;
+    --g-gap: 18px;
+    --g-nav-h: 50px;
+    --g-r-xl: 26px;
+    --g-r-lg: 22px;
+  }
+
+  #body-wrap {
+    padding-top: calc(var(--g-nav-h) + 22px);
+  }
+
+  #nav.glass {
+    top: 10px !important;
+    width: calc(100% - 20px) !important;
+    height: var(--g-nav-h);
+    padding: 0 16px !important;
+  }
+
+  #nav .menus_items {
+    display: none;
+  }
+
+  #nav #toggle-menu {
+    display: inline-block !important;
+  }
+
+  #page-header.nav-fixed #nav.glass {
+    top: 8px !important;
+    height: 46px;
+  }
+
+  .layout {
+    padding: 0 12px;
+  }
+
+  #post .article-container,
+  #page .page-content,
+  #post #post-info,
+  #post .post-copyright {
+    max-width: none;
+  }
+
+  #article-container {
+    font-size: 0.98rem;
+    line-height: 1.85;
+  }
+
+  #post .post-title,
+  #page .page-title {
+    font-size: 1.55rem;
+  }
+
+  /* Phones drop the SVG displacement (glass-core.js treats a coarse pointer
+     as a reduced profile), so a trace of blur is all that is left to suggest
+     optical thickness. Keep it a trace: blur is fill-rate bound, and a
+     double-digit radius over a full-screen card is both the most expensive
+     thing on the page and the "everything is equally frosted" look §54
+     rules out. */
+  .glass {
+    --g-blur: 1.5px;
+  }
+
+  .glass--strong,
+  .glass--floating {
+    --g-blur: 2px;
+  }
+
+  .glass--dense {
+    --g-blur: 3px;
+  }
+}
+
+@media (max-width: 768px) {
+  :root {
+    --g-nav-h: 46px;
+    --g-pad: 18px;
+  }
+
+  #nav.glass {
+    width: calc(100% - 14px) !important;
+    padding: 0 12px !important;
+    font-size: 0.92rem !important;
+  }
+
+
+
+  #recent-posts .recent-post-item .recent-post-info {
+    padding: 14px 12px 12px !important;
+  }
+
+  #recent-posts .recent-post-item .article-title {
+    font-size: 1.12rem;
+  }
+
+  #article-container .table-wrap.glass {
+    /* Wide tables scroll inside the glass, never widen the page. */
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* Touch devices never get the hover lift — it fires on tap and looks broken. */
+@media (hover: none) {
+  .glass--interactive:hover {
+    transform: none;
+    box-shadow: var(--g-shine), var(--g-shadow);
+    background-color: var(--g-tint);
+  }
+
+  .glass:hover::after {
+    opacity: 0;
+  }
+}
+
+/* ==========================================================================
+   Degradation
+   ========================================================================== */
+
+/* No backdrop-filter at all: the tint has to carry the contrast alone. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .glass {
+    --g-tint: rgba(255, 250, 243, 0.88);
+    --g-tint-hover: rgba(255, 250, 243, 0.94);
+  }
+
+  .glass--dense {
+    --g-tint: rgba(38, 27, 20, 0.94);
+  }
+
+  [data-theme="dark"] .glass {
+    --g-tint: rgba(32, 24, 19, 0.90);
+    --g-tint-hover: rgba(42, 32, 25, 0.94);
+  }
+}
+
+/* ==========================================================================
+   Performance tiers (§41, §42)
+   --------------------------------------------------------------------------
+   glass-performance.js measures a rolling FPS average and steps the page down
+   through full -> motion -> distortion -> minimal. It never swaps the material
+   for "ordinary frosted glass" — it only sheds optical extras, in order:
+
+       dynamic light -> chromatic aberration -> animation
+                     -> distortion -> background animation
+
+   The refraction/aberration part is handled in JS (GlassCore.setQuality);
+   these rules cover the CSS-side extras the JS only flags.
+   ========================================================================== */
+
+/* Dynamic pointer light off — the sheen pseudo-element is simply hidden. */
+[data-glass-light="off"] .glass::after {
+  display: none;
+}
+
+/* Motion tier and below: entrance & micro animations settle instantly. */
+[data-glass-motion="reduced"] #recent-posts .recent-post-item.glass,
+[data-glass-motion="reduced"] #aside-content .card-widget.glass,
+[data-glass-motion="reduced"] #post.glass,
+[data-glass-motion="reduced"] #page.glass,
+[data-glass-motion="reduced"] #archive.glass,
+[data-glass-motion="reduced"] #tag.glass,
+[data-glass-motion="reduced"] #category.glass {
+  animation-duration: 0.001s !important;
+}
+
+/* Minimal tier: the slowly drifting background ornament is frozen, but the
+   background itself — the glass's optical input — stays. */
+[data-glass-bg="static"] body::after {
+  animation: none !important;
+}
+
+/* Minimal tier: surfaces hold their shape with a touch less moving blur. */
+.glass-tier-minimal .glass {
+  --g-blur: 0.6px;
+}
+
+/* Readers who ask for less transparency get opaque surfaces and no
+   refraction. The JS honours the same query and stops emitting --g-filter. */
+@media (prefers-reduced-transparency: reduce) {
+  .glass {
+    --g-filter: ;
+    --g-blur: 0px;
+    --g-tint: rgba(255, 250, 243, 0.96);
+    --g-tint-hover: rgba(255, 250, 243, 1);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+
+  .glass--dense {
+    --g-tint: rgba(32, 22, 16, 0.98);
+  }
+
+  [data-theme="dark"] .glass {
+    --g-tint: rgba(26, 19, 15, 0.97);
+    --g-tint-hover: rgba(34, 25, 20, 1);
+  }
+
+  body::after,
+  html::after {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001s !important;
+    animation-delay: 0s !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001s !important;
+  }
+
+  body::after {
+    animation: none !important;
+  }
+
+  .glass--interactive:hover {
+    transform: none;
+  }
+
+  #recent-posts .recent-post-item:hover .post-bg {
+    transform: none;
+  }
+}
+
+@media (prefers-contrast: more) {
+  :root {
+    --g-ink: #1a120c;
+    --g-ink-dim: #4a382c;
+    --g-edge: rgba(255, 255, 255, 0.85);
+  }
+
+  .glass {
+    --g-tint: rgba(255, 251, 245, 0.82);
+  }
+}
+
+/* ==========================================================================
+   Print
+   ========================================================================== */
+
+@media print {
+  body::before,
+  body::after,
+  html::after,
+  #nav,
+  #rightside,
+  #footer,
+  #aside-content {
+    display: none !important;
+  }
+
+  .glass {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+    background: #fff !important;
+    box-shadow: none !important;
+    border: none !important;
+    color: #000 !important;
+    animation: none !important;
+  }
+
+  .glass::before,
+  .glass::after {
+    display: none !important;
+  }
+
+  #body-wrap {
+    padding-top: 0;
+  }
+}

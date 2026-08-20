@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" width="1600" height="900" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="sky" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2e1811"/>
+      <stop offset="45%" stop-color="#5c2c1a"/>
+      <stop offset="100%" stop-color="#150e0a"/>
+    </linearGradient>
+    <radialGradient id="sun" cx="50%" cy="34%" r="38%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.85"/>
+      <stop offset="45%" stop-color="#e0745a" stop-opacity="0.45"/>
+      <stop offset="100%" stop-color="#e0745a" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="pool" cx="78%" cy="88%" r="46%">
+      <stop offset="0%" stop-color="#d2643f" stop-opacity="0.62"/>
+      <stop offset="100%" stop-color="#d2643f" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="vig" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#000000" stop-opacity="0.10"/>
+      <stop offset="55%" stop-color="#000000" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0.42"/>
+    </linearGradient>
+    <filter id="blob" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="62"/>
+    </filter>
+    <filter id="gr">
+      <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="3" seed="31"/>
+      <feColorMatrix type="saturate" values="0"/>
+    </filter>
+  </defs>
+
+  <rect width="1600" height="900" fill="url(#sky)"/>
+
+  <g filter="url(#blob)">
+    <ellipse cx="330" cy="230" rx="290" ry="210" fill="#e0745a" opacity="0.50"/>
+    <ellipse cx="1240" cy="200" rx="260" ry="190" fill="#ffffff" opacity="0.26"/>
+    <ellipse cx="980" cy="700" rx="330" ry="230" fill="#d2643f" opacity="0.48"/>
+    <ellipse cx="240" cy="740" rx="250" ry="180" fill="#5c2c1a" opacity="0.42"/>
+  </g>
+
+  <rect width="1600" height="900" fill="url(#sun)"/>
+  <rect width="1600" height="900" fill="url(#pool)"/>
+
+  <g opacity="0.16" stroke="#ffffff" fill="none" stroke-width="1.1">
+    <path d="M-40 640 C 300 560, 620 700, 900 610 S 1400 500, 1660 590"/>
+    <path d="M-40 700 C 320 620, 640 760, 920 672 S 1420 566, 1660 654"/>
+    <path d="M-40 760 C 340 686, 660 820, 940 736 S 1440 630, 1660 716"/>
+  </g>
+
+  <rect width="1600" height="900" fill="url(#vig)"/>
+  <rect width="1600" height="900" filter="url(#gr)" opacity="0.045"/>
+</svg>

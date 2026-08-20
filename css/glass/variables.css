@@ -1,0 +1,207 @@
+/* ==========================================================================
+   Liquid Glass Design System — Design Tokens
+   --------------------------------------------------------------------------
+   Single source of truth for the whole glass system. Every surface in the
+   blog derives from these tokens; component CSS never hard-codes a colour,
+   radius or blur.
+
+   Palette: warm (amber / terracotta / cream).
+   Theme:   follows the system by default, Butterfly's [data-theme] wins.
+   ========================================================================== */
+
+:root {
+  /* ---- Warm brand ramp ------------------------------------------------ */
+  --g-amber:      #e8973c;
+  --g-terracotta: #d2643f;
+  --g-rose:       #e08a72;
+  --g-gold:       #f2c46b;
+  --g-accent:     var(--g-terracotta);
+
+  /* ---- Ink ------------------------------------------------------------ */
+  --g-ink:      #2b201a;
+  --g-ink-dim:  #7d6a5c;
+  --g-ink-mute: #a8968a;
+
+  /* ---- Background base ------------------------------------------------ */
+  --g-bg:       #f7ece0;
+  --g-bg-deep:  #efdfcd;
+
+  /* ---- Glass material -------------------------------------------------
+     Component modifiers (.glass--soft … .glass--floating) override these.
+     Values here are the neutral "medium" defaults.
+
+     Blur is zero by default, and that is the whole point. Liquid glass is
+     not frosted glass: the background stays legible *through* the surface,
+     and the material reads as glass because its edges bend light — not
+     because the middle is milky.
+
+     It also has to be zero for the refraction to survive. backdrop-filter
+     applies its functions in order, so blur() runs *after* the displacement
+     and smears out exactly the bent edge detail the displacement just drew.
+     Even 1-2px visibly flattens the bezel. Blur only earns its place where
+     there is no displacement to protect: the CSS fallback path and the
+     opaque code-block weight (see glass.css).                            */
+  --g-tint:        rgba(255, 249, 240, 0.06);
+  --g-tint-hover:  rgba(255, 249, 240, 0.13);
+  --g-blur:        0px;
+  --g-saturate:    1.45;
+  --g-brightness:  1.02;
+  --g-contrast:    1.06;
+
+  /* ---- Refraction / optics (spec §9, §10, §11, §12) -------------------
+     These are the knobs the spec forbids hard-coding. The JS engine reads
+     them straight off the computed style of each surface, so a weight, a
+     media query or the PoC page can retune any surface without touching JS.
+
+       --glass-refraction    peak displacement at the bezel, in px
+       --glass-bezel-width   how wide the refracting band is, in px
+       --glass-edge-depth    falloff exponent; higher = bend hugs the rim
+       --glass-ior           index of refraction, ~1.45-1.52 for glass (§10)
+       --glass-chromatic     dispersion; must stay subtle (§11)            */
+  --glass-refraction:  50;
+  --glass-bezel-width: 26;
+  --glass-edge-depth:  2.4;
+  --glass-ior:         1.485;
+  --glass-chromatic:   0.035;
+
+  /* ---- Edge highlight (§12) -------------------------------------------
+     Highlight is deliberately independent of refraction, so a surface can be
+     optically thick without being shiny, and vice versa. */
+  --glass-highlight-intensity: 1;
+  --glass-highlight-width:     2px;
+  --glass-highlight-angle:     158deg;
+  --glass-highlight-softness:  1px;
+
+  /* Legacy aliases: earlier component CSS referred to these. Kept pointing
+     at the canonical tokens so both spellings resolve to one value. */
+  --g-refract: var(--glass-refraction);
+  --g-band:    var(--glass-bezel-width);
+
+  /* ---- Edge treatment -------------------------------------------------
+     Two inset highlights (top-left catch, bottom-right rim) plus a hairline
+     border are what sell "thick glass" rather than "blurred div".        */
+  /* Three inset layers: a bright catch along the top-left, a softer return
+     along the bottom-right, a hairline around the whole rim, and a tight
+     inner shadow that reads as the thickness of the slab. */
+  --g-shine:
+    inset 1px 1px 0 0 rgba(255, 255, 255, 0.95),
+    inset -1px -1px 0 0 rgba(255, 255, 255, 0.70),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.30),
+    inset 0 0 10px -6px rgba(120, 62, 24, 0.16);
+  --g-edge: rgba(255, 255, 255, 0.50);
+
+  --g-shadow:
+    0 6px 18px rgba(96, 50, 20, 0.14),
+    0 1px 3px  rgba(96, 50, 20, 0.10);
+  --g-shadow-lift:
+    0 20px 46px rgba(96, 50, 20, 0.30),
+    0 3px 10px  rgba(96, 50, 20, 0.18);
+
+  /* Specular sheen that tracks the pointer (see glass.css / .glass::after) */
+  --g-sheen: rgba(255, 255, 255, 0.28);
+
+  /* ---- Radius --------------------------------------------------------- */
+  --g-r-sm:   14px;
+  --g-r-md:   20px;
+  --g-r-lg:   26px;
+  --g-r-xl:   32px;
+  --g-r-pill: 999px;
+
+  /* ---- Motion --------------------------------------------------------- */
+  --g-spring:      cubic-bezier(0.175, 0.885, 0.32, 1.6);
+  --g-ease:        cubic-bezier(0.22, 1, 0.36, 1);
+  --g-dur:         0.42s;
+  --g-dur-fast:    0.2s;
+
+  /* ---- Layout --------------------------------------------------------- */
+  --g-max:     1280px;
+  --g-gap:     26px;
+  --g-pad:     34px;   /* glass content padding — see article.css */
+  --g-nav-h:   60px;
+}
+
+/* --------------------------------------------------------------------------
+   Dark theme.
+   Declared twice on purpose: once behind prefers-color-scheme (so an
+   untouched visitor follows their OS) and once behind [data-theme="dark"]
+   (so Butterfly's toggle still wins in both directions).
+   -------------------------------------------------------------------------- */
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --g-ink:      #f4e6d8;
+    --g-ink-dim:  #bda694;
+    --g-ink-mute: #8d7a6c;
+
+    --g-accent:   #f0a35e;
+
+    --g-bg:       #191210;
+    --g-bg-deep:  #0f0b09;
+
+    --g-tint:       rgba(92, 68, 50, 0.10);
+    --g-tint-hover: rgba(112, 84, 62, 0.18);
+    --g-saturate:   1.35;
+    --g-brightness: 1.05;
+    --g-contrast:   1.05;
+
+    --g-shine:
+      inset 1px 1px 0 0 rgba(255, 236, 212, 0.72),
+      inset -1px -1px 0 0 rgba(255, 236, 212, 0.42),
+      inset 0 0 0 1px rgba(255, 236, 212, 0.18),
+      inset 0 0 10px -6px rgba(0, 0, 0, 0.30);
+    --g-edge: rgba(255, 236, 212, 0.34);
+
+    --g-shadow:
+      0 6px 18px rgba(0, 0, 0, 0.45),
+      0 1px 3px  rgba(0, 0, 0, 0.35);
+    --g-shadow-lift:
+      0 16px 38px rgba(0, 0, 0, 0.58),
+      0 2px 8px   rgba(0, 0, 0, 0.40);
+
+    --g-sheen: rgba(255, 220, 180, 0.22);
+  }
+}
+
+[data-theme="dark"] {
+  --g-ink:      #f4e6d8;
+  --g-ink-dim:  #bda694;
+  --g-ink-mute: #8d7a6c;
+
+  --g-accent:   #f0a35e;
+
+  --g-bg:       #191210;
+  --g-bg-deep:  #0f0b09;
+
+  --g-tint:       rgba(92, 68, 50, 0.10);
+  --g-tint-hover: rgba(112, 84, 62, 0.18);
+  --g-saturate:   1.35;
+  --g-brightness: 1.05;
+  --g-contrast:   1.05;
+
+  --g-shine:
+    inset 1px 1px 0 0 rgba(255, 236, 212, 0.72),
+    inset -1px -1px 0 0 rgba(255, 236, 212, 0.42),
+    inset 0 0 0 1px rgba(255, 236, 212, 0.18),
+    inset 0 0 10px -6px rgba(0, 0, 0, 0.30);
+  --g-edge: rgba(255, 236, 212, 0.34);
+
+  --g-shadow:
+    0 6px 18px rgba(0, 0, 0, 0.45),
+    0 1px 3px  rgba(0, 0, 0, 0.35);
+  --g-shadow-lift:
+    0 16px 38px rgba(0, 0, 0, 0.58),
+    0 2px 8px   rgba(0, 0, 0, 0.40);
+
+  --g-sheen: rgba(255, 220, 180, 0.22);
+}
+
+/* Bridge our tokens into Butterfly's own variables so untouched theme
+   components (buttons, links, selection) inherit the warm palette. */
+:root {
+  --btn-color: #fff;
+  --btn-bg: var(--g-accent);
+  --text-highlight-color: var(--g-ink);
+  --anzhiyu-main: var(--g-accent);
+  --pseudo-hover: var(--g-accent);
+  --hl-bg: transparent;
+}

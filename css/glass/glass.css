@@ -1,0 +1,360 @@
+/* ==========================================================================
+   Liquid Glass Design System — the material
+   --------------------------------------------------------------------------
+   One material, five weights. Every surface in the blog is `.glass` plus a
+   modifier; nothing in components.css re-implements the look, it only picks
+   a weight and a radius.
+
+   Anatomy of a surface:
+
+     background-color   the tint  — a wash so text always has contrast
+     backdrop-filter    the body  — blur + saturation + (Chromium) refraction
+     ::before           the depth — top-light gradient + inner edge glow
+     ::after            the sheen — specular highlight tracking the pointer
+     box-shadow         the rim   — inset shine + cast shadow
+
+   The refraction itself comes from an SVG displacement map generated per
+   element size by js/glass/glass-sdf.js + glass-core.js, which set --g-filter
+   on the element. Where that is unsupported the var stays empty and the surface
+   degrades to blur + tint, which still reads as glass.
+   ========================================================================== */
+
+.glass {
+  /* Custom properties inherit, so a child surface would silently reuse its
+     parent's filter (built for a different size) before the adapter reaches
+     it. Declaring it empty here stops that at every surface boundary. */
+  --g-filter: ;
+
+  position: relative;
+  isolation: isolate;
+  border-radius: var(--g-radius, var(--g-r-lg));
+  background-color: var(--g-tint);
+  border: 1px solid var(--g-edge);
+  box-shadow: var(--g-shine), var(--g-shadow);
+  color: var(--g-ink);
+
+  -webkit-backdrop-filter:
+    var(--g-filter, ) blur(var(--g-blur))
+    saturate(var(--g-saturate)) brightness(var(--g-brightness))
+    contrast(var(--g-contrast));
+  backdrop-filter:
+    var(--g-filter, ) blur(var(--g-blur))
+    saturate(var(--g-saturate)) brightness(var(--g-brightness))
+    contrast(var(--g-contrast));
+
+  transition:
+    background-color var(--g-dur) var(--g-ease),
+    box-shadow       var(--g-dur) var(--g-ease),
+    transform        var(--g-dur) var(--g-spring),
+    border-radius    var(--g-dur) var(--g-spring);
+}
+
+/* Depth. A single top-light gradient does most of the work of making a flat
+   translucent rectangle read as a solid piece of glass with thickness. */
+.glass::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  border-radius: inherit;
+  /* §12 — the highlight is independent of refraction. Its overall strength is
+     the one optical knob that can be read straight out of CSS, which keeps the
+     PoC control panel and future tuning panels free of any JS coupling. */
+  opacity: var(--glass-highlight-intensity, 0.9);
+  /* A narrow streak, not a wash: light glancing off a curved top edge.
+     A full-surface gradient here is what makes glass look like frost. */
+  background:
+    linear-gradient(
+      158deg,
+      rgba(255, 255, 255, 0.60) 0%,
+      rgba(255, 255, 255, 0.16) 7%,
+      rgba(255, 255, 255, 0.00) 18%,
+      rgba(255, 255, 255, 0.00) 78%,
+      rgba(255, 236, 202, 0.14) 93%,
+      rgba(255, 246, 226, 0.42) 100%
+    );
+}
+
+/* Specular sheen. --g-mx/--g-my are written by the pointer tracker; before
+   the pointer ever enters they default to the top-left, which matches the
+   lighting direction of ::before.
+
+   It rests at partial opacity rather than zero. Hiding it until :hover meant
+   a surface at rest had no specular at all — the dynamic light of §13 only
+   existed under the cursor, and on a still page (or a screenshot) the glass
+   read as flat. */
+.glass::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  border-radius: inherit;
+  opacity: 0.55;
+  background: radial-gradient(
+    32rem 32rem at var(--g-mx, 20%) var(--g-my, 0%),
+    var(--g-sheen),
+    transparent 60%
+  );
+  transition: opacity var(--g-dur) var(--g-ease);
+}
+
+.glass:hover::after { opacity: 1; }
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .glass::before {
+    background:
+      linear-gradient(
+        158deg,
+        rgba(255, 236, 212, 0.30) 0%,
+        rgba(255, 236, 212, 0.08) 9%,
+        rgba(255, 255, 255, 0.00) 22%,
+        rgba(255, 255, 255, 0.00) 82%,
+        rgba(255, 190, 130, 0.12) 100%
+      );
+  }
+}
+
+[data-theme="dark"] .glass::before {
+  background:
+    linear-gradient(
+      158deg,
+      rgba(255, 236, 212, 0.30) 0%,
+      rgba(255, 236, 212, 0.08) 9%,
+      rgba(255, 255, 255, 0.00) 22%,
+      rgba(255, 255, 255, 0.00) 82%,
+      rgba(255, 190, 130, 0.12) 100%
+    );
+}
+
+
+/* ==========================================================================
+   Specificity bridge
+   --------------------------------------------------------------------------
+   Butterfly styles its shells through id selectors (`#recent-posts
+   .recent-post-item`, `#aside-content .card-widget`, …), which outrank a bare
+   `.glass`. Rather than sprinkle !important through the material, the surface
+   list is restated once here at matching specificity. article.css and
+   components.css load after this file and can still refine any of it.
+   ========================================================================== */
+
+#nav.glass,
+#recent-posts .recent-post-item.glass,
+#aside-content .card-widget.glass,
+#card-toc.glass,
+#post.glass, #page.glass, #archive.glass, #tag.glass, #category.glass,
+#rightside button.glass,
+#pagination .page-number.glass, #pagination .extend.glass,
+#tag .tag-cloud-list a.glass,
+.tag-cloud-list a.glass,
+#article-container .tag-list a.glass,
+#article-container figure.highlight.glass,
+#article-container pre.glass,
+#article-container blockquote.glass,
+#article-container .table-wrap.glass,
+#article-container .note.glass,
+#local-search .search-dialog.glass,
+#sidebar-menus.glass,
+#body-wrap .toggle-menu-dialog.glass {
+  background-color: var(--g-tint);
+  background-image: none;
+  border: 1px solid var(--g-edge);
+  border-radius: var(--g-radius, var(--g-r-lg));
+  box-shadow: var(--g-shine), var(--g-shadow);
+}
+
+#nav.glass--interactive:hover,
+#recent-posts .recent-post-item.glass--interactive:hover,
+#aside-content .card-widget.glass--interactive:hover,
+#rightside button.glass--interactive:hover,
+#pagination .page-number.glass--interactive:hover,
+#pagination .extend.glass--interactive:hover,
+#tag .tag-cloud-list a.glass--interactive:hover,
+.tag-cloud-list a.glass--interactive:hover,
+#article-container .tag-list a.glass--interactive:hover {
+  background-color: var(--g-tint-hover);
+  box-shadow: var(--g-shine), var(--g-shadow-lift);
+}
+
+/* Butterfly reads --card-bg in a handful of places we have not enumerated;
+   pointing it at the tint keeps those in the system too. */
+.glass {
+  --card-bg: var(--g-tint);
+}
+
+/* ==========================================================================
+   Weights
+   --------------------------------------------------------------------------
+                refraction  transparency  blur   edge     used by
+     soft            low        high       med    low     navbar, tags, pills
+     medium          med        med        med    med     aside, TOC
+     strong          high       med        high   high     article, post cards
+     dense           low        low        high   high     code, table, quote
+     floating        high       high       high   high     modal, search
+   ========================================================================== */
+
+.glass--soft {
+  --g-radius: var(--g-r-pill);
+  --g-blur: 0px;
+  --glass-refraction: 30;
+  --glass-bezel-width: 14;
+  --glass-edge-depth: 2.2;
+  --glass-chromatic: 0.030;
+  --g-tint: rgba(255, 249, 240, 0.07);
+  --g-tint-hover: rgba(255, 249, 240, 0.15);
+}
+
+.glass--medium {
+  --g-radius: var(--g-r-lg);
+  --g-blur: 0px;
+  --glass-refraction: 48;
+  --glass-bezel-width: 24;
+  --glass-edge-depth: 2.1;
+  --glass-chromatic: 0.028;
+}
+
+.glass--strong {
+  --g-radius: var(--g-r-xl);
+  --g-blur: 0px;
+  --glass-refraction: 72;
+  --glass-bezel-width: 32;
+  --glass-edge-depth: 2.0;
+  --glass-chromatic: 0.026;
+  --g-tint: rgba(255, 250, 243, 0.09);
+  --g-tint-hover: rgba(255, 250, 243, 0.18);
+}
+
+.glass--dense {
+  --g-radius: var(--g-r-md);
+  --g-blur: 2px;
+  /* §24 — high opacity, low distortion, but still a refracting bezel. */
+  --glass-refraction: 24;
+  --glass-bezel-width: 16;
+  --glass-edge-depth: 2.8;
+  --glass-chromatic: 0.015;
+  --g-tint: rgba(46, 32, 24, 0.72);
+  --g-tint-hover: rgba(46, 32, 24, 0.78);
+  --g-saturate: 1.2;
+  color: #f6ece2;
+}
+
+.glass--floating {
+  --g-radius: var(--g-r-xl);
+  --g-blur: 0px;
+  --glass-refraction: 66;
+  --glass-bezel-width: 30;
+  --glass-edge-depth: 2.1;
+  --glass-chromatic: 0.030;
+  --g-tint: rgba(255, 250, 243, 0.12);
+  --g-shadow: var(--g-shadow-lift);
+}
+
+/* Dark theme adjustments per weight. Only the tints move; the geometry of
+   the material is theme-independent. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .glass--soft {
+    --g-tint: rgba(92, 68, 50, 0.14);
+    --g-tint-hover: rgba(112, 84, 62, 0.26);
+  }
+  :root:not([data-theme="light"]) .glass--strong {
+    --g-tint: rgba(84, 62, 46, 0.22);
+    --g-tint-hover: rgba(100, 74, 56, 0.32);
+  }
+  :root:not([data-theme="light"]) .glass--dense {
+    --g-tint: rgba(24, 17, 13, 0.78);
+    --g-tint-hover: rgba(24, 17, 13, 0.84);
+  }
+  :root:not([data-theme="light"]) .glass--floating {
+    --g-tint: rgba(84, 62, 46, 0.24);
+  }
+}
+
+[data-theme="dark"] .glass--soft {
+  --g-tint: rgba(92, 68, 50, 0.14);
+  --g-tint-hover: rgba(112, 84, 62, 0.26);
+}
+[data-theme="dark"] .glass--strong {
+  --g-tint: rgba(84, 62, 46, 0.22);
+  --g-tint-hover: rgba(100, 74, 56, 0.32);
+}
+[data-theme="dark"] .glass--dense {
+  --g-tint: rgba(24, 17, 13, 0.78);
+  --g-tint-hover: rgba(24, 17, 13, 0.84);
+}
+[data-theme="dark"] .glass--floating {
+  --g-tint: rgba(84, 62, 46, 0.24);
+}
+
+/* ==========================================================================
+   Interaction
+   ========================================================================== */
+
+.glass--interactive {
+  cursor: pointer;
+  /* Magnetic shift (§15). --g-pull-x / --g-pull-y are written by the pointer
+     tracker (glass-motion.js) and capped hard at 2px. When the pointer is not
+     over the surface the vars fall back to 0, so the surface sits still. */
+  transform: translate(var(--g-pull-x, 0px), var(--g-pull-y, 0px));
+}
+
+.glass--interactive:hover {
+  background-color: var(--g-tint-hover);
+  box-shadow: var(--g-shine), var(--g-shadow-lift);
+  /* §49 — no big translateY. A barely-there scale + the magnetic pull. */
+  transform:
+    translate(var(--g-pull-x, 0px), var(--g-pull-y, 0px))
+    scale(1.005);
+}
+
+/* Pills only brighten and rise slightly — growing their radius does nothing
+   when it is already 999px. */
+.glass--soft.glass--interactive:hover {
+  transform:
+    translate(var(--g-pull-x, 0px), var(--g-pull-y, 0px))
+    scale(1.01);
+}
+
+.glass--interactive:active {
+  transform:
+    translate(var(--g-pull-x, 0px), var(--g-pull-y, 0px))
+    scale(0.985);
+  transition-duration: var(--g-dur-fast);
+}
+
+/* Touch press (§43): a short compression with a spring return. The class is
+   toggled by glass-motion.js on pointerdown / pointerup. */
+.glass--pressed {
+  transform: scale(0.985);
+  box-shadow: var(--g-shine), var(--g-shadow);
+  transition-duration: var(--g-dur-fast);
+}
+
+/* --------------------------------------------------------------------------
+   Morphing (§16) — small-to-large stretch instead of an opacity fade.
+   glass-motion.js marks overlays with .glass-morph-in the moment they open.
+   -------------------------------------------------------------------------- */
+
+@keyframes g-morph-in {
+  from { opacity: 0; transform: scale(0.94); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+#local-search .search-dialog.glass-morph-in,
+.search-dialog.glass-morph-in,
+#sidebar-menus.glass-morph-in {
+  animation: g-morph-in 0.42s var(--g-spring);
+}
+
+/* --------------------------------------------------------------------------
+   CSS renderer edge ring (§34) — the non-Chromium path has no displacement,
+   so the silhouette has to carry the "thick glass" reading on its own.
+   -------------------------------------------------------------------------- */
+
+html.glass-css .glass {
+  --g-blur: 3px;
+  box-shadow:
+    var(--g-shine),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.30),
+    var(--g-shadow);
+}

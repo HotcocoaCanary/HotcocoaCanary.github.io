@@ -1,0 +1,450 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>安装通用开发工具 | 𝒞𝒶𝓃𝒶𝓇𝓎</title><meta name="author" content="Canary"><meta name="copyright" content="Canary"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#f7ece0"><meta name="description" content="安装通用开发工具 适用读者：已完成 Arch Linux 安装（无论实体机还是 WSL），想搭建完整开发环境的读者。本文所有步骤在两种环境下均适用。   前言：我们要装什么？一个典型的全栈开发环境需要：    工具 用途    git 版本控制，几乎所有项目必备   yay AUR 助手，扩展 Arch 软件源   sdkman Java&#x2F;Maven 版本管理   nvm Node.js">
+<meta property="og:type" content="article">
+<meta property="og:title" content="安装通用开发工具">
+<meta property="og:url" content="https://hotcocoacanary.github.io/2026/06/17/linux/03-%E5%AE%89%E8%A3%85%E9%80%9A%E7%94%A8%E5%BC%80%E5%8F%91%E5%B7%A5%E5%85%B7/index.html">
+<meta property="og:site_name" content="𝒞𝒶𝓃𝒶𝓇𝓎">
+<meta property="og:description" content="安装通用开发工具 适用读者：已完成 Arch Linux 安装（无论实体机还是 WSL），想搭建完整开发环境的读者。本文所有步骤在两种环境下均适用。   前言：我们要装什么？一个典型的全栈开发环境需要：    工具 用途    git 版本控制，几乎所有项目必备   yay AUR 助手，扩展 Arch 软件源   sdkman Java&#x2F;Maven 版本管理   nvm Node.js">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://hotcocoacanary.github.io/img/avatar.png">
+<meta property="article:published_time" content="2026-06-16T16:00:00.000Z">
+<meta property="article:modified_time" content="2026-08-19T04:01:39.793Z">
+<meta property="article:author" content="Canary">
+<meta property="article:tag" content="Docker">
+<meta property="article:tag" content="Go">
+<meta property="article:tag" content="Java">
+<meta property="article:tag" content="Neovim">
+<meta property="article:tag" content="Node.js">
+<meta property="article:tag" content="Python">
+<meta property="article:tag" content="yay">
+<meta property="article:tag" content="开发环境">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://hotcocoacanary.github.io/img/avatar.png"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "安装通用开发工具",
+  "url": "https://hotcocoacanary.github.io/2026/06/17/linux/03-%E5%AE%89%E8%A3%85%E9%80%9A%E7%94%A8%E5%BC%80%E5%8F%91%E5%B7%A5%E5%85%B7/",
+  "image": "https://hotcocoacanary.github.io/img/avatar.png",
+  "datePublished": "2026-06-16T16:00:00.000Z",
+  "dateModified": "2026-08-19T04:01:39.793Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "Canary",
+      "url": "https://hotcocoacanary.github.io"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/img/favicon.svg"><link rel="canonical" href="https://hotcocoacanary.github.io/2026/06/17/linux/03-%E5%AE%89%E8%A3%85%E9%80%9A%E7%94%A8%E5%BC%80%E5%8F%91%E5%B7%A5%E5%85%B7/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=5.7.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.3.1/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        const data = { value }
+
+        if (ttl != null) {
+          data.expiry = Date.now() + ttl * 86400000
+        }
+
+        localStorage.setItem(key, JSON.stringify(data))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return
+
+        try {
+          const data = JSON.parse(itemStr)
+
+          if (data.expiry && Date.now() > data.expiry) {
+            localStorage.removeItem(key)
+            return
+          }
+
+          return data.value
+        } catch {
+          localStorage.removeItem(key)
+        }
+      }
+    }
+
+    const scriptCache = new Map()
+    const cssCache = new Map()
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => {
+        if (scriptCache.has(url)) {
+          return scriptCache.get(url)
+        }
+
+        const promise = new Promise((resolve, reject) => {
+          const script = document.createElement('script')
+
+          script.src = url
+          script.async = true
+
+          for (const key in attr) {
+            script.setAttribute(key, attr[key])
+          }
+
+          script.onload = resolve
+          script.onerror = reject
+
+          document.head.appendChild(script)
+        })
+
+        scriptCache.set(url, promise)
+
+        return promise
+      },
+      getCSS: (url, id) => {
+        if (cssCache.has(url)) {
+          return cssCache.get(url)
+        }
+
+        const promise = new Promise((resolve, reject) => {
+          const link = document.createElement('link')
+
+          link.rel = 'stylesheet'
+          link.href = url
+
+          if (id) {
+            link.id = id
+          }
+
+          link.onload = resolve
+          link.onerror = reject
+
+          document.head.appendChild(link)
+        })
+
+        cssCache.set(url, promise)
+
+        return promise
+      },
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const metaThemeColor = document.querySelector('meta[name="theme-color"]')
+      const activateDarkMode = () => {
+        document.documentElement.dataset.theme = 'dark'
+        if (metaThemeColor !== null) {
+          metaThemeColor.setAttribute('content', '#191210')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.dataset.theme = 'light'
+        if (metaThemeColor !== null) {
+          metaThemeColor.setAttribute('content', '#f7ece0')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":true,"top_n_per_article":1,"unescape":false,"pagination":{"enable":true,"hitsPerPage":10},"languages":{"hits_empty":"未找到符合您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":false},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.13.0/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '安装通用开发工具',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><link rel="stylesheet" href="/css/glass/variables.css"><link rel="stylesheet" href="/css/glass/background.css"><link rel="stylesheet" href="/css/glass/glass.css"><link rel="stylesheet" href="/css/glass/components.css"><link rel="stylesheet" href="/css/glass/article.css"><link rel="stylesheet" href="/css/glass/responsive.css"><meta name="generator" content="Hexo 8.1.2"></head><body><div id="loading-box"><div class="loading-left-bg"></div><div class="loading-right-bg"></div><div class="spinner-box"><div class="configure-border-1"><div class="configure-core"></div></div><div class="configure-border-2"><div class="configure-core"></div></div><div class="loading-word">加载中...</div></div></div><script>(()=>{
+  const $loadingBox = document.getElementById('loading-box')
+  const $body = document.body
+  const preloader = {
+    endLoading: () => {
+      if ($loadingBox.classList.contains('loaded')) return
+      $body.style.overflow = ''
+      $loadingBox.classList.add('loaded')
+    },
+    initLoading: () => {
+      $body.style.overflow = 'hidden'
+      $loadingBox.classList.remove('loaded')
+    }
+  }
+
+  preloader.initLoading()
+
+  if (document.readyState === 'complete') {
+    preloader.endLoading()
+  } else {
+    window.addEventListener('load', preloader.endLoading)
+    document.addEventListener('DOMContentLoaded', preloader.endLoading)
+    // Add timeout protection: force end after 7 seconds
+    setTimeout(preloader.endLoading, 7000)
+  }
+
+  if (false) {
+    btf.addGlobalFn('pjaxSend', preloader.initLoading, 'preloader_init')
+    btf.addGlobalFn('pjaxComplete', preloader.endLoading, 'preloader_end')
+  }
+})()</script><div class="post" id="body-wrap"><header class="not-top-img" id="page-header"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">𝒞𝒶𝓃𝒶𝓇𝓎</span></a><a class="nav-page-title" href="/"><span class="site-name">安装通用开发工具</span><span class="site-name"><i class="fa-solid fa-circle-arrow-left"></i><span>  返回首页</span></span></a></span><div id="menus"><div id="search-button"><span class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> 搜索</span></span></div></div></nav></header><main class="layout" id="content-inner"><div id="post"><div id="post-info"><h1 class="post-title">安装通用开发工具</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2026-06-16T16:00:00.000Z" title="发表于 2026-06-17 00:00:00">2026-06-17</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2026-08-19T04:01:39.793Z" title="更新于 2026-08-19 12:01:39">2026-08-19</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/linux/">linux</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div><article class="container post-content" id="article-container"><h1 id="安装通用开发工具"><a href="#安装通用开发工具" class="headerlink" title="安装通用开发工具"></a>安装通用开发工具</h1><blockquote>
+<p><strong>适用读者</strong>：已完成 Arch Linux 安装（无论实体机还是 WSL），想搭建完整开发环境的读者。本文所有步骤在两种环境下均适用。</p>
+</blockquote>
+<hr>
+<h2 id="前言：我们要装什么？"><a href="#前言：我们要装什么？" class="headerlink" title="前言：我们要装什么？"></a>前言：我们要装什么？</h2><p>一个典型的全栈开发环境需要：</p>
+<table>
+<thead>
+<tr>
+<th>工具</th>
+<th>用途</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>git</td>
+<td>版本控制，几乎所有项目必备</td>
+</tr>
+<tr>
+<td>yay</td>
+<td>AUR 助手，扩展 Arch 软件源</td>
+</tr>
+<tr>
+<td>sdkman</td>
+<td>Java&#x2F;Maven 版本管理</td>
+</tr>
+<tr>
+<td>nvm</td>
+<td>Node.js 版本管理</td>
+</tr>
+<tr>
+<td>uv</td>
+<td>Python 虚拟环境和包管理（Rust 写的，极快）</td>
+</tr>
+<tr>
+<td>go</td>
+<td>Go 语言工具链</td>
+</tr>
+<tr>
+<td>docker</td>
+<td>容器化运行环境</td>
+</tr>
+<tr>
+<td>neovim + LazyVim</td>
+<td>高效终端编辑器</td>
+</tr>
+<tr>
+<td>kitty</td>
+<td>GPU 加速终端模拟器（实体机）</td>
+</tr>
+<tr>
+<td>zip &#x2F; unzip</td>
+<td>压缩解压工具（sdkman 依赖）</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="一、安装-git（通过-pacman）"><a href="#一、安装-git（通过-pacman）" class="headerlink" title="一、安装 git（通过 pacman）"></a>一、安装 git（通过 pacman）</h2><p><strong>为什么先用 pacman 安装 git？</strong></p>
+<p>后续安装 <code>yay</code>（AUR 助手）需要从 GitHub 克隆代码，而克隆就需要 git。pacman 是 Arch 内置的包管理器，git 在官方源里有，直接装：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> pacman -S git</span><br></pre></td></tr></table></figure>
+
+<p>验证安装：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git --version</span><br><span class="line"><span class="comment"># 输出类似：git version 2.x.x</span></span><br></pre></td></tr></table></figure>
+
+<p>配置你的身份（git commit 时会用到）：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">git config --global user.name <span class="string">&quot;你的名字&quot;</span></span><br><span class="line">git config --global user.email <span class="string">&quot;你的邮箱&quot;</span></span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="二、安装-yay（AUR-助手）"><a href="#二、安装-yay（AUR-助手）" class="headerlink" title="二、安装 yay（AUR 助手）"></a>二、安装 yay（AUR 助手）</h2><h3 id="2-1-什么是-AUR？"><a href="#2-1-什么是-AUR？" class="headerlink" title="2.1 什么是 AUR？"></a>2.1 什么是 AUR？</h3><p>AUR（Arch User Repository）是 Arch Linux 的社区软件仓库，里面有官方源没有的软件，比如各种专有软件、开发工具、字体等。官方源用 <code>pacman</code> 管理，AUR 需要 AUR 助手来自动化编译安装过程。</p>
+<p><code>yay</code> 是目前最流行的 AUR 助手，它完全兼容 pacman 的命令语法，你可以把它当 pacman 的超集来用——<code>yay</code> 既能装官方源的包，也能装 AUR 的包。</p>
+<h3 id="2-2-安装前置依赖"><a href="#2-2-安装前置依赖" class="headerlink" title="2.2 安装前置依赖"></a>2.2 安装前置依赖</h3><p>yay 本身需要 <code>base-devel</code>（编译工具集）才能从 AUR 编译软件：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> pacman -S base-devel</span><br></pre></td></tr></table></figure>
+
+<p><code>base-devel</code> 包含 gcc、make、binutils 等编译必需的工具链。</p>
+<h3 id="2-3-克隆并编译-yay"><a href="#2-3-克隆并编译-yay" class="headerlink" title="2.3 克隆并编译 yay"></a>2.3 克隆并编译 yay</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 克隆 yay 的 AUR 构建脚本到临时目录</span></span><br><span class="line">git <span class="built_in">clone</span> https://aur.archlinux.org/yay.git /tmp/yay</span><br><span class="line"></span><br><span class="line"><span class="comment"># 进入目录</span></span><br><span class="line"><span class="built_in">cd</span> /tmp/yay</span><br><span class="line"></span><br><span class="line"><span class="comment"># 编译并安装（-si 表示安装依赖并安装软件包）</span></span><br><span class="line">makepkg -si</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>⚠️ AUR 的软件不能以 root 身份编译，请确保你是普通用户（提示符末尾是 <code>$</code> 而不是 <code>#</code>）。</p>
+</blockquote>
+<p>安装完成后验证：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yay --version</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="三、使用-yay-批量安装开发工具"><a href="#三、使用-yay-批量安装开发工具" class="headerlink" title="三、使用 yay 批量安装开发工具"></a>三、使用 yay 批量安装开发工具</h2><p>有了 yay，后续安装无论官方包还是 AUR 包，语法完全一致。</p>
+<h3 id="3-1-安装-zip-和-unzip（sdkman-的前置依赖）"><a href="#3-1-安装-zip-和-unzip（sdkman-的前置依赖）" class="headerlink" title="3.1 安装 zip 和 unzip（sdkman 的前置依赖）"></a>3.1 安装 zip 和 unzip（sdkman 的前置依赖）</h3><p>sdkman 的安装脚本和下载逻辑依赖 <code>zip</code> 和 <code>unzip</code>，必须提前装好：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yay -S zip unzip</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-2-批量安装其余工具"><a href="#3-2-批量安装其余工具" class="headerlink" title="3.2 批量安装其余工具"></a>3.2 批量安装其余工具</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yay -S git yay sdkman nvm uv kitty go docker neovim</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p><strong>说明</strong>：</p>
+<ul>
+<li><code>git</code> 和 <code>yay</code> 已经装了，再执行不会报错，yay 会提示”已是最新版本”并跳过</li>
+<li><code>kitty</code> 是 GPU 加速终端，WSL 环境下用不上（WSL 没有独立的窗口系统），实体机用户安装</li>
+<li><code>sdkman</code> 和 <code>nvm</code> 在 AUR 里，yay 会自动处理编译</li>
+</ul>
+</blockquote>
+<hr>
+<h2 id="四、安装并配置-LazyVim"><a href="#四、安装并配置-LazyVim" class="headerlink" title="四、安装并配置 LazyVim"></a>四、安装并配置 LazyVim</h2><h3 id="4-1-什么是-LazyVim？"><a href="#4-1-什么是-LazyVim？" class="headerlink" title="4.1 什么是 LazyVim？"></a>4.1 什么是 LazyVim？</h3><p>LazyVim 是基于 Neovim 的一套完整配置框架，集成了 LSP（语言服务器协议，实现代码补全、跳转定义等）、文件树、模糊搜索、git 集成等常用插件，开箱即用，同时保持高度可扩展性。</p>
+<p><strong>LazyVim 是本次配置中唯一不由 yay 管理的组件</strong>，它通过官方推荐的方式直接以配置文件形式安装，由 Neovim 的插件管理器 lazy.nvim 在首次启动时自动下载。</p>
+<h3 id="4-2-备份旧配置（如有）"><a href="#4-2-备份旧配置（如有）" class="headerlink" title="4.2 备份旧配置（如有）"></a>4.2 备份旧配置（如有）</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 备份已有的 Neovim 配置（如果有的话）</span></span><br><span class="line"><span class="built_in">mv</span> ~/.config/nvim ~/.config/nvim.bak 2&gt;/dev/null</span><br><span class="line"><span class="built_in">mv</span> ~/.local/share/nvim ~/.local/share/nvim.bak 2&gt;/dev/null</span><br><span class="line"><span class="built_in">mv</span> ~/.local/state/nvim ~/.local/state/nvim.bak 2&gt;/dev/null</span><br><span class="line"><span class="built_in">mv</span> ~/.cache/nvim ~/.cache/nvim.bak 2&gt;/dev/null</span><br></pre></td></tr></table></figure>
+
+<h3 id="4-3-克隆-LazyVim-起始配置"><a href="#4-3-克隆-LazyVim-起始配置" class="headerlink" title="4.3 克隆 LazyVim 起始配置"></a>4.3 克隆 LazyVim 起始配置</h3><p>LazyVim 官方提供了一个 starter 仓库，直接克隆到 Neovim 配置目录：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">git <span class="built_in">clone</span> https://github.com/LazyVim/starter ~/.config/nvim</span><br><span class="line"></span><br><span class="line"><span class="comment"># 删除 .git 目录，方便后续用自己的 git 管理配置</span></span><br><span class="line"><span class="built_in">rm</span> -rf ~/.config/nvim/.git</span><br></pre></td></tr></table></figure>
+
+<h3 id="4-4-首次启动"><a href="#4-4-首次启动" class="headerlink" title="4.4 首次启动"></a>4.4 首次启动</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nvim</span><br></pre></td></tr></table></figure>
+
+<p>第一次打开 Neovim，lazy.nvim 会自动下载并安装所有插件（需要访问 GitHub，国内可能较慢，耐心等待）。</p>
+<p>安装完成后界面会变得非常漂亮，有文件树、状态栏、语法高亮等。</p>
+<p>常用快捷键：</p>
+<ul>
+<li><code>Space</code>：打开命令菜单（LazyVim 的核心入口）</li>
+<li><code>Space + e</code>：打开&#x2F;关闭文件树</li>
+<li><code>Space + ff</code>：模糊搜索文件</li>
+<li><code>:q</code> 或 <code>:wq</code>：退出</li>
+</ul>
+<hr>
+<h2 id="五、配置-sdkman（Java-Maven-版本管理）"><a href="#五、配置-sdkman（Java-Maven-版本管理）" class="headerlink" title="五、配置 sdkman（Java&#x2F;Maven 版本管理）"></a>五、配置 sdkman（Java&#x2F;Maven 版本管理）</h2><h3 id="5-1-什么是-sdkman？"><a href="#5-1-什么是-sdkman？" class="headerlink" title="5.1 什么是 sdkman？"></a>5.1 什么是 sdkman？</h3><p>sdkman 是 JVM 生态的版本管理工具，可以方便地安装和切换不同版本的 JDK、Maven、Gradle 等工具。类似 Python 的 pyenv、Node.js 的 nvm。</p>
+<h3 id="5-2-激活-sdkman"><a href="#5-2-激活-sdkman" class="headerlink" title="5.2 激活 sdkman"></a>5.2 激活 sdkman</h3><p>通过 yay 安装的 sdkman 包会在 <code>/opt/sdkman</code> 下放置文件，但还需要在 shell 配置文件中激活它：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 激活 sdkman（这条命令也需要加入 .bashrc，见第九节）</span></span><br><span class="line"><span class="built_in">source</span> /opt/sdkman/bin/sdkman-init.sh</span><br></pre></td></tr></table></figure>
+
+<p>验证：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sdk version</span><br></pre></td></tr></table></figure>
+
+<h3 id="5-3-基本命令"><a href="#5-3-基本命令" class="headerlink" title="5.3 基本命令"></a>5.3 基本命令</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 列出可安装的 JDK 版本</span></span><br><span class="line">sdk list java</span><br><span class="line"></span><br><span class="line"><span class="comment"># 安装 JDK 21（LTS 版本，推荐）</span></span><br><span class="line">sdk install java 21.0.x-tem</span><br><span class="line"></span><br><span class="line"><span class="comment"># 安装特定的 JDK，比如 Temurin（原 AdoptOpenJDK）</span></span><br><span class="line">sdk install java 21.0.5-tem</span><br><span class="line"></span><br><span class="line"><span class="comment"># 安装 Maven</span></span><br><span class="line">sdk install maven</span><br><span class="line"></span><br><span class="line"><span class="comment"># 查看当前使用的版本</span></span><br><span class="line">sdk current java</span><br><span class="line">sdk current maven</span><br><span class="line"></span><br><span class="line"><span class="comment"># 在当前 shell 临时切换版本</span></span><br><span class="line">sdk use java 17.0.x-tem</span><br><span class="line"></span><br><span class="line"><span class="comment"># 设置默认版本</span></span><br><span class="line">sdk default java 21.0.x-tem</span><br></pre></td></tr></table></figure>
+
+<h3 id="5-4-安装-JDK-和-Maven"><a href="#5-4-安装-JDK-和-Maven" class="headerlink" title="5.4 安装 JDK 和 Maven"></a>5.4 安装 JDK 和 Maven</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 安装 JDK 21（当前 LTS 版本）</span></span><br><span class="line">sdk install java</span><br><span class="line"></span><br><span class="line"><span class="comment"># 安装 Maven</span></span><br><span class="line">sdk install maven</span><br></pre></td></tr></table></figure>
+
+<p>直接 <code>sdk install java</code> 不指定版本时，会安装 sdkman 推荐的默认版本。</p>
+<p>验证：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">java -version</span><br><span class="line">mvn -version</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="六、配置-nvm（Node-js-版本管理）"><a href="#六、配置-nvm（Node-js-版本管理）" class="headerlink" title="六、配置 nvm（Node.js 版本管理）"></a>六、配置 nvm（Node.js 版本管理）</h2><h3 id="6-1-什么是-nvm？"><a href="#6-1-什么是-nvm？" class="headerlink" title="6.1 什么是 nvm？"></a>6.1 什么是 nvm？</h3><p>nvm（Node Version Manager）允许你在同一台机器上安装和切换多个 Node.js 版本。不同项目可能需要不同的 Node.js 版本，nvm 让切换变得简单。</p>
+<h3 id="6-2-激活-nvm"><a href="#6-2-激活-nvm" class="headerlink" title="6.2 激活 nvm"></a>6.2 激活 nvm</h3><p>通过 yay 安装的 nvm 包同样需要在 shell 配置中激活（见第九节，这里先手动激活验证）：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">source</span> /usr/share/nvm/init-nvm.sh</span><br></pre></td></tr></table></figure>
+
+<h3 id="6-3-基本命令"><a href="#6-3-基本命令" class="headerlink" title="6.3 基本命令"></a>6.3 基本命令</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 列出可用的 Node.js 版本</span></span><br><span class="line">nvm ls-remote</span><br><span class="line"></span><br><span class="line"><span class="comment"># 安装最新 LTS 版本</span></span><br><span class="line">nvm install --lts</span><br><span class="line"></span><br><span class="line"><span class="comment"># 安装指定版本</span></span><br><span class="line">nvm install 20</span><br><span class="line"></span><br><span class="line"><span class="comment"># 列出已安装的版本</span></span><br><span class="line">nvm <span class="built_in">ls</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 切换版本</span></span><br><span class="line">nvm use 20</span><br><span class="line"></span><br><span class="line"><span class="comment"># 设置默认版本（新 shell 会使用此版本）</span></span><br><span class="line">nvm <span class="built_in">alias</span> default 20</span><br></pre></td></tr></table></figure>
+
+<h3 id="6-4-安装-Node-js"><a href="#6-4-安装-Node-js" class="headerlink" title="6.4 安装 Node.js"></a>6.4 安装 Node.js</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 安装当前 LTS 版本</span></span><br><span class="line">nvm install --lts</span><br><span class="line"></span><br><span class="line"><span class="comment"># 设为默认</span></span><br><span class="line">nvm <span class="built_in">alias</span> default node</span><br></pre></td></tr></table></figure>
+
+<p>验证：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">node --version</span><br><span class="line">npm --version</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="七、配置-uv（Python-环境管理）"><a href="#七、配置-uv（Python-环境管理）" class="headerlink" title="七、配置 uv（Python 环境管理）"></a>七、配置 uv（Python 环境管理）</h2><h3 id="7-1-什么是-uv？"><a href="#7-1-什么是-uv？" class="headerlink" title="7.1 什么是 uv？"></a>7.1 什么是 uv？</h3><p>uv 是由 Astral 公司用 Rust 编写的 Python 包管理和项目管理工具，速度比 pip 快 10~100 倍。它整合了虚拟环境创建、包安装、Python 版本管理等功能。</p>
+<p><strong>为什么不用 pyenv？</strong></p>
+<p>Arch Linux 默认会预装系统 Python（<code>python3</code>），日常开发直接用 uv 创建虚拟环境即可，不需要用 pyenv 再管理一套 Python 版本。uv 自身也可以安装指定版本的 Python。</p>
+<h3 id="7-2-基本命令"><a href="#7-2-基本命令" class="headerlink" title="7.2 基本命令"></a>7.2 基本命令</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 查看 uv 版本</span></span><br><span class="line">uv --version</span><br><span class="line"></span><br><span class="line"><span class="comment"># 创建虚拟环境（在当前目录创建 .venv/）</span></span><br><span class="line">uv venv</span><br><span class="line"></span><br><span class="line"><span class="comment"># 激活虚拟环境</span></span><br><span class="line"><span class="built_in">source</span> .venv/bin/activate</span><br><span class="line"></span><br><span class="line"><span class="comment"># 在虚拟环境中安装包</span></span><br><span class="line">uv pip install requests fastapi</span><br><span class="line"></span><br><span class="line"><span class="comment"># 退出虚拟环境</span></span><br><span class="line">deactivate</span><br><span class="line"></span><br><span class="line"><span class="comment"># 使用项目模式（推荐，会自动管理虚拟环境）</span></span><br><span class="line">uv init myproject    <span class="comment"># 创建新项目</span></span><br><span class="line"><span class="built_in">cd</span> myproject</span><br><span class="line">uv add requests      <span class="comment"># 添加依赖（自动创建虚拟环境）</span></span><br><span class="line">uv run python main.py  <span class="comment"># 在虚拟环境中运行脚本</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 安装特定版本的 Python</span></span><br><span class="line">uv python install 3.12</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="八、配置-Go"><a href="#八、配置-Go" class="headerlink" title="八、配置 Go"></a>八、配置 Go</h2><h3 id="8-1-设置-GOPATH-和-GOMODCACHE"><a href="#8-1-设置-GOPATH-和-GOMODCACHE" class="headerlink" title="8.1 设置 GOPATH 和 GOMODCACHE"></a>8.1 设置 GOPATH 和 GOMODCACHE</h3><p>Go 安装完后，默认的工作目录是 <code>~/go</code>，通常不需要修改。但在国内，访问 Go 官方模块代理（<code>proxy.golang.org</code>）会很慢，需要配置国内代理：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 设置国内模块代理（七牛云）</span></span><br><span class="line">go <span class="built_in">env</span> -w GOPROXY=https://goproxy.cn,direct</span><br><span class="line"></span><br><span class="line"><span class="comment"># 设置模块私有化白名单（按需，公司内网仓库用）</span></span><br><span class="line"><span class="comment"># go env -w GONOSUMCHECK=your.private.domain</span></span><br></pre></td></tr></table></figure>
+
+<p><code>GOPROXY=https://goproxy.cn,direct</code> 的含义：先从 goproxy.cn 下载，如果没有再直连（<code>direct</code>），兼容私有模块。</p>
+<h3 id="8-2-基本命令"><a href="#8-2-基本命令" class="headerlink" title="8.2 基本命令"></a>8.2 基本命令</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 查看 Go 版本</span></span><br><span class="line">go version</span><br><span class="line"></span><br><span class="line"><span class="comment"># 初始化一个新模块</span></span><br><span class="line">go mod init myapp</span><br><span class="line"></span><br><span class="line"><span class="comment"># 下载依赖</span></span><br><span class="line">go mod tidy</span><br><span class="line"></span><br><span class="line"><span class="comment"># 编译</span></span><br><span class="line">go build -o myapp .</span><br><span class="line"></span><br><span class="line"><span class="comment"># 运行</span></span><br><span class="line">go run main.go</span><br><span class="line"></span><br><span class="line"><span class="comment"># 安装工具（安装到 $GOPATH/bin/，需要将其加入 PATH）</span></span><br><span class="line">go install golang.org/x/tools/gopls@latest</span><br></pre></td></tr></table></figure>
+
+<h3 id="8-3-将-Go-工具目录加入-PATH"><a href="#8-3-将-Go-工具目录加入-PATH" class="headerlink" title="8.3 将 Go 工具目录加入 PATH"></a>8.3 将 Go 工具目录加入 PATH</h3><p>Go 安装的工具（通过 <code>go install</code>）默认放在 <code>~/go/bin/</code>，需要将这个目录加入 PATH 才能直接运行。这在第九节的 <code>.bashrc</code> 配置中一并完成。</p>
+<hr>
+<h2 id="九、-bashrc-配置详解"><a href="#九、-bashrc-配置详解" class="headerlink" title="九、.bashrc 配置详解"></a>九、.bashrc 配置详解</h2><p><code>.bashrc</code> 是 bash shell 每次启动时自动执行的配置文件，里面放置环境变量、PATH 配置、alias 等。</p>
+<p>编辑：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nano ~/.bashrc</span><br></pre></td></tr></table></figure>
+
+<p>完整配置如下（含解析）：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># ===== 系统自带部分（通常已存在，不需要动） =====</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 如果不是交互式 shell，直接退出（脚本中被 source 时的保护）</span></span><br><span class="line">[ -z <span class="string">&quot;<span class="variable">$PS1</span>&quot;</span> ] &amp;&amp; <span class="built_in">return</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 历史记录设置</span></span><br><span class="line">HISTCONTROL=ignoredups:ignorespace   <span class="comment"># 忽略重复命令和以空格开头的命令</span></span><br><span class="line">HISTSIZE=1000                        <span class="comment"># 内存中保留 1000 条历史</span></span><br><span class="line">HISTFILESIZE=2000                    <span class="comment"># 历史文件最多 2000 条</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">shopt</span> -s histappend    <span class="comment"># 多个终端同时运行时，历史追加而非覆盖</span></span><br><span class="line"><span class="built_in">shopt</span> -s checkwinsize  <span class="comment"># 每条命令后自动更新终端窗口大小变量</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># ===== 终端提示符（PS1）=====</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 自定义一个简洁、带颜色的提示符</span></span><br><span class="line"><span class="comment"># 格式：用户名@主机名 当前目录 $</span></span><br><span class="line"><span class="comment"># 颜色说明：\033[36m = 青色，\033[33m = 黄色，\033[32m = 绿色，\033[0m = 重置颜色</span></span><br><span class="line">PS1=<span class="string">&#x27;\[\033[36m\]\u@\h\[\033[0m\] \[\033[33m\]\W\[\033[0m\] \[\033[32m\]$ \[\033[0m\]&#x27;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># ===== PATH 扩展 =====</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># Go 工具安装目录</span></span><br><span class="line"><span class="built_in">export</span> PATH=<span class="string">&quot;<span class="variable">$HOME</span>/go/bin:<span class="variable">$PATH</span>&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># ===== sdkman 初始化 =====</span></span><br><span class="line"><span class="comment"># sdkman 通过修改 PATH 来切换 JDK/Maven 版本</span></span><br><span class="line"><span class="comment"># THIS MUST BE AT THE END OF THE FILE for sdkman to work!!!</span></span><br><span class="line"><span class="built_in">export</span> SDKMAN_DIR=<span class="string">&quot;/opt/sdkman&quot;</span></span><br><span class="line">[[ -s <span class="string">&quot;<span class="variable">$SDKMAN_DIR</span>/bin/sdkman-init.sh&quot;</span> ]] &amp;&amp; <span class="built_in">source</span> <span class="string">&quot;<span class="variable">$SDKMAN_DIR</span>/bin/sdkman-init.sh&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># ===== nvm 初始化 =====</span></span><br><span class="line"><span class="comment"># nvm 同样通过修改 PATH 来切换 Node.js 版本</span></span><br><span class="line"><span class="built_in">source</span> /usr/share/nvm/init-nvm.sh</span><br></pre></td></tr></table></figure>
+
+<p><strong>关键点解析：</strong></p>
+<ul>
+<li><strong><code>\[\033[36m\]</code></strong>：ANSI 转义序列，设置终端颜色。<code>\[...\]</code> 包裹是告诉 bash 这部分不可见，用于正确计算光标位置。<code>36m</code> 是青色。</li>
+<li><strong><code>\u</code></strong>：当前用户名；<strong><code>\h</code></strong>：主机名；<strong><code>\W</code></strong>：当前目录名（仅最后一级）</li>
+<li><strong><code>\[\033[0m\]</code></strong>：重置颜色，防止颜色”溢出”影响后续输出</li>
+<li><strong>sdkman 必须在文件末尾</strong>：sdkman 的注释里明确要求这一点，因为它需要最后修改 PATH 以确保优先级</li>
+</ul>
+<p>修改完 <code>.bashrc</code> 后，让当前 shell 加载新配置：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">source</span> ~/.bashrc</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="十、Docker-配置"><a href="#十、Docker-配置" class="headerlink" title="十、Docker 配置"></a>十、Docker 配置</h2><h3 id="10-1-启动并设置-Docker-开机自启"><a href="#10-1-启动并设置-Docker-开机自启" class="headerlink" title="10.1 启动并设置 Docker 开机自启"></a>10.1 启动并设置 Docker 开机自启</h3><p>Docker 安装后不会自动启动，需要手动开启：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 启动 Docker 服务</span></span><br><span class="line"><span class="built_in">sudo</span> systemctl start docker</span><br><span class="line"></span><br><span class="line"><span class="comment"># 设置开机自动启动 Docker</span></span><br><span class="line"><span class="built_in">sudo</span> systemctl <span class="built_in">enable</span> docker</span><br></pre></td></tr></table></figure>
+
+<p><strong>为什么要用 systemctl？</strong></p>
+<p>Arch Linux 使用 systemd 作为 init 系统，所有后台服务（守护进程）通过 <code>systemctl</code> 管理。<code>enable</code> 命令会在 <code>/etc/systemd/system/</code> 下创建符号链接，让系统启动时自动拉起 Docker 守护进程。</p>
+<h3 id="10-2-将用户加入-docker-组"><a href="#10-2-将用户加入-docker-组" class="headerlink" title="10.2 将用户加入 docker 组"></a>10.2 将用户加入 docker 组</h3><p>默认情况下，运行 docker 命令需要 sudo。将当前用户加入 <code>docker</code> 组可以避免每次都输密码：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> usermod -aG docker <span class="variable">$USER</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>重新登录</strong>后生效（或执行 <code>newgrp docker</code> 立即在当前 shell 生效）。</p>
+<h3 id="10-3-基本命令"><a href="#10-3-基本命令" class="headerlink" title="10.3 基本命令"></a>10.3 基本命令</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 验证 Docker 安装</span></span><br><span class="line">docker --version</span><br><span class="line">docker run hello-world</span><br><span class="line"></span><br><span class="line"><span class="comment"># 镜像操作</span></span><br><span class="line">docker pull nginx                 <span class="comment"># 拉取镜像</span></span><br><span class="line">docker images                     <span class="comment"># 列出本地镜像</span></span><br><span class="line">docker rmi nginx                  <span class="comment"># 删除镜像</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 容器操作</span></span><br><span class="line">docker run -d -p 8080:80 nginx   <span class="comment"># 后台运行 nginx，映射端口 8080→80</span></span><br><span class="line">docker ps                         <span class="comment"># 列出运行中的容器</span></span><br><span class="line">docker ps -a                      <span class="comment"># 列出所有容器（含已停止）</span></span><br><span class="line">docker stop &lt;容器ID&gt;              <span class="comment"># 停止容器</span></span><br><span class="line">docker <span class="built_in">rm</span> &lt;容器ID&gt;                <span class="comment"># 删除容器</span></span><br><span class="line">docker logs &lt;容器ID&gt;              <span class="comment"># 查看容器日志</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 进入运行中的容器</span></span><br><span class="line">docker <span class="built_in">exec</span> -it &lt;容器ID&gt; bash</span><br><span class="line"></span><br><span class="line"><span class="comment"># Docker Compose</span></span><br><span class="line">docker compose up -d              <span class="comment"># 后台启动</span></span><br><span class="line">docker compose down               <span class="comment"># 停止并删除</span></span><br><span class="line">docker compose logs -f            <span class="comment"># 跟踪日志</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="10-4-WSL-中的-Docker-注意事项"><a href="#10-4-WSL-中的-Docker-注意事项" class="headerlink" title="10.4 WSL 中的 Docker 注意事项"></a>10.4 WSL 中的 Docker 注意事项</h3><p>WSL2 环境下，systemd 默认不启用。可以在 <code>/etc/wsl.conf</code> 中启用它：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> nano /etc/wsl.conf</span><br></pre></td></tr></table></figure>
+
+<p>写入：</p>
+<figure class="highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">[boot]</span></span><br><span class="line"><span class="attr">systemd</span>=<span class="literal">true</span></span><br></pre></td></tr></table></figure>
+
+<p>重启 WSL（在 PowerShell 执行 <code>wsl --shutdown</code>）后，systemctl 命令就能正常使用了。</p>
+<p>或者，如果不想开启 systemd，也可以手动启动 Docker：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> dockerd &amp;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2><p>这一篇完成了完整开发环境的搭建：</p>
+<ol>
+<li><strong>git</strong> → 版本控制基础</li>
+<li><strong>yay</strong> → 打开 AUR 生态的大门</li>
+<li><strong>sdkman</strong> → Java&#x2F;Maven 多版本管理</li>
+<li><strong>nvm</strong> → Node.js 多版本管理</li>
+<li><strong>uv</strong> → 现代化 Python 环境管理</li>
+<li><strong>Go</strong> → Go 工具链及国内代理配置</li>
+<li><strong>LazyVim</strong> → 开箱即用的 Neovim 配置</li>
+<li><strong>.bashrc</strong> → 将所有配置串联起来</li>
+<li><strong>Docker</strong> → 容器化运行环境</li>
+</ol>
+<p>下一篇：<strong>niri 和 Hyprland 配置</strong>，通过 DMS 让你的窗口管理器真正”能用”起来。</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="https://hotcocoacanary.github.io">Canary</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="https://hotcocoacanary.github.io/2026/06/17/linux/03-%E5%AE%89%E8%A3%85%E9%80%9A%E7%94%A8%E5%BC%80%E5%8F%91%E5%B7%A5%E5%85%B7/">https://hotcocoacanary.github.io/2026/06/17/linux/03-%E5%AE%89%E8%A3%85%E9%80%9A%E7%94%A8%E5%BC%80%E5%8F%91%E5%B7%A5%E5%85%B7/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来源 <a href="https://hotcocoacanary.github.io" target="_blank">𝒞𝒶𝓃𝒶𝓇𝓎</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/Python/">Python</a><a class="post-meta__tags" href="/tags/Java/">Java</a><a class="post-meta__tags" href="/tags/%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83/">开发环境</a><a class="post-meta__tags" href="/tags/yay/">yay</a><a class="post-meta__tags" href="/tags/Neovim/">Neovim</a><a class="post-meta__tags" href="/tags/Docker/">Docker</a><a class="post-meta__tags" href="/tags/Node-js/">Node.js</a><a class="post-meta__tags" href="/tags/Go/">Go</a></div><div class="post-share"><div class="social-share" data-image="/img/avatar.png" data-sites="facebook,x,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.6/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.6/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related" href="/2026/06/17/linux/04-niri%E5%92%8CHyprland%E9%85%8D%E7%BD%AEDMS/" title="niri 和 Hyprland 配置（DMS）"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info"><div class="info-1"><div class="info-item-1">上一篇</div><div class="info-item-2">niri 和 Hyprland 配置（DMS）</div></div><div class="info-2"><div class="info-item-1">niri 和 Hyprland 配置（DMS） 适用读者：已在实体机上安装 niri 或 Hyprland 的读者。WSL 用户跳过此篇（WSL 没有独立的 Wayland 显示服务器）。   前言：窗口管理器 ≠ 桌面环境安装完 niri 或 Hyprland 后，你会发现它们只是”窗口管理器”——负责排列、移动窗口。一个完整可用的桌面还需要：  状态栏（显示时间、网络、音量、电量） 应用启动器（搜索和打开应用） 通知系统（消息弹窗） 锁屏程序 壁纸管理 屏幕截图工具 剪贴板管理  把这些一个个手动安装配置，需要几天时间。DMS（Dank Material Shell） 是一个一站式的桌面 Shell，设计目标就是让 niri 和 Hyprland 开箱即用，界面遵循 Material Design 3 风格，外观现代、功能完整。  一、DMS 简介DMS 全称 DankMaterialShell，是基于 Quickshell（一个 QML 驱动的 Shell 框架）和 Go 构建的桌面 Shell。它能替代以下独立工具：    替代的工具 DMS 对应功能    Waybar...</div></div></div></a><a class="pagination-related" href="/2026/06/17/linux/02-WSL%E5%AE%89%E8%A3%85Arch-Linux/" title="通过 WSL 安装 Arch Linux"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2">通过 WSL 安装 Arch Linux</div></div><div class="info-2"><div class="info-item-1">通过 WSL 安装 Arch Linux 适用读者：Windows 用户，想在不折腾物理机、不装双系统的情况下，在 Windows 里使用完整的 Arch Linux 开发环境。   前言：WSL 是什么？WSL（Windows Subsystem for Linux）是微软内置于 Windows 10&#x2F;11 的 Linux 兼容层，让你可以在 Windows 里运行一个真实的 Linux 内核和发行版。WSL2 使用完整的 Linux 内核（而不是模拟层），性能接近原生，文件系统、网络、进程隔离都更完善。 WSL 的优点：  无需重启，Windows 和 Linux 同时运行 可以直接访问 Windows 文件（/mnt/c/ 等） 支持 GUI 应用（WSLg） 开发工具链（git、Python、Node.js、Docker 等）可以原生运行在 Linux 环境  WSL 默认只提供 Ubuntu，但 Arch Linux 可以通过第三方方式安装进来，享受 Arch 的滚动更新和 AUR 生态。  一、启用 WSL21.1 系统要求 Windows 10 版本 20...</div></div></div></a></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><a class="pagination-related" href="/2026/02/25/java/LeetCode-1705-Maximum-Number-of-Eaten-Apples/" title="LeetCode 1705. Maximum Number of Eaten Apples"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-02-25</div><div class="info-item-2">LeetCode 1705. Maximum Number of Eaten Apples</div></div><div class="info-2"><div class="info-item-1">题目描述有一棵特殊的苹果树，一连 n 天，每天都可以长出若干个苹果。在第 i 天，树上会长出 apples[i] 个苹果，这些苹果将会在 days[i] 天后腐烂，变得无法食用。你打算每天最多吃一个苹果，以保持营养均衡。返回你可以吃掉的苹果的最大数目。 例如：apples = [1,2,3,5,2]，days = [3,2,1,4,2]，输出 7。 解题思路核心贪心策略这是一个经典的贪心 + 最小堆问题。为了最大化吃掉的苹果数量，每天应该优先吃掉最早腐烂的苹果（即过期时间最早的苹果）。这样可以避免苹果在腐烂前没有被吃掉。 数据结构定义一个 Apple 类，包含两个属性：  count：该批次苹果的剩余数量。 days：该批次苹果的过期时间（即 i + days[i]），在 days 天之前（不含当天）可以食用。  使用最小堆按过期时间 days 排序，堆顶始终是即将最早腐烂的苹果。 算法步骤 初始化最小堆 heap，计数器 res = 0，天数 i = 0。 当 i &lt; n（还有苹果在生长）或堆非空（还有苹果可以吃）时进行循环： 添加当天的苹果：如果 i &lt; n 且 ...</div></div></div></a><a class="pagination-related" href="/2026/02/14/python/LeetCode-1470-Shuffle-the-Array/" title="LeetCode 1470. Shuffle the Array"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-02-14</div><div class="info-item-2">LeetCode 1470. Shuffle the Array</div></div><div class="info-2"><div class="info-item-1">题目描述给你一个数组 nums，数组中有 2n 个元素，按 [x1, x2, ..., xn, y1, y2, ..., yn] 的格式排列。请你将数组按 [x1, y1, x2, y2, ..., xn, yn] 格式重新排列，返回重排后的数组。 示例 1： 123输入：nums = [2,5,1,3,4,7], n = 3输出：[2,3,5,4,1,7]解释：x1=2, x2=5, x3=1, y1=3, y2=4, y3=7，重排后为 [2,3,5,4,1,7]  示例 2： 12输入：nums = [1,2,3,4,4,3,2,1], n = 4输出：[1,4,2,3,3,2,4,1]  解题思路题目要求将数组从”前半部分 x + 后半部分 y”的排列方式转换为”交叉排列”的方式。换句话说，原数组的前 n 个元素是 x 组，后 n 个元素是 y 组，我们需要逐一交叉取出。 分析步骤：  数组长度为 2n，前 n 个元素 nums[0] 到 nums[n-1] 对应 x1 到 xn。 后 n 个元素 nums[n] 到 nums[2n-1] 对应 y1 到 yn。 目标顺序...</div></div></div></a><a class="pagination-related" href="/2026/02/25/java/LeetCode-459-Repeated-Substring-Pattern/" title="LeetCode 459. Repeated Substring Pattern"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-02-25</div><div class="info-item-2">LeetCode 459. Repeated Substring Pattern</div></div><div class="info-2"><div class="info-item-1">问题描述给定一个非空的字符串 s，检查是否可以通过由它的一个子串重复多次构成。 解题思路如果字符串 s 可以由子串 p 重复 k 次构成，那么 s 的长度 n 必定是子串长度 len(p) 的整数倍，即 len(p) 是 n 的因数。 因数枚举法 找出所有可能的子串长度：  一个子串如果可以重复构成整个字符串，其长度必然是字符串总长度 n 的一个因数 遍历 1 到 n/2，收集所有 n 的因数（子串长度不可能超过 n/2，因为至少要重复两次）   逐个验证：  对于每个因数 factor（可能的子串长度）： 计算重复次数 count = n / factor 截取前 factor 个字符作为候选子串 sub 使用 sub.repeat(count) 生成重复字符串，与原始字符串 s 比较 如果相等，返回 true     返回结果：如果所有因数都无法匹配，返回 false。   举例说明以输入 s = &quot;abab&quot;（n&#x3D;4）为例：  因数有：[1, 2] 检查 factor&#x3D;1：sub = &quot;a&quot;，重复 4 次得 &qu...</div></div></div></a><a class="pagination-related" href="/2026/02/21/java/LeetCode-1700-Number-of-Students-Unable-to-Eat-Lunch/" title="LeetCode 1700. Number of Students Unable to Eat Lunch"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-02-21</div><div class="info-item-2">LeetCode 1700. Number of Students Unable to Eat Lunch</div></div><div class="info-2"><div class="info-item-1">题目描述学校的自助午餐提供圆形和方形的三明治，分别用 0 和 1 表示。所有学生站在一个队列里，每个学生要么喜欢圆形的要么喜欢方形的。餐厅里三明治的数量与学生的数量相同。所有三明治都放在一个栈里，每一轮：  如果队列最前面的学生喜欢栈顶的三明治，会拿走它并离开队列； 否则学生会放弃这个三明治并回到队列的尾部。这个过程会一直持续到队列里所有学生都不喜欢栈顶的三明治为止。返回无法吃上午餐的学生数量。  例如：students = [1,1,0,0]，sandwiches = [0,1,0,1]，输出 0。 解释：所有学生最终都能拿到喜欢的三明治。 解题思路核心思想这是一个模拟问题，使用队列来模拟学生的排队行为。 步骤 将所有学生放入队列 queue 中。 遍历三明治栈（sandwiches），对于每个三明治： 记录已检查的学生数 r = 0。 不断检查队首学生是否喜欢当前三明治： 如果喜欢（queue.peek() == sandwich），该学生拿走三明治并出队，跳出内层循环。 如果不喜欢，该学生回到队尾（queue.offer(queue.poll())），r++。 关键：如果 ...</div></div></div></a><a class="pagination-related" href="/2026/02/25/java/LeetCode-328-Odd-Even-Linked-List/" title="LeetCode 328. Odd Even Linked List"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-02-25</div><div class="info-item-2">LeetCode 328. Odd Even Linked List</div></div><div class="info-2"><div class="info-item-1">问题描述给定单链表的头节点 head，将所有索引为奇数的节点和索引为偶数的节点分别组合在一起，然后返回重新排序的列表。第一个节点索引为奇数，第二个节点为偶数，以此类推。 解题思路本题要求就地重新排列链表，将奇数位置（1, 3, 5, …）的节点放在前面，偶数位置（2, 4, 6, …）的节点放在后面，且保持各自的相对顺序。 双指针分离法使用两个指针 odd 和 even 分别追踪奇数和偶数链表的尾节点：  初始化：  odd 指向头节点（第 1 个节点，奇数位） even 指向第二个节点（第 2 个节点，偶数位） evenHead 保存偶数链表的头节点，用于最后拼接   交替跳转：在循环中，每次操作两个节点：  odd.next = even.next：将当前奇数节点的 next 跳过偶数节点，连接到下一个奇数节点 odd = odd.next：odd 指针移动到下一个奇数节点 even.next = odd.next：将当前偶数节点的 next 跳过新奇数节点，连接到下一个偶数节点 even = even.next：even 指针移动到下一个偶数节点   终止条件：当 even...</div></div></div></a><a class="pagination-related" href="/2026/02/15/java/LeetCode-941-Valid-Mountain-Array/" title="LeetCode 941. Valid Mountain Array"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-02-15</div><div class="info-item-2">LeetCode 941. Valid Mountain Array</div></div><div class="info-2"><div class="info-item-1">题目描述给定一个整数数组 arr，如果它是有效的山脉数组就返回 true，否则返回 false。 有效山脉数组的定义：  arr.length &gt;= 3 存在某个下标 i（0 &lt; i &lt; arr.length - 1）使得： arr[0] &lt; arr[1] &lt; ... &lt; arr[i-1] &lt; arr[i] arr[i] &gt; arr[i+1] &gt; ... &gt; arr[arr.length - 1]    即数组先严格递增，到某个峰值后严格递减。峰值不能在数组的首尾位置。 例如：  arr = [0,3,2,1] → true（峰值 3 在下标 1） arr = [3,5,5] → false（有相等元素，不是严格递增&#x2F;递减） arr = [0,1,2,3] → false（只有递增，没有递减）  解题思路本题可以用线性扫描（类似双指针的思想）一次遍历解决。 算法步骤 如果数组长度小于 3，直接返回 false（不满足山峰的最短长度要求）。  第一阶段：爬坡（递增段扫描）  从下标 0 开始向右遍历，只要 arr...</div></div></div></a></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/img/avatar.png" onerror="this.onerror=null;this.src='/img/broken-image.svg'" alt="avatar"/></div><div class="author-info-name">Canary</div><div class="author-info-description"></div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">49</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">43</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">2</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/HotcocoaCanary"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%AE%89%E8%A3%85%E9%80%9A%E7%94%A8%E5%BC%80%E5%8F%91%E5%B7%A5%E5%85%B7"><span class="toc-number">1.</span> <span class="toc-text">安装通用开发工具</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%89%8D%E8%A8%80%EF%BC%9A%E6%88%91%E4%BB%AC%E8%A6%81%E8%A3%85%E4%BB%80%E4%B9%88%EF%BC%9F"><span class="toc-number">1.1.</span> <span class="toc-text">前言：我们要装什么？</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80%E3%80%81%E5%AE%89%E8%A3%85-git%EF%BC%88%E9%80%9A%E8%BF%87-pacman%EF%BC%89"><span class="toc-number">1.2.</span> <span class="toc-text">一、安装 git（通过 pacman）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8C%E3%80%81%E5%AE%89%E8%A3%85-yay%EF%BC%88AUR-%E5%8A%A9%E6%89%8B%EF%BC%89"><span class="toc-number">1.3.</span> <span class="toc-text">二、安装 yay（AUR 助手）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-1-%E4%BB%80%E4%B9%88%E6%98%AF-AUR%EF%BC%9F"><span class="toc-number">1.3.1.</span> <span class="toc-text">2.1 什么是 AUR？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-2-%E5%AE%89%E8%A3%85%E5%89%8D%E7%BD%AE%E4%BE%9D%E8%B5%96"><span class="toc-number">1.3.2.</span> <span class="toc-text">2.2 安装前置依赖</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-3-%E5%85%8B%E9%9A%86%E5%B9%B6%E7%BC%96%E8%AF%91-yay"><span class="toc-number">1.3.3.</span> <span class="toc-text">2.3 克隆并编译 yay</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%89%E3%80%81%E4%BD%BF%E7%94%A8-yay-%E6%89%B9%E9%87%8F%E5%AE%89%E8%A3%85%E5%BC%80%E5%8F%91%E5%B7%A5%E5%85%B7"><span class="toc-number">1.4.</span> <span class="toc-text">三、使用 yay 批量安装开发工具</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-1-%E5%AE%89%E8%A3%85-zip-%E5%92%8C-unzip%EF%BC%88sdkman-%E7%9A%84%E5%89%8D%E7%BD%AE%E4%BE%9D%E8%B5%96%EF%BC%89"><span class="toc-number">1.4.1.</span> <span class="toc-text">3.1 安装 zip 和 unzip（sdkman 的前置依赖）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-2-%E6%89%B9%E9%87%8F%E5%AE%89%E8%A3%85%E5%85%B6%E4%BD%99%E5%B7%A5%E5%85%B7"><span class="toc-number">1.4.2.</span> <span class="toc-text">3.2 批量安装其余工具</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%9B%E3%80%81%E5%AE%89%E8%A3%85%E5%B9%B6%E9%85%8D%E7%BD%AE-LazyVim"><span class="toc-number">1.5.</span> <span class="toc-text">四、安装并配置 LazyVim</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#4-1-%E4%BB%80%E4%B9%88%E6%98%AF-LazyVim%EF%BC%9F"><span class="toc-number">1.5.1.</span> <span class="toc-text">4.1 什么是 LazyVim？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-2-%E5%A4%87%E4%BB%BD%E6%97%A7%E9%85%8D%E7%BD%AE%EF%BC%88%E5%A6%82%E6%9C%89%EF%BC%89"><span class="toc-number">1.5.2.</span> <span class="toc-text">4.2 备份旧配置（如有）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-3-%E5%85%8B%E9%9A%86-LazyVim-%E8%B5%B7%E5%A7%8B%E9%85%8D%E7%BD%AE"><span class="toc-number">1.5.3.</span> <span class="toc-text">4.3 克隆 LazyVim 起始配置</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-4-%E9%A6%96%E6%AC%A1%E5%90%AF%E5%8A%A8"><span class="toc-number">1.5.4.</span> <span class="toc-text">4.4 首次启动</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%94%E3%80%81%E9%85%8D%E7%BD%AE-sdkman%EF%BC%88Java-Maven-%E7%89%88%E6%9C%AC%E7%AE%A1%E7%90%86%EF%BC%89"><span class="toc-number">1.6.</span> <span class="toc-text">五、配置 sdkman（Java&#x2F;Maven 版本管理）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#5-1-%E4%BB%80%E4%B9%88%E6%98%AF-sdkman%EF%BC%9F"><span class="toc-number">1.6.1.</span> <span class="toc-text">5.1 什么是 sdkman？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-2-%E6%BF%80%E6%B4%BB-sdkman"><span class="toc-number">1.6.2.</span> <span class="toc-text">5.2 激活 sdkman</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-3-%E5%9F%BA%E6%9C%AC%E5%91%BD%E4%BB%A4"><span class="toc-number">1.6.3.</span> <span class="toc-text">5.3 基本命令</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#5-4-%E5%AE%89%E8%A3%85-JDK-%E5%92%8C-Maven"><span class="toc-number">1.6.4.</span> <span class="toc-text">5.4 安装 JDK 和 Maven</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%AD%E3%80%81%E9%85%8D%E7%BD%AE-nvm%EF%BC%88Node-js-%E7%89%88%E6%9C%AC%E7%AE%A1%E7%90%86%EF%BC%89"><span class="toc-number">1.7.</span> <span class="toc-text">六、配置 nvm（Node.js 版本管理）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#6-1-%E4%BB%80%E4%B9%88%E6%98%AF-nvm%EF%BC%9F"><span class="toc-number">1.7.1.</span> <span class="toc-text">6.1 什么是 nvm？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6-2-%E6%BF%80%E6%B4%BB-nvm"><span class="toc-number">1.7.2.</span> <span class="toc-text">6.2 激活 nvm</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6-3-%E5%9F%BA%E6%9C%AC%E5%91%BD%E4%BB%A4"><span class="toc-number">1.7.3.</span> <span class="toc-text">6.3 基本命令</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#6-4-%E5%AE%89%E8%A3%85-Node-js"><span class="toc-number">1.7.4.</span> <span class="toc-text">6.4 安装 Node.js</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%83%E3%80%81%E9%85%8D%E7%BD%AE-uv%EF%BC%88Python-%E7%8E%AF%E5%A2%83%E7%AE%A1%E7%90%86%EF%BC%89"><span class="toc-number">1.8.</span> <span class="toc-text">七、配置 uv（Python 环境管理）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#7-1-%E4%BB%80%E4%B9%88%E6%98%AF-uv%EF%BC%9F"><span class="toc-number">1.8.1.</span> <span class="toc-text">7.1 什么是 uv？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#7-2-%E5%9F%BA%E6%9C%AC%E5%91%BD%E4%BB%A4"><span class="toc-number">1.8.2.</span> <span class="toc-text">7.2 基本命令</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%AB%E3%80%81%E9%85%8D%E7%BD%AE-Go"><span class="toc-number">1.9.</span> <span class="toc-text">八、配置 Go</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#8-1-%E8%AE%BE%E7%BD%AE-GOPATH-%E5%92%8C-GOMODCACHE"><span class="toc-number">1.9.1.</span> <span class="toc-text">8.1 设置 GOPATH 和 GOMODCACHE</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#8-2-%E5%9F%BA%E6%9C%AC%E5%91%BD%E4%BB%A4"><span class="toc-number">1.9.2.</span> <span class="toc-text">8.2 基本命令</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#8-3-%E5%B0%86-Go-%E5%B7%A5%E5%85%B7%E7%9B%AE%E5%BD%95%E5%8A%A0%E5%85%A5-PATH"><span class="toc-number">1.9.3.</span> <span class="toc-text">8.3 将 Go 工具目录加入 PATH</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B9%9D%E3%80%81-bashrc-%E9%85%8D%E7%BD%AE%E8%AF%A6%E8%A7%A3"><span class="toc-number">1.10.</span> <span class="toc-text">九、.bashrc 配置详解</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8D%81%E3%80%81Docker-%E9%85%8D%E7%BD%AE"><span class="toc-number">1.11.</span> <span class="toc-text">十、Docker 配置</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#10-1-%E5%90%AF%E5%8A%A8%E5%B9%B6%E8%AE%BE%E7%BD%AE-Docker-%E5%BC%80%E6%9C%BA%E8%87%AA%E5%90%AF"><span class="toc-number">1.11.1.</span> <span class="toc-text">10.1 启动并设置 Docker 开机自启</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#10-2-%E5%B0%86%E7%94%A8%E6%88%B7%E5%8A%A0%E5%85%A5-docker-%E7%BB%84"><span class="toc-number">1.11.2.</span> <span class="toc-text">10.2 将用户加入 docker 组</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#10-3-%E5%9F%BA%E6%9C%AC%E5%91%BD%E4%BB%A4"><span class="toc-number">1.11.3.</span> <span class="toc-text">10.3 基本命令</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#10-4-WSL-%E4%B8%AD%E7%9A%84-Docker-%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9"><span class="toc-number">1.11.4.</span> <span class="toc-text">10.4 WSL 中的 Docker 注意事项</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%B0%8F%E7%BB%93"><span class="toc-number">1.12.</span> <span class="toc-text">小结</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/06/17/linux/01-archinstall%E5%AE%89%E8%A3%85Arch-Linux/" title="通过 archinstall 安装 Arch Linux">通过 archinstall 安装 Arch Linux</a><time datetime="2026-06-16T16:00:00.000Z" title="发表于 2026-06-17 00:00:00">2026-06-17</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/06/17/linux/02-WSL%E5%AE%89%E8%A3%85Arch-Linux/" title="通过 WSL 安装 Arch Linux">通过 WSL 安装 Arch Linux</a><time datetime="2026-06-16T16:00:00.000Z" title="发表于 2026-06-17 00:00:00">2026-06-17</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/06/17/linux/03-%E5%AE%89%E8%A3%85%E9%80%9A%E7%94%A8%E5%BC%80%E5%8F%91%E5%B7%A5%E5%85%B7/" title="安装通用开发工具">安装通用开发工具</a><time datetime="2026-06-16T16:00:00.000Z" title="发表于 2026-06-17 00:00:00">2026-06-17</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/06/17/linux/04-niri%E5%92%8CHyprland%E9%85%8D%E7%BD%AEDMS/" title="niri 和 Hyprland 配置（DMS）">niri 和 Hyprland 配置（DMS）</a><time datetime="2026-06-16T16:00:00.000Z" title="发表于 2026-06-17 00:00:00">2026-06-17</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/06/17/linux/05-%E4%B8%AD%E6%96%87%E7%8E%AF%E5%A2%83%E5%92%8C%E8%BE%93%E5%85%A5%E6%B3%95%E9%85%8D%E7%BD%AE/" title="中文环境配置和中文输入法">中文环境配置和中文输入法</a><time datetime="2026-06-16T16:00:00.000Z" title="发表于 2026-06-17 00:00:00">2026-06-17</time></div></div></div></div></div></div></main><footer id="footer"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;&nbsp;2025 - 2026 By Canary</span><span class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 8.1.2</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.7.0</a></span></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=5.7.0"></script><script src="/js/main.js?v=5.7.0"></script><div class="js-pjax"></div><script src="/js/glass/glass-sdf.js"></script><script src="/js/glass/glass-core.js"></script><script src="/js/glass/glass-performance.js"></script><script src="/js/glass/glass-motion.js"></script><script src="/js/glass/glass-adapter.js"></script><script defer="defer" id="ribbon" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.6/dist/canvas-ribbon.min.js" size="150" alpha="0.6" zIndex="-1" mobile="false" data-click="false"></script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><i class="fas fa-spinner fa-pulse" id="loading-status" hidden="hidden"></i><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="text-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据加载中</span></div><div class="local-search-input"><input placeholder="搜索文章..." type="text"/></div><hr/><div id="local-search-results"></div><div class="ais-Pagination" id="local-search-pagination" style="display:none;"><ul class="ais-Pagination-list"></ul></div><div id="local-search-stats"></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=5.7.0"></script></div></div></body></html>

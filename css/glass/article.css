@@ -1,0 +1,244 @@
+/* ==========================================================================
+   Liquid Glass Design System — Article & readability
+   --------------------------------------------------------------------------
+   The article stays glass. Readability is bought with geometry and contrast
+   instead — a wide safe zone between the refracting rim and the first
+   character, a calmer background under long text (background.css), a higher
+   tint, and ink that is genuinely dark rather than "dark-ish".
+   ========================================================================== */
+
+#post.glass,
+#page.glass,
+#archive.glass,
+#tag.glass,
+#category.glass {
+  padding: var(--g-pad) calc(var(--g-pad) + 6px);
+}
+
+/* The safe zone. Body text never comes within --g-pad of the rim, which is
+   exactly the band the displacement map bends (see --g-band). */
+#post .article-container,
+#page .page-content {
+  max-width: 46rem;
+  margin: 0 auto;
+}
+
+#article-container {
+  font-size: 1.02rem;
+  line-height: 1.9;
+  color: var(--g-ink);
+}
+
+#article-container p {
+  margin: 0 0 1.2em;
+}
+
+#article-container a {
+  color: var(--g-accent);
+  border-bottom: 1px solid transparent;
+  transition: border-color var(--g-dur-fast) var(--g-ease);
+}
+
+#article-container a:hover {
+  border-bottom-color: var(--g-accent);
+}
+
+/* ---- Headings ---------------------------------------------------------- */
+
+#article-container h1,
+#article-container h2,
+#article-container h3,
+#article-container h4,
+#article-container h5,
+#article-container h6 {
+  color: var(--g-ink);
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  scroll-margin-top: calc(var(--g-nav-h) + 24px);
+}
+
+#article-container h1 { font-size: 1.7rem; }
+#article-container h2 { font-size: 1.42rem; }
+#article-container h3 { font-size: 1.2rem; }
+
+/* A warm rule under h2 ties headings to the palette without a coloured slab. */
+#article-container h2 {
+  padding-bottom: 0.32em;
+  border-bottom: 1px solid color-mix(in srgb, var(--g-accent) 32%, transparent);
+}
+
+#article-container h1 .headerlink,
+#article-container h2 .headerlink,
+#article-container h3 .headerlink,
+#article-container h4 .headerlink,
+#article-container h5 .headerlink,
+#article-container h6 .headerlink {
+  color: var(--g-ink-mute);
+}
+
+/* ---- Post header ------------------------------------------------------- */
+
+#post .post-title,
+#page .page-title {
+  border-bottom: none;
+  font-size: 2rem;
+  line-height: 1.35;
+  font-weight: 800;
+  color: var(--g-ink);
+  margin-bottom: 0.5em;
+}
+
+#post .post-meta,
+#post #post-info .post-meta {
+  color: var(--g-ink-dim);
+  font-size: 0.85rem;
+}
+
+#post #post-info {
+  text-align: left;
+  max-width: 46rem;
+  margin: 0 auto 1.8em;
+  padding-bottom: 1.2em;
+  border-bottom: 1px solid color-mix(in srgb, var(--g-ink) 12%, transparent);
+}
+
+/* ---- Prose furniture --------------------------------------------------- */
+
+#article-container img {
+  border-radius: var(--g-r-md);
+  box-shadow: 0 6px 20px rgba(96, 56, 26, 0.16);
+}
+
+#article-container hr {
+  border: none;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in srgb, var(--g-accent) 45%, transparent),
+    transparent
+  );
+  margin: 2.2em 0;
+}
+
+#article-container ul,
+#article-container ol {
+  padding-left: 1.5em;
+}
+
+#article-container li::marker {
+  color: var(--g-accent);
+}
+
+/* Inline code is not a glass surface — it is type. Giving 8-character spans
+   their own backdrop-filter is how you make a page drop frames. */
+#article-container p code,
+#article-container li code,
+#article-container td code,
+#article-container h1 code,
+#article-container h2 code,
+#article-container h3 code {
+  background: color-mix(in srgb, var(--g-accent) 16%, transparent);
+  color: color-mix(in srgb, var(--g-ink) 88%, var(--g-accent));
+  border-radius: 6px;
+  padding: 0.12em 0.42em;
+  font-size: 0.9em;
+}
+
+/* ---- Quote: dense glass ------------------------------------------------ */
+
+#article-container blockquote.glass {
+  border: 1px solid var(--g-edge);
+  border-left: 3px solid var(--g-accent);
+  border-radius: var(--g-r-md);
+  padding: 1em 1.3em;
+  margin: 1.6em 0;
+  color: #f2e6da;
+}
+
+#article-container blockquote.glass p:last-child {
+  margin-bottom: 0;
+}
+
+/* ---- Code: dark dense glass -------------------------------------------- */
+
+#article-container figure.highlight.glass,
+#article-container pre.glass {
+  border: 1px solid rgba(255, 226, 196, 0.14);
+  border-radius: var(--g-r-md);
+  overflow: hidden;
+  margin: 1.6em 0;
+}
+
+#article-container figure.highlight .highlight-tools {
+  background: transparent;
+  color: #cdb6a2;
+}
+
+#article-container figure.highlight table,
+#article-container figure.highlight pre {
+  background: transparent !important;
+  color: #f2e7dc;
+}
+
+#article-container figure.highlight .gutter pre {
+  color: rgba(242, 231, 220, 0.38);
+}
+
+#article-container figure.highlight .line {
+  line-height: 1.7;
+}
+
+/* ---- Table: dense glass ------------------------------------------------ */
+
+#article-container .table-wrap.glass {
+  padding: 4px;
+  overflow-x: auto;
+  margin: 1.6em 0;
+}
+
+#article-container .table-wrap table {
+  background: transparent;
+  border: none;
+  margin: 0;
+  color: #f4e9de;
+}
+
+#article-container .table-wrap th,
+#article-container .table-wrap td {
+  border-color: rgba(255, 226, 196, 0.14);
+  background: transparent;
+}
+
+#article-container .table-wrap thead {
+  background: rgba(255, 226, 196, 0.08);
+}
+
+/* ---- Copyright / related ----------------------------------------------- */
+
+#post .post-copyright {
+  border: 1px solid var(--g-edge);
+  border-radius: var(--g-r-md);
+  background: color-mix(in srgb, var(--g-accent) 8%, transparent);
+  max-width: 46rem;
+  margin: 2.4em auto 0;
+}
+
+#post .post-copyright::before {
+  color: var(--g-accent);
+}
+
+.relatedPosts .relatedPosts-list > div.glass {
+  --g-radius: var(--g-r-md);
+  overflow: hidden;
+}
+
+.relatedPosts .relatedPosts-list > div.glass .cover {
+  border-radius: inherit;
+}
+
+/* ---- Reading progress bar (Butterfly's) -------------------------------- */
+
+.pace .pace-progress {
+  background: var(--g-accent) !important;
+}

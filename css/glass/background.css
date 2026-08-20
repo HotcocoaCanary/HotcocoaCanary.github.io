@@ -1,0 +1,143 @@
+/* ==========================================================================
+   Liquid Glass Design System — Background System
+   --------------------------------------------------------------------------
+   Glass has nothing to say without something behind it. The background is
+   therefore a real subsystem, not a colour (spec §17-§20):
+
+     Base        gradient mesh (warm, slowly drifting)
+     Decoration  SVG ornament + film grain
+     Light       radial light sources
+
+   Home pages get the full-strength version; article pages get a lower
+   frequency variant so long-form reading stays calm.
+
+   This lives on <body>'s own pseudo-elements rather than on Butterfly's
+   #web_bg. #web_bg is only emitted when the theme's `background:` option is
+   set, so keying the whole background system off it meant that clearing that
+   option deleted the background — and with it every refraction, since glass
+   over a flat fill bends nothing you can see.
+   ========================================================================== */
+
+/* The base colour lives on <html> (the canvas) and <body> stays transparent,
+   so body's negative-z pseudo-elements have something to sit on and nothing
+   opaque buries them. */
+html {
+  background-color: var(--g-bg);
+}
+
+body {
+  background-color: transparent !important;
+  background-image: none !important;
+  position: relative;   /* keeps the fixed pseudo-elements' z-index predictable */
+}
+
+/* If Butterfly's `background:` option is ever set again, #web_bg would paint
+   its own layer straight over this one. Keep it out of the way. */
+#web_bg {
+  display: none !important;
+}
+
+/* ---- Base + light -------------------------------------------------------
+   Five radial lights on a warm base, plus a vignette. Fixed to the viewport
+   so every glass surface has the same optical input wherever it scrolls to. */
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -3;
+  pointer-events: none;
+  background-color: var(--g-bg);
+  background-image:
+    /* Vignette first so the lights sit on top of it. */
+    radial-gradient(120% 100% at 50% 50%, transparent 44%, rgba(150,  86,  44, 0.22) 100%),
+    radial-gradient(58% 46% at 10% 10%,  rgba(246, 190,  96, 0.86), transparent 62%),
+    radial-gradient(52% 42% at 88% 16%,  rgba(236, 146,  70, 0.78), transparent 64%),
+    radial-gradient(50% 46% at 78% 84%,  rgba(214,  98,  74, 0.66), transparent 64%),
+    radial-gradient(46% 40% at 18% 86%,  rgba(228, 132, 118, 0.64), transparent 62%),
+    radial-gradient(36% 32% at 50% 50%,  rgba(255, 236, 206, 0.70), transparent 66%);
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+}
+
+/* ---- Decoration: SVG ornament -------------------------------------------
+   A tiled line ornament. Low contrast and low frequency: enough structure
+   for the displacement map to bend visibly, not enough to fight text.
+   It scrolls slowly, the way the reference wallpaper does. */
+
+body::after {
+  content: "";
+  position: fixed;
+  inset: -10%;
+  pointer-events: none;
+  z-index: -1;
+  opacity: 0.62;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400' viewBox='0 0 400 400'%3E%3Cdefs%3E%3CradialGradient id='glow'%3E%3Cstop offset='0%25' stop-color='%23e8973c' stop-opacity='0.55'/%3E%3Cstop offset='100%25' stop-color='%23e8973c' stop-opacity='0'/%3E%3C/radialGradient%3E%3CradialGradient id='glow2'%3E%3Cstop offset='0%25' stop-color='%23f2c46b' stop-opacity='0.4'/%3E%3Cstop offset='100%25' stop-color='%23f2c46b' stop-opacity='0'/%3E%3C/radialGradient%3E%3C/defs%3E%3Cg fill='none' stroke='%23c9713f'%3E%3C!-- large rings --%3E%3Ccircle cx='72' cy='68' r='56' stroke-width='1.4'/%3E%3Ccircle cx='72' cy='68' r='38' stroke-width='0.8'/%3E%3Ccircle cx='72' cy='68' r='20' stroke-width='0.5'/%3E%3Ccircle cx='280' cy='100' r='82' stroke-width='1.2'/%3E%3Ccircle cx='280' cy='100' r='60' stroke-width='0.7'/%3E%3Ccircle cx='280' cy='100' r='34' stroke-width='0.5'/%3E%3Ccircle cx='140' cy='260' r='64' stroke-width='1.3'/%3E%3Ccircle cx='140' cy='260' r='44' stroke-width='0.8'/%3E%3Ccircle cx='340' cy='290' r='48' stroke-width='1.0'/%3E%3Ccircle cx='340' cy='290' r='28' stroke-width='0.6'/%3E%3Ccircle cx='50' cy='310' r='36' stroke-width='1.0'/%3E%3Ccircle cx='50' cy='310' r='18' stroke-width='0.5'/%3E%3Ccircle cx='340' cy='50' r='44' stroke-width='1.0'/%3E%3Ccircle cx='340' cy='50' r='24' stroke-width='0.5'/%3E%3C!-- medium rings --%3E%3Ccircle cx='190' cy='52' r='28' stroke-width='0.9'/%3E%3Ccircle cx='190' cy='52' r='14' stroke-width='0.5'/%3E%3Ccircle cx='360' cy='170' r='32' stroke-width='0.8'/%3E%3Ccircle cx='360' cy='170' r='16' stroke-width='0.4'/%3E%3Ccircle cx='20' cy='160' r='24' stroke-width='0.8'/%3E%3Ccircle cx='100' cy='370' r='30' stroke-width='0.8'/%3E%3Ccircle cx='240' cy='340' r='22' stroke-width='0.7'/%3E%3Ccircle cx='310' cy='220' r='26' stroke-width='0.8'/%3E%3C!-- ripples --%3E%3Ccircle cx='120' cy='130' r='12' stroke-width='0.6'/%3E%3Ccircle cx='120' cy='130' r='20' stroke-width='0.4'/%3E%3Ccircle cx='120' cy='130' r='28' stroke-width='0.25'/%3E%3Ccircle cx='300' cy='320' r='10' stroke-width='0.6'/%3E%3Ccircle cx='300' cy='320' r='18' stroke-width='0.4'/%3E%3Ccircle cx='300' cy='320' r='26' stroke-width='0.25'/%3E%3Ccircle cx='200' cy='200' r='14' stroke-width='0.5'/%3E%3Ccircle cx='200' cy='200' r='22' stroke-width='0.3'/%3E%3Ccircle cx='200' cy='200' r='32' stroke-width='0.2'/%3E%3C!-- sine waves --%3E%3Cpath d='M0 170 Q80 118 160 170 T320 170 T400 170' stroke-width='1.0'/%3E%3Cpath d='M0 190 Q80 138 160 190 T320 190 T400 190' stroke-width='0.5'/%3E%3Cpath d='M0 310 Q80 258 160 310 T320 310 T400 310' stroke-width='0.9'/%3E%3Cpath d='M0 24 Q80 -28 160 24 T320 24 T400 24' stroke-width='0.7'/%3E%3Cpath d='M0 44 Q80 -8 160 44 T320 44 T400 44' stroke-width='0.4'/%3E%3Cpath d='M0 370 Q80 318 160 370 T320 370 T400 370' stroke-width='0.7'/%3E%3C/g%3E%3C!-- light spots --%3E%3Ccircle cx='72' cy='68' r='60' fill='url(%23glow)'/%3E%3Ccircle cx='280' cy='100' r='86' fill='url(%23glow)'/%3E%3Ccircle cx='140' cy='260' r='68' fill='url(%23glow)'/%3E%3Ccircle cx='340' cy='290' r='52' fill='url(%23glow2)'/%3E%3Ccircle cx='50' cy='310' r='40' fill='url(%23glow2)'/%3E%3Ccircle cx='120' cy='130' r='32' fill='url(%23glow2)'/%3E%3Ccircle cx='300' cy='320' r='30' fill='url(%23glow2)'/%3E%3Ccircle cx='200' cy='200' r='36' fill='url(%23glow)'/%3E%3C/svg%3E");
+  background-size: 400px 400px;
+  animation: g-scroll 90s linear infinite;
+}
+
+@keyframes g-scroll {
+  from { background-position:    0px    0px; }
+  to   { background-position: -400px -800px; }
+}
+
+/* ---- Decoration: grain --------------------------------------------------
+   Breaks up the gradient banding and gives the glass something fine-grained
+   to refract at the edges. Static — animating grain is a battery fire. */
+
+html::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: -1;
+  opacity: 0.16;
+  mix-blend-mode: soft-light;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 160px 160px;
+}
+
+/* ---- Dark theme ---------------------------------------------------------
+   Same construction, deeper and less saturated: warm embers on near-black
+   rather than a lit room. */
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) body::before {
+    background-image:
+      radial-gradient(60% 48% at  8%  8%, rgba(226, 126,  48, 0.62), transparent 62%),
+      radial-gradient(54% 44% at 90% 14%, rgba(198,  84,  56, 0.58), transparent 64%),
+      radial-gradient(52% 48% at 80% 88%, rgba(150,  70,  96, 0.48), transparent 64%),
+      radial-gradient(48% 42% at 16% 88%, rgba(206, 112,  56, 0.50), transparent 62%),
+      radial-gradient(38% 34% at 50% 48%, rgba(244, 186, 118, 0.34), transparent 66%);
+  }
+  :root:not([data-theme="light"]) body::after { opacity: 0.34; }
+  html:not([data-theme="light"])::after  { opacity: 0.22; mix-blend-mode: overlay; }
+}
+
+[data-theme="dark"] body::before {
+  background-image:
+    radial-gradient(60% 48% at  8%  8%, rgba(226, 126,  48, 0.62), transparent 62%),
+    radial-gradient(54% 44% at 90% 14%, rgba(198,  84,  56, 0.58), transparent 64%),
+    radial-gradient(52% 48% at 80% 88%, rgba(150,  70,  96, 0.48), transparent 64%),
+    radial-gradient(48% 42% at 16% 88%, rgba(206, 112,  56, 0.50), transparent 62%),
+    radial-gradient(38% 34% at 50% 48%, rgba(244, 186, 118, 0.34), transparent 66%);
+}
+[data-theme="dark"] body::after { opacity: 0.34; }
+html[data-theme="dark"]::after  { opacity: 0.22; mix-blend-mode: overlay; }
+
+/* ---- Article pages: calm it down ----------------------------------------
+   The ornament and grain layers belong to <body>/<html>, so an article page
+   is reached with :has() on the wrapper Butterfly puts the layout in.
+   Browsers without :has() simply keep the home-page background — a visual
+   nicety to lose, not a break. */
+
+body:has(#body-wrap.post)::after {
+  opacity: 0.26;
+  background-size: 600px 600px;   /* lower frequency near body text */
+  animation-duration: 160s;
+}
+
+html:has(#body-wrap.post)::after {
+  opacity: 0.10;
+}

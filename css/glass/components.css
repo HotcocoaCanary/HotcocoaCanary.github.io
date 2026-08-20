@@ -1,0 +1,562 @@
+/* ==========================================================================
+   Liquid Glass Design System — Butterfly component mapping
+   --------------------------------------------------------------------------
+   Butterfly keeps its markup and its behaviour; this file only re-dresses it.
+   Rules here pick radii, spacing and layout — never blur, tint or shine,
+   which belong to glass.css.
+
+   `#id.glass` selectors are deliberate: Butterfly styles its shells with id
+   selectors, so a plain `.glass` would lose the specificity fight.
+   ========================================================================== */
+
+/* ==========================================================================
+   Frame
+   ========================================================================== */
+
+#body-wrap {
+  overflow: visible;
+  padding-top: calc(var(--g-nav-h) + 32px);
+}
+
+.layout {
+  max-width: var(--g-max) !important;
+  gap: var(--g-gap);
+  padding: 0 24px;
+}
+
+.layout > .aside-content {
+  max-width: 300px !important;
+}
+
+/* Kill the hero. `disable_top_img` removes the image, not the empty band. */
+#page-header {
+  background: transparent !important;
+  height: auto !important;
+  min-height: 0 !important;
+}
+
+#page-header:not(.not-top-img)::before {
+  background-color: transparent !important;
+}
+
+#page-header #site-info,
+#page-header #scroll-down {
+  display: none !important;
+}
+
+/* ==========================================================================
+   Navigation — floating soft glass bar
+   ========================================================================== */
+
+/* `disable_top_img` puts .not-top-img on the header, and Butterfly's rule for
+   that state paints #nav a flat rgba(255,255,255,.8) — two ids beat our one,
+   so the bar came out milky white no matter what the tint said. Restate the
+   tint at matching specificity instead of bumping everything to !important. */
+#page-header.not-top-img #nav.glass,
+#page-header #nav.glass,
+#nav.glass {
+  background: var(--g-tint);
+  box-shadow: var(--g-shine), var(--g-shadow);
+}
+
+#nav.glass {
+  --g-radius: var(--g-r-pill);
+  position: fixed !important;
+  top: 14px !important;
+  left: 0 !important;
+  right: 0 !important;
+  margin-inline: auto;
+  transform: none !important;
+  z-index: 91;
+  display: flex !important;
+  align-items: center !important;
+  width: min(calc(100% - 40px), var(--g-max)) !important;
+  height: var(--g-nav-h);
+  padding: 0 22px !important;
+  box-sizing: border-box;
+  opacity: 1 !important;
+  transition:
+    top var(--g-dur) var(--g-spring),
+    height var(--g-dur) var(--g-spring),
+    background-color var(--g-dur) var(--g-ease);
+}
+
+/* Butterfly toggles these on scroll; we only want the size change. */
+#page-header.nav-fixed #nav.glass {
+  top: 10px !important;
+  height: 52px;
+}
+
+#nav #blog-info {
+  flex: 1;
+  min-width: 0;
+}
+
+#nav .site-name {
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#nav,
+#nav a,
+#nav #blog-info,
+#nav span.site-page,
+#nav #toggle-menu,
+#page-header.nav-fixed #nav,
+#page-header.nav-fixed #nav a,
+#page-header.nav-fixed #nav span.site-page {
+  color: var(--g-ink);
+  text-shadow: none !important;
+}
+
+#nav .site-page {
+  border-radius: var(--g-r-sm);
+  padding: 0.32em 0.75em;
+  transition:
+    background-color var(--g-dur-fast) var(--g-ease),
+    transform var(--g-dur-fast) var(--g-spring);
+}
+
+#nav .site-page:hover {
+  background-color: color-mix(in srgb, var(--g-accent) 22%, transparent);
+  transform: translateY(-1px);
+}
+
+#nav .menus_item_child {
+  border-radius: var(--g-r-md);
+  overflow: hidden;
+  background: var(--g-bg);
+  box-shadow: var(--g-shadow-lift);
+}
+
+/* --------------------------------------------------------------------------
+   Scroll edge effect (§46)
+   --------------------------------------------------------------------------
+   Not "navbar opacity up". As content arrives under the bar, the bar separates
+   from the page: its tint firms, its rim brightens and a dissolve appears
+   along its lower edge so text passing beneath fades instead of colliding.
+   glass-motion.js toggles .glass-scrolled on <html> after the first ~3px and
+   writes a continuous 0..1 value to --g-scroll-edge on :root.
+   -------------------------------------------------------------------------- */
+
+html.glass-scrolled #nav.glass {
+  --g-tint: rgba(255, 250, 243, 0.52);
+  --g-edge: rgba(255, 255, 255, 0.68);
+  box-shadow:
+    var(--g-shine),
+    var(--g-shadow),
+    inset 0 -20px 28px -20px rgba(255, 255, 255, 0.58);
+}
+
+html.glass-scrolled #nav.glass::before {
+  background:
+    linear-gradient(
+      158deg,
+      rgba(255, 255, 255, 0.50) 0%,
+      rgba(255, 255, 255, 0.12) 10%,
+      rgba(255, 255, 255, 0.00) 26%,
+      rgba(255, 255, 255, 0.00) 82%,
+      rgba(255, 226, 186, 0.20) 100%
+    );
+}
+
+html[data-theme="dark"].glass-scrolled #nav.glass {
+  --g-tint: rgba(56, 42, 32, 0.62);
+  --g-edge: rgba(255, 232, 205, 0.34);
+  box-shadow:
+    var(--g-shine),
+    var(--g-shadow),
+    inset 0 -20px 28px -20px rgba(0, 0, 0, 0.55);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]).glass-scrolled #nav.glass {
+    --g-tint: rgba(56, 42, 32, 0.62);
+    --g-edge: rgba(255, 232, 205, 0.34);
+    box-shadow:
+      var(--g-shine),
+      var(--g-shadow),
+      inset 0 -20px 28px -20px rgba(0, 0, 0, 0.55);
+  }
+}
+
+/* ==========================================================================
+   Home — post card grid
+   ========================================================================== */
+
+#recent-posts .recent-post-items {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--g-gap);
+}
+
+#recent-posts .recent-post-item.glass {
+  display: flex !important;
+  flex-direction: column !important;
+  width: auto !important;
+  height: 100% !important;
+  margin: 0 !important;
+  padding: 8px !important;
+  overflow: hidden;
+}
+
+#recent-posts .recent-post-item .post_cover {
+  width: 100% !important;
+  height: auto !important;
+  aspect-ratio: 16 / 9;
+  flex: none !important;
+  order: -1 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border-radius: calc(var(--g-radius) - 8px);
+  overflow: hidden;
+}
+
+#recent-posts .recent-post-item .post_cover a,
+#recent-posts .recent-post-item .post_cover img {
+  border-radius: inherit;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+#recent-posts .recent-post-item .post-bg {
+  transition: transform 0.9s var(--g-ease);
+}
+
+#recent-posts .recent-post-item:hover .post-bg {
+  transform: scale(1.06);
+}
+
+#recent-posts .recent-post-item .recent-post-info {
+  width: auto !important;
+  padding: 18px 16px 14px !important;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  flex: 1 1 auto;
+}
+
+#recent-posts .recent-post-item .article-title {
+  font-size: 1.26rem;
+  line-height: 1.42;
+  font-weight: 700;
+  color: var(--g-ink);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+#recent-posts .recent-post-item .content {
+  font-size: 0.9rem;
+  line-height: 1.72;
+  color: var(--g-ink-dim);
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+#recent-posts .recent-post-item .article-meta-wrap {
+  font-size: 0.78rem;
+  color: var(--g-ink-mute);
+  margin-top: auto;
+}
+
+#recent-posts .recent-post-item .article-meta-wrap a {
+  color: var(--g-accent);
+}
+
+/* ==========================================================================
+   Aside
+   ========================================================================== */
+
+#aside-content .card-widget.glass {
+  border: 1px solid var(--g-edge);
+  box-shadow: var(--g-shine), var(--g-shadow);
+  padding: 20px !important;
+  margin-bottom: var(--g-gap);
+}
+
+#aside-content .item-headline {
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  color: var(--g-ink);
+}
+
+#aside-content .card-info {
+  text-align: center;
+}
+
+#aside-content .card-info .avatar-img {
+  border-radius: 50%;
+  overflow: hidden;
+  transition: transform 0.6s var(--g-spring);
+}
+
+#aside-content .card-info:hover .avatar-img {
+  transform: scale(1.06) rotate(3deg);
+}
+
+#aside-content .card-info .author-info-name {
+  font-weight: 700;
+  font-size: 1.3rem;
+  color: var(--g-ink);
+  margin: 10px 0 4px;
+}
+
+#aside-content .card-info .author-info-description {
+  font-size: 0.86rem;
+  color: var(--g-ink-dim);
+  margin-bottom: 14px;
+}
+
+#aside-content .card-info .card-info-social-icons a {
+  color: var(--g-ink-dim);
+}
+
+#aside-content .card-info #card-info-btn {
+  background: var(--g-accent);
+  border-radius: var(--g-r-pill);
+  color: #fff;
+  transition: transform var(--g-dur-fast) var(--g-spring);
+}
+
+#aside-content .card-info #card-info-btn:hover {
+  transform: translateY(-2px);
+}
+
+#aside-content .card-tag-cloud a,
+#aside-content .card-categories .card-category-list-link {
+  color: var(--g-ink-dim);
+  transition: color var(--g-dur-fast) var(--g-ease);
+}
+
+#aside-content .card-tag-cloud a:hover,
+#aside-content .card-categories .card-category-list-link:hover {
+  color: var(--g-accent);
+}
+
+/* TOC */
+
+#card-toc.glass .toc-content .toc-link.active,
+#card-toc .toc-content .toc-link:hover {
+  color: var(--g-accent);
+}
+
+#card-toc .toc-content .toc-link.active {
+  background: color-mix(in srgb, var(--g-accent) 16%, transparent);
+  border-radius: 6px;
+}
+
+/* ==========================================================================
+   Right rail, pagination, footer
+   ========================================================================== */
+
+#rightside button.glass,
+#rightside > div > button {
+  --g-radius: var(--g-r-md);
+  border-radius: var(--g-r-md) !important;
+  color: var(--g-ink);
+  transition: transform var(--g-dur-fast) var(--g-spring),
+              background-color var(--g-dur-fast) var(--g-ease);
+}
+
+#rightside button.glass:hover {
+  transform: scale(1.08);
+}
+
+#pagination .page-number.glass,
+#pagination .extend.glass {
+  --g-radius: var(--g-r-sm);
+  border-radius: var(--g-r-sm);
+  color: var(--g-ink);
+}
+
+#pagination .page-number.current {
+  background: var(--g-accent) !important;
+  color: #fff !important;
+  border-color: transparent;
+}
+
+#footer {
+  background: transparent !important;
+}
+
+#footer::before {
+  display: none;
+}
+
+#footer-wrap {
+  padding: 30px 0;
+  color: var(--g-ink-dim);
+}
+
+#footer-wrap a {
+  color: var(--g-accent);
+}
+
+/* ==========================================================================
+   Tags / categories / archives
+   ========================================================================== */
+
+/* Hexo's tag_cloud helper writes a random background colour inline, which is
+   the one thing in the theme that cannot be reached without !important. The
+   inline font-size stays — it is what encodes how often a tag is used. */
+.tag-cloud-list a.glass,
+#article-container .tag-list a.glass {
+  --g-radius: var(--g-r-pill);
+  display: inline-block;
+  padding: 0.3em 0.95em;
+  margin: 0.3em 0.22em;
+  background-color: var(--g-tint) !important;
+  color: var(--g-ink) !important;
+}
+
+.tag-cloud-list a.glass:hover,
+#article-container .tag-list a.glass:hover {
+  background-color: var(--g-tint-hover) !important;
+  color: var(--g-accent) !important;
+}
+
+#page .tag-cloud-list,
+#tag .tag-cloud-list {
+  padding: 0.6em 0;
+}
+
+/* Butterfly's archive timeline is hard-coded to its blue ramp (the rail is a
+   border, the nodes are borders too), so each part is restated in warm. */
+.article-sort {
+  border-left-color: color-mix(in srgb, var(--g-accent) 45%, transparent);
+}
+
+.article-sort-title::before,
+.article-sort-item::before,
+.article-sort-item.year::before {
+  border-color: var(--g-accent);
+}
+
+.article-sort-title::after {
+  background: color-mix(in srgb, var(--g-accent) 45%, transparent);
+}
+
+.article-sort-title:hover::before,
+.article-sort-item:hover::before {
+  border-color: var(--g-terracotta);
+}
+
+.article-sort-item-title,
+.article-sort-title {
+  color: var(--g-ink);
+}
+
+.article-sort-item-title:hover {
+  color: var(--g-accent);
+}
+
+.article-sort-item-img {
+  border-radius: var(--g-r-sm);
+}
+
+/* ==========================================================================
+   Overlays — search, mobile drawer
+   ========================================================================== */
+
+#local-search .search-dialog.glass,
+.search-dialog.glass {
+  border: 1px solid var(--g-edge);
+  overflow: hidden;
+}
+
+.search-dialog .search-nav {
+  color: var(--g-ink);
+}
+
+#local-search-input input,
+.search-dialog input {
+  background: color-mix(in srgb, var(--g-ink) 8%, transparent);
+  border: 1px solid var(--g-edge);
+  border-radius: var(--g-r-pill);
+  color: var(--g-ink);
+  padding: 0.5em 1em;
+}
+
+#sidebar-menus.glass {
+  --g-radius: var(--g-r-xl) 0 0 var(--g-r-xl);
+  border-radius: var(--g-r-xl) 0 0 var(--g-r-xl);
+  border-right: none;
+}
+
+#sidebar-menus .sidebar-menu-item a,
+#sidebar-menus .site-data a {
+  color: var(--g-ink);
+}
+
+/* ==========================================================================
+   Selection & scrollbar
+   ========================================================================== */
+
+::selection {
+  background: color-mix(in srgb, var(--g-accent) 34%, transparent);
+  color: var(--g-ink);
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--g-accent) 45%, transparent);
+  border-radius: var(--g-r-pill);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--g-accent);
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* ==========================================================================
+   Entrance
+   --------------------------------------------------------------------------
+   Cards rise into place once on load. Staggered by nth-child rather than by
+   script so it survives PJAX without any bookkeeping.
+   ========================================================================== */
+
+@keyframes g-rise {
+  from { opacity: 0; transform: translateY(18px) scale(0.985); }
+  to   { opacity: 1; transform: none; }
+}
+
+#recent-posts .recent-post-item.glass,
+#aside-content .card-widget.glass,
+#post.glass,
+#page.glass,
+#archive.glass,
+#tag.glass,
+#category.glass {
+  /* `backwards` holds the hidden state through the stagger delay but releases
+     after the entrance, so the pointer-tracked magnetic transform can take
+     over (a `both`/`forwards` fill would pin transform:none forever). */
+  animation: g-rise 0.62s var(--g-ease) backwards;
+}
+
+#recent-posts .recent-post-item:nth-child(2) { animation-delay: 0.06s; }
+#recent-posts .recent-post-item:nth-child(3) { animation-delay: 0.12s; }
+#recent-posts .recent-post-item:nth-child(4) { animation-delay: 0.18s; }
+#recent-posts .recent-post-item:nth-child(5) { animation-delay: 0.24s; }
+#recent-posts .recent-post-item:nth-child(n+6) { animation-delay: 0.3s; }
+
+#aside-content .card-widget:nth-child(2) { animation-delay: 0.08s; }
+#aside-content .card-widget:nth-child(3) { animation-delay: 0.14s; }
+#aside-content .card-widget:nth-child(n+4) { animation-delay: 0.2s; }
