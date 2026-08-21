@@ -36,7 +36,11 @@
     /* Strong: the things you actually came to read. */
     ['#recent-posts .recent-post-item', 'glass--strong glass--interactive'],
     ['#post, #page, #archive, #tag, #category', 'glass--strong'],
-    ['.relatedPosts .relatedPosts-list > div', 'glass--soft glass--interactive'],
+    /* Both of these render as <a class="pagination-related">, not the <div>
+       an older Butterfly emitted -- the previous selector matched nothing, so
+       the post footer was the one region with no glass in it at all. */
+    ['.pagination-post .pagination-related', 'glass--soft glass--interactive'],
+    ['.relatedPosts .relatedPosts-list .pagination-related', 'glass--soft glass--interactive'],
     /* The year rows are markers on the rail, not entries — giving them a
        panel of their own turns the timeline into a stack of bars. */
     ['#archive .article-sort-item:not(.year)', 'glass--soft glass--interactive'],

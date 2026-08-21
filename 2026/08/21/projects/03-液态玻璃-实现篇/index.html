@@ -1,0 +1,938 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>给博客做一套液态玻璃（三）：位移贴图与滤镜链 | 𝒞𝒶𝓃𝒶𝓇𝓎</title><meta name="author" content="Canary"><meta name="copyright" content="Canary"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#f7ece0"><meta name="description" content="适用读者：想知道 feDisplacementMap 到底怎么用的人。这一篇是实现细节，包含两个我调了很久才想明白的坑。   feDisplacementMap 是怎么工作的一句话：用一张图的颜色，去决定另一张图每个像素该从哪里采样。 1234&lt;feDisplacementMap in&#x3D;&quot;SourceGraphic&quot; in2&#x3D;&quot;map&quot;">
+<meta property="og:type" content="article">
+<meta property="og:title" content="给博客做一套液态玻璃（三）：位移贴图与滤镜链">
+<meta property="og:url" content="https://hotcocoacanary.github.io/2026/08/21/projects/03-%E6%B6%B2%E6%80%81%E7%8E%BB%E7%92%83-%E5%AE%9E%E7%8E%B0%E7%AF%87/index.html">
+<meta property="og:site_name" content="𝒞𝒶𝓃𝒶𝓇𝓎">
+<meta property="og:description" content="适用读者：想知道 feDisplacementMap 到底怎么用的人。这一篇是实现细节，包含两个我调了很久才想明白的坑。   feDisplacementMap 是怎么工作的一句话：用一张图的颜色，去决定另一张图每个像素该从哪里采样。 1234&lt;feDisplacementMap in&#x3D;&quot;SourceGraphic&quot; in2&#x3D;&quot;map&quot;">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://hotcocoacanary.github.io/img/avatar.png">
+<meta property="article:published_time" content="2026-08-20T16:00:00.000Z">
+<meta property="article:modified_time" content="2026-08-21T10:37:14.029Z">
+<meta property="article:author" content="Canary">
+<meta property="article:tag" content="CSS">
+<meta property="article:tag" content="Canvas">
+<meta property="article:tag" content="SVG">
+<meta property="article:tag" content="液态玻璃">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://hotcocoacanary.github.io/img/avatar.png"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "给博客做一套液态玻璃（三）：位移贴图与滤镜链",
+  "url": "https://hotcocoacanary.github.io/2026/08/21/projects/03-%E6%B6%B2%E6%80%81%E7%8E%BB%E7%92%83-%E5%AE%9E%E7%8E%B0%E7%AF%87/",
+  "image": "https://hotcocoacanary.github.io/img/avatar.png",
+  "datePublished": "2026-08-20T16:00:00.000Z",
+  "dateModified": "2026-08-21T10:37:14.029Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "Canary",
+      "url": "https://hotcocoacanary.github.io"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/img/favicon.svg"><link rel="canonical" href="https://hotcocoacanary.github.io/2026/08/21/projects/03-%E6%B6%B2%E6%80%81%E7%8E%BB%E7%92%83-%E5%AE%9E%E7%8E%B0%E7%AF%87/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css?v=5.7.0"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.3.1/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        const data = { value }
+
+        if (ttl != null) {
+          data.expiry = Date.now() + ttl * 86400000
+        }
+
+        localStorage.setItem(key, JSON.stringify(data))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return
+
+        try {
+          const data = JSON.parse(itemStr)
+
+          if (data.expiry && Date.now() > data.expiry) {
+            localStorage.removeItem(key)
+            return
+          }
+
+          return data.value
+        } catch {
+          localStorage.removeItem(key)
+        }
+      }
+    }
+
+    const scriptCache = new Map()
+    const cssCache = new Map()
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => {
+        if (scriptCache.has(url)) {
+          return scriptCache.get(url)
+        }
+
+        const promise = new Promise((resolve, reject) => {
+          const script = document.createElement('script')
+
+          script.src = url
+          script.async = true
+
+          for (const key in attr) {
+            script.setAttribute(key, attr[key])
+          }
+
+          script.onload = resolve
+          script.onerror = reject
+
+          document.head.appendChild(script)
+        })
+
+        scriptCache.set(url, promise)
+
+        return promise
+      },
+      getCSS: (url, id) => {
+        if (cssCache.has(url)) {
+          return cssCache.get(url)
+        }
+
+        const promise = new Promise((resolve, reject) => {
+          const link = document.createElement('link')
+
+          link.rel = 'stylesheet'
+          link.href = url
+
+          if (id) {
+            link.id = id
+          }
+
+          link.onload = resolve
+          link.onerror = reject
+
+          document.head.appendChild(link)
+        })
+
+        cssCache.set(url, promise)
+
+        return promise
+      },
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!true && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const metaThemeColor = document.querySelector('meta[name="theme-color"]')
+      const activateDarkMode = () => {
+        document.documentElement.dataset.theme = 'dark'
+        if (metaThemeColor !== null) {
+          metaThemeColor.setAttribute('content', '#191210')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.dataset.theme = 'light'
+        if (metaThemeColor !== null) {
+          metaThemeColor.setAttribute('content', '#f7ece0')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":true,"top_n_per_article":1,"unescape":false,"pagination":{"enable":true,"hitsPerPage":10},"languages":{"hits_empty":"未找到符合您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":460,"highlightFullpage":false,"highlightMacStyle":false},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid@4.13.0/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: true,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '给博客做一套液态玻璃（三）：位移贴图与滤镜链',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><link rel="stylesheet" href="/css/glass/variables.css"><link rel="stylesheet" href="/css/glass/background.css"><link rel="stylesheet" href="/css/glass/glass.css"><link rel="stylesheet" href="/css/glass/components.css"><link rel="stylesheet" href="/css/glass/article.css"><link rel="stylesheet" href="/css/glass/responsive.css"><link rel="stylesheet" href="/css/glass/loading.css"><meta name="generator" content="Hexo 8.1.2"><link rel="alternate" href="/atom.xml" title="𝒞𝒶𝓃𝒶𝓇𝓎" type="application/atom+xml">
+<link rel="alternate" href="/rss2.xml" title="𝒞𝒶𝓃𝒶𝓇𝓎" type="application/rss+xml">
+</head><body><div id="loading-box"><div class="loading-left-bg"></div><div class="loading-right-bg"></div><div class="spinner-box"><div class="configure-border-1"><div class="configure-core"></div></div><div class="configure-border-2"><div class="configure-core"></div></div><div class="loading-word">加载中...</div></div></div><script>(()=>{
+  const $loadingBox = document.getElementById('loading-box')
+  const $body = document.body
+  const preloader = {
+    endLoading: () => {
+      if ($loadingBox.classList.contains('loaded')) return
+      $body.style.overflow = ''
+      $loadingBox.classList.add('loaded')
+    },
+    initLoading: () => {
+      $body.style.overflow = 'hidden'
+      $loadingBox.classList.remove('loaded')
+    }
+  }
+
+  preloader.initLoading()
+
+  if (document.readyState === 'complete') {
+    preloader.endLoading()
+  } else {
+    window.addEventListener('load', preloader.endLoading)
+    document.addEventListener('DOMContentLoaded', preloader.endLoading)
+    // Add timeout protection: force end after 7 seconds
+    setTimeout(preloader.endLoading, 7000)
+  }
+
+  if (true) {
+    btf.addGlobalFn('pjaxSend', preloader.initLoading, 'preloader_init')
+    btf.addGlobalFn('pjaxComplete', preloader.endLoading, 'preloader_end')
+  }
+})()</script><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/avatar.png" onerror="this.onerror=null;this.src='/img/broken-image.svg'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">55</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">54</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">3</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="not-top-img fixed" id="page-header"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">𝒞𝒶𝓃𝒶𝓇𝓎</span></a><a class="nav-page-title" href="/"><span class="site-name">给博客做一套液态玻璃（三）：位移贴图与滤镜链</span><span class="site-name"><i class="fa-solid fa-circle-arrow-left"></i><span>  返回首页</span></span></a></span><div id="menus"><div id="search-button"><span class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> 搜索</span></span></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 归档</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav></header><main class="layout" id="content-inner"><div id="post"><div id="post-info"><h1 class="post-title">给博客做一套液态玻璃（三）：位移贴图与滤镜链</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2026-08-20T16:00:00.000Z" title="发表于 2026-08-21 00:00:00">2026-08-21</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2026-08-21T10:37:14.029Z" title="更新于 2026-08-21 18:37:14">2026-08-21</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/projects/">projects</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">总字数:</span><span class="word-count">2.1k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>8分钟</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div><article class="container post-content" id="article-container"><blockquote>
+<p><strong>适用读者</strong>：想知道 <code>feDisplacementMap</code> 到底怎么用的人。这一篇是实现细节，包含两个我调了很久才想明白的坑。</p>
+</blockquote>
+<hr>
+<h2 id="feDisplacementMap-是怎么工作的"><a href="#feDisplacementMap-是怎么工作的" class="headerlink" title="feDisplacementMap 是怎么工作的"></a>feDisplacementMap 是怎么工作的</h2><p>一句话：<strong>用一张图的颜色，去决定另一张图每个像素该从哪里采样。</strong></p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">feDisplacementMap</span> <span class="attr">in</span>=<span class="string">&quot;SourceGraphic&quot;</span> <span class="attr">in2</span>=<span class="string">&quot;map&quot;</span></span></span><br><span class="line"><span class="tag">                   <span class="attr">scale</span>=<span class="string">&quot;20&quot;</span></span></span><br><span class="line"><span class="tag">                   <span class="attr">xChannelSelector</span>=<span class="string">&quot;R&quot;</span></span></span><br><span class="line"><span class="tag">                   <span class="attr">yChannelSelector</span>=<span class="string">&quot;G&quot;</span>/&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>对输出的每个像素，它去 <code>map</code> 里读同位置的颜色，然后：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">偏移X = (R/255 - 0.5) × scale</span><br><span class="line">偏移Y = (G/255 - 0.5) × scale</span><br></pre></td></tr></table></figure>
+
+<p>所以 <strong>128 是中性值</strong>（不偏移），比 128 大往一个方向偏，小往另一个方向偏。</p>
+<p>我们要做的，就是生成这张 map：把上一篇算出的「表面斜率场」编码进 R&#x2F;G 通道。</p>
+<hr>
+<h2 id="一、生成位移贴图"><a href="#一、生成位移贴图" class="headerlink" title="一、生成位移贴图"></a>一、生成位移贴图</h2><p>核心循环。对每个像素：求距离 → 求梯度（方向）→ 求剖面（强度）→ 编码。</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> (<span class="keyword">var</span> j = <span class="number">0</span>; j &lt; mh; j++) &#123;</span><br><span class="line">  <span class="keyword">var</span> py = ((j + <span class="number">0.5</span>) / mh) * h - hh;</span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">var</span> i = <span class="number">0</span>; i &lt; mw; i++) &#123;</span><br><span class="line">    <span class="keyword">var</span> px = ((i + <span class="number">0.5</span>) / mw) * w - hw;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">var</span> d = <span class="title function_">roundedRectSDF</span>(px, py, hw, hh, r);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 剖面：圆弧倒角截面，边缘处斜率最大</span></span><br><span class="line">    <span class="keyword">var</span> u = (d + bezel) / bezel;</span><br><span class="line">    <span class="keyword">if</span> (u &lt;= <span class="number">0</span>) <span class="keyword">continue</span>;</span><br><span class="line">    <span class="keyword">if</span> (u &gt; <span class="number">1</span>) u = <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">var</span> t = u * lensNorm / <span class="title class_">Math</span>.<span class="title function_">sqrt</span>(<span class="number">1</span> - u * u * lensK);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 内侧收边，否则带子起始处会有一道线</span></span><br><span class="line">    <span class="keyword">if</span> (d + bezel &lt; innerGate) &#123;</span><br><span class="line">      <span class="keyword">var</span> g = (d + bezel) / innerGate;</span><br><span class="line">      t *= g * g * (<span class="number">3</span> - <span class="number">2</span> * g);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (t &lt;= <span class="number">0.0005</span>) <span class="keyword">continue</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 方向：距离场的梯度就是表面法线</span></span><br><span class="line">    <span class="keyword">var</span> gx = <span class="title function_">roundedRectSDF</span>(px + e, py, hw, hh, r) -</span><br><span class="line">             <span class="title function_">roundedRectSDF</span>(px - e, py, hw, hh, r);</span><br><span class="line">    <span class="keyword">var</span> gy = <span class="title function_">roundedRectSDF</span>(px, py + e, hw, hh, r) -</span><br><span class="line">             <span class="title function_">roundedRectSDF</span>(px, py - e, hw, hh, r);</span><br><span class="line">    <span class="keyword">var</span> len = <span class="title class_">Math</span>.<span class="title function_">sqrt</span>(gx * gx + gy * gy);</span><br><span class="line">    <span class="keyword">if</span> (len &lt; <span class="number">1e-6</span>) <span class="keyword">continue</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">var</span> amt = t * strength;</span><br><span class="line">    offs[p]     = -(gx / len) * amt;</span><br><span class="line">    offs[p + <span class="number">1</span>] = -(gy / len) * amt;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>注意 <code>continue</code>：内部区域 <code>t</code> 接近零，直接跳过，连梯度都不用算。一张卡片的贴图里，大部分像素是被跳过的。</p>
+<h3 id="坑-①：解析梯度比有限差分快，但会在圆角留折痕"><a href="#坑-①：解析梯度比有限差分快，但会在圆角留折痕" class="headerlink" title="坑 ①：解析梯度比有限差分快，但会在圆角留折痕"></a>坑 ①：解析梯度比有限差分快，但会在圆角留折痕</h3><p>那四次 <code>roundedRectSDF</code> 调用是<strong>中心差分</strong>求梯度。实测下来每像素约 3.82 次求值，看着就很浪费——而圆角矩形 SDF 的梯度是<strong>有闭式解</strong>的，一次求值就够，理论上快 3.8 倍。</p>
+<p>我改成解析式，然后写了个测试对比两者：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">99.77% 的采样吻合（差 &lt; 1°）</span><br><span class="line">最大偏差：76°</span><br></pre></td></tr></table></figure>
+
+<p>那 0.23% 在哪？<strong>在每个圆角向内的 45° 对角线上。</strong></p>
+<p>那条线是「到两条边等距」的脊，真实距离场在那里有一个<strong>真实的尖点</strong>（不可导）。解析梯度会在脊上从「指向上」瞬间翻转到「指向左」，90° 硬跳变；而有限差分因为采样 ±1px，会平滑地转过去。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">    圆角处的脊</span><br><span class="line">       ╲</span><br><span class="line">────────╲──────</span><br><span class="line">│  ↑ ↑ ↑ ╲ ← ← ←</span><br><span class="line">│  ↑ ↑ ↑  ╲← ← ←</span><br><span class="line">          ╲</span><br><span class="line">  解析梯度在这条线上硬翻转</span><br><span class="line">  → 每个圆角一道折痕</span><br></pre></td></tr></table></figure>
+
+<p>而收益是多少？<code>buildMap</code> 按几何缓存，一个页面只跑 6–10 次，<strong>不是每帧</strong>。实测省下 1–2ms 的<strong>页面加载</strong>时间。</p>
+<p><strong>为了 1ms 在旗舰视觉效果最强的位置引入折痕，不值。</strong> 撤回，把原因写进注释。</p>
+<blockquote>
+<p>这件事的教训是：先量，再优化。如果我没写那个对比测试，这个「优化」会带着一个只在圆角出现的细微瑕疵进入生产，而且极难定位。</p>
+</blockquote>
+<h3 id="编码"><a href="#编码" class="headerlink" title="编码"></a>编码</h3><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> scale = peak * <span class="number">2</span>;</span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">var</span> n = <span class="number">0</span>, q = <span class="number">0</span>; n &lt; data.<span class="property">length</span>; n += <span class="number">4</span>, q += <span class="number">2</span>) &#123;</span><br><span class="line">  data[n]     = (<span class="number">0.5</span> + offs[q]     / scale) * <span class="number">255</span>;   <span class="comment">// R → X</span></span><br><span class="line">  data[n + <span class="number">1</span>] = (<span class="number">0.5</span> + offs[q + <span class="number">1</span>] / scale) * <span class="number">255</span>;   <span class="comment">// G → Y</span></span><br><span class="line">  data[n + <span class="number">2</span>] = <span class="number">0</span>;</span><br><span class="line">  data[n + <span class="number">3</span>] = <span class="number">255</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>scale</code> 取 <code>2 × peak</code>，这样 <code>0.5 ± off/(2·peak)</code> 正好能被 <code>feDisplacementMap</code> 的 <code>(C - 0.5) × scale</code> 精确还原回来。贴图存的是归一化值，实际强度交给 <code>scale</code> 属性。</p>
+<hr>
+<h2 id="二、滤镜链"><a href="#二、滤镜链" class="headerlink" title="二、滤镜链"></a>二、滤镜链</h2><p>不带色散时，链子很短：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">feImage(贴图) → feDisplacementMap(SourceGraphic)</span><br></pre></td></tr></table></figure>
+
+<p>带色散时，要把背景<strong>用三个略微不同的强度位移三次</strong>，再把 R&#x2F;G&#x2F;B 重新组合起来：</p>
+<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> scales = [</span><br><span class="line">  map.<span class="property">scale</span> * (<span class="number">1</span> + spread),   <span class="comment">// 红偏折最多</span></span><br><span class="line">  map.<span class="property">scale</span>,</span><br><span class="line">  map.<span class="property">scale</span> * (<span class="number">1</span> - spread)    <span class="comment">// 蓝最少</span></span><br><span class="line">];</span><br></pre></td></tr></table></figure>
+
+<p>每一路位移之后，用 <code>feColorMatrix</code> 只保留一个通道，最后加起来。</p>
+<h3 id="坑-②：不能把-alpha-归零"><a href="#坑-②：不能把-alpha-归零" class="headerlink" title="坑 ②：不能把 alpha 归零"></a>坑 ②：不能把 alpha 归零</h3><p>我第一版的通道矩阵是这样写的——只保留红色，alpha 也归零，理由是「三路的 alpha 叠加会变成 3，得防着点」：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">1 0 0 0 0</span><br><span class="line">0 0 0 0 0</span><br><span class="line">0 0 0 0 0</span><br><span class="line">0 0 0 0 0    ← alpha 归零</span><br></pre></td></tr></table></figure>
+
+<p>结果：<strong>整个页面所有玻璃面渲染成纯绿色。</strong></p>
+<p>原因是 SVG 滤镜运算在<strong>预乘 alpha</strong>（premultiplied alpha）空间里。alpha &#x3D; 0 意味着这一路的颜色在 <code>feComposite</code> 看到它之前就已经被乘成 0 了。所以红色和蓝色两路被彻底删除，只剩下中间那路绿色。</p>
+<p>正确写法是<strong>保留 alpha</strong>：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">1 0 0 0 0</span><br><span class="line">0 0 0 0 0</span><br><span class="line">0 0 0 0 0</span><br><span class="line">0 0 0 1 0    ← 保留</span><br></pre></td></tr></table></figure>
+
+<p>背景是不透明的，三个 alpha 相加得 3，然后被 clamp 回 1。既正确又无害。</p>
+<blockquote>
+<p>这个坑值得记住：<strong>在预乘 alpha 空间里，把 alpha 置零 &#x3D; 把颜色也置零。</strong></p>
+</blockquote>
+<hr>
+<h2 id="三、Fresnel：用-box-shadow-做"><a href="#三、Fresnel：用-box-shadow-做" class="headerlink" title="三、Fresnel：用 box-shadow 做"></a>三、Fresnel：用 box-shadow 做</h2><p>上一篇说过，菲涅尔是「立体感」贡献最大的一项，而它不需要滤镜——<code>box-shadow</code> 的 inset 天然就沿着 <code>border-radius</code> 走。</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">--g-shine</span>:</span><br><span class="line">  <span class="comment">/* 左上：光打过来的高光 */</span></span><br><span class="line">  inset <span class="number">1px</span> <span class="number">1px</span> <span class="number">1.5px</span> -<span class="number">0.5px</span> <span class="built_in">rgba</span>(<span class="number">255</span>, <span class="number">255</span>, <span class="number">255</span>, <span class="number">0.50</span>),</span><br><span class="line">  <span class="comment">/* 右下：远侧的反弹，更暗 */</span></span><br><span class="line">  inset -<span class="number">1px</span> -<span class="number">1px</span> <span class="number">2px</span> -<span class="number">1px</span> <span class="built_in">rgba</span>(<span class="number">255</span>, <span class="number">255</span>, <span class="number">255</span>, <span class="number">0.30</span>),</span><br><span class="line">  <span class="comment">/* 一圈极淡的定形线 */</span></span><br><span class="line">  inset <span class="number">0</span> <span class="number">0</span> <span class="number">0</span> <span class="number">1px</span> <span class="built_in">rgba</span>(<span class="number">255</span>, <span class="number">255</span>, <span class="number">255</span>, <span class="number">0.07</span>),</span><br><span class="line">  <span class="comment">/* 菲涅尔：整圈提亮，向内衰减 */</span></span><br><span class="line">  inset <span class="number">0</span> <span class="number">0</span> <span class="number">22px</span> -<span class="number">11px</span> <span class="built_in">rgba</span>(<span class="number">255</span>, <span class="number">255</span>, <span class="number">255</span>, <span class="number">0.44</span>),</span><br><span class="line">  <span class="comment">/* 厚度感的内阴影 */</span></span><br><span class="line">  inset <span class="number">0</span> <span class="number">0</span> <span class="number">12px</span> -<span class="number">7px</span> <span class="built_in">rgba</span>(<span class="number">120</span>, <span class="number">62</span>, <span class="number">24</span>, <span class="number">0.18</span>);</span><br></pre></td></tr></table></figure>
+
+<p>这里有个我一开始就写错的地方：<strong>前两层的模糊半径原本是 0</strong>。</p>
+<p>模糊为零的 <code>box-shadow</code> 是一条<strong>硬线</strong>。一条 0.95 白的硬线绕着四条边跑一圈，那是<strong>画出来的边框</strong>，不是光。</p>
+<p>而且这两层本质是<strong>方向性光照</strong>：<code>inset 1px 1px</code> 偏向右下，所以在形状内部只会出现在<strong>上边和左边</strong>（光从左上打来）。给它们加上小模糊和负扩散之后，每一条变成贴着自己那条边的柔和光带，「亮边 &#x2F; 暗边」的不对称才回来了。</p>
+<hr>
+<h2 id="四、性能：两个真实的瓶颈"><a href="#四、性能：两个真实的瓶颈" class="headerlink" title="四、性能：两个真实的瓶颈"></a>四、性能：两个真实的瓶颈</h2><p>调优时我先去量，结果发现最贵的东西根本不在玻璃引擎里。</p>
+<h3 id="背景动画在动画-background-position"><a href="#背景动画在动画-background-position" class="headerlink" title="背景动画在动画 background-position"></a>背景动画在动画 <code>background-position</code></h3><figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">body</span><span class="selector-pseudo">::after</span> &#123;</span><br><span class="line">  <span class="attribute">position</span>: fixed;</span><br><span class="line">  <span class="attribute">animation</span>: g-scroll <span class="number">90s</span> linear infinite;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">@keyframes</span> g-scroll &#123;</span><br><span class="line">  <span class="selector-tag">from</span> &#123; <span class="attribute">background-position</span>: <span class="number">0</span> <span class="number">0</span>; &#125;</span><br><span class="line">  <span class="selector-tag">to</span>   &#123; <span class="attribute">background-position</span>: -<span class="number">400px</span> -<span class="number">800px</span>; &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>background-position</code> 是 <strong>paint 属性</strong>。一个铺满视口的 fixed 图层每帧重绘，而 30 个 <code>backdrop-filter</code> 面全压在它上面——每次重绘都逼它们重新采样、重跑位移滤镜。<strong>而且它永远在跑，每个页面都在跑。</strong></p>
+<p>改成等距的 <code>translate3d</code>，视觉完全一致，但只走合成器：</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">@keyframes</span> g-drift &#123;</span><br><span class="line">  <span class="selector-tag">from</span> &#123; <span class="attribute">transform</span>: <span class="built_in">translate3d</span>(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>); &#125;</span><br><span class="line">  <span class="selector-tag">to</span>   &#123; <span class="attribute">transform</span>: <span class="built_in">translate3d</span>(-<span class="number">400px</span>, -<span class="number">800px</span>, <span class="number">0</span>); &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>注意两点：</p>
+<ul>
+<li>位移必须是<strong>贴图尺寸的整数倍</strong>，否则循环重启时会看见跳变。<code>400/800</code> 对 400px 贴图正好是 1 和 2 倍。（顺带发现文章页的贴图是 600px，位移还是 400&#x2F;800——除不尽，原来每 160 秒就跳一次。）</li>
+<li><strong>不要加 <code>will-change</code></strong>。运行中的 transform 动画本来就会拿到独立图层，而固定钉住会让最低性能档关掉动画后仍然付出代价。</li>
+</ul>
+<h3 id="transition-all-注册了-400-多个过渡"><a href="#transition-all-注册了-400-多个过渡" class="headerlink" title="transition: all 注册了 400 多个过渡"></a><code>transition: all</code> 注册了 400 多个过渡</h3><p>Butterfly 有十几处 <code>transition: all .3s</code>。<code>all</code> 会给<strong>每一个</strong>可动画长属性注册过渡，包括布局属性：<code>height</code>、<code>padding</code>、<code>margin</code>、<code>border-width</code>。</p>
+<p>首页统计：<strong>417 个已注册过渡</strong>，其中约 130 个是布局属性。任何无关的样式变化——主题切换、性能降级、窗口 resize——都会在 30 个跑着 backdrop-filter 的面上同时动画布局属性。</p>
+<p>在已有的特异性桥接块里换成显式四项：</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">transition</span>:</span><br><span class="line">  background-color <span class="built_in">var</span>(--g-dur) <span class="built_in">var</span>(--g-ease),</span><br><span class="line">  box-shadow       <span class="built_in">var</span>(--g-dur) <span class="built_in">var</span>(--g-ease),</span><br><span class="line">  transform        <span class="built_in">var</span>(--g-dur) <span class="built_in">var</span>(--g-spring),</span><br><span class="line">  border-radius    <span class="built_in">var</span>(--g-dur) <span class="built_in">var</span>(--g-spring);</span><br></pre></td></tr></table></figure>
+
+<p>结果：<strong>417 → 152（−64%）</strong>，布局属性过渡 <strong>~130 → 3（−98%）</strong>。</p>
+<hr>
+<h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2><table>
+<thead>
+<tr>
+<th>坑</th>
+<th>症状</th>
+<th>原因</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>alpha 归零</td>
+<td>玻璃全绿</td>
+<td>预乘 alpha 下 α&#x3D;0 会把颜色也乘没</td>
+</tr>
+<tr>
+<td>解析梯度</td>
+<td>圆角折痕</td>
+<td>距离场在角平分线上有真实尖点</td>
+</tr>
+<tr>
+<td>shine 零模糊</td>
+<td>像画的边框</td>
+<td>零模糊的 box-shadow 是硬线，不是光</td>
+</tr>
+<tr>
+<td><code>background-position</code> 动画</td>
+<td>持续掉帧</td>
+<td>paint 属性，逼 30 个 backdrop-filter 重算</td>
+</tr>
+<tr>
+<td><code>transition: all</code></td>
+<td>417 个过渡</td>
+<td>把布局属性也注册进去了</td>
+</tr>
+</tbody></table>
+<p>下一篇是收尾：讲一个我做完又删掉的功能，以及和主题级联打架的经历。</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="https://hotcocoacanary.github.io">Canary</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="https://hotcocoacanary.github.io/2026/08/21/projects/03-%E6%B6%B2%E6%80%81%E7%8E%BB%E7%92%83-%E5%AE%9E%E7%8E%B0%E7%AF%87/">https://hotcocoacanary.github.io/2026/08/21/projects/03-%E6%B6%B2%E6%80%81%E7%8E%BB%E7%92%83-%E5%AE%9E%E7%8E%B0%E7%AF%87/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来源 <a href="https://hotcocoacanary.github.io" target="_blank">𝒞𝒶𝓃𝒶𝓇𝓎</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E6%B6%B2%E6%80%81%E7%8E%BB%E7%92%83/">液态玻璃</a><a class="post-meta__tags" href="/tags/CSS/">CSS</a><a class="post-meta__tags" href="/tags/SVG/">SVG</a><a class="post-meta__tags" href="/tags/Canvas/">Canvas</a></div><div class="post-share"><div class="social-share" data-image="/img/avatar.png" data-sites="facebook,x,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.6/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.6/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related" href="/2026/08/21/projects/04-%E6%B6%B2%E6%80%81%E7%8E%BB%E7%92%83-%E5%8F%96%E8%88%8D%E7%AF%87/" title="给博客做一套液态玻璃（四）：做完又删掉的那些"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info"><div class="info-1"><div class="info-item-1">上一篇</div><div class="info-item-2">给博客做一套液态玻璃（四）：做完又删掉的那些</div></div><div class="info-2"><div class="info-item-1"> 适用读者：这一篇讲失败。一个完整实现并通过全部测试、最后还是被删掉的功能，以及和主题 CSS 级联缠斗的经历。   一、被删掉的「水融水」交互想要的效果鼠标靠近卡片边缘时，边缘像水一样被”吸”过去；鼠标沿边缘移动，形变跟着流动；停下时微微晃动；离开后慢慢回弹。 实现我做完了整套，而且是认真做的： 局部形变。不是整体位移，而是把圆角矩形边界采样成约 150 个点（法线解析求出），每个点按 smoothstep(到光标距离) 位移，Catmull-Rom 转三次贝塞尔，输出 clip-path: path()。 弹簧物理。弹的不是 240 个点，而是驱动量——光标 x、y 和整体振幅，只有 3 个弹簧。轮廓每帧从弹簧值重算。240 个耦合点弹簧既慢又容易发散。 12345Spring.prototype.step = function (k) &#123;  this.velocity += (this.target - this.value) * this.stiffness * k;  this.velocity *= Math.pow(this.damping, k);  t...</div></div></div></a><a class="pagination-related" href="/2026/08/21/projects/02-%E6%B6%B2%E6%80%81%E7%8E%BB%E7%92%83-%E6%96%B9%E6%A1%88%E7%AF%87/" title="给博客做一套液态玻璃（二）：架构怎么搭"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2">给博客做一套液态玻璃（二）：架构怎么搭</div></div><div class="info-2"><div class="info-item-1"> 适用读者：上一篇讲了玻璃的光学原理，这一篇讲怎么把它变成一个能跑在真实博客上、不拖垮性能、不和主题打架的系统。   三条约束动手之前，先把限制写下来。这三条决定了后面所有的设计选择：  不能 fork 主题。Butterfly 会更新，改了主题源码就等于放弃升级。 同屏 30 个玻璃面。文章页上卡片、侧栏、导航、代码块、表格、引用块全是玻璃。 不能降级成毛玻璃。性能不够的时候可以砍效果，但砍到最后必须还是玻璃——退回 blur() 等于承认失败。   分层1234567891011121314           Butterfly 主题                 │           ┌─────┴─────┐           │  适配器层  │   ← 唯一知道 Butterfly 存在的文件           └─────┬─────┘                 │     ┌───────────┼───────────┐     ▼           ▼           ▼ 材质系统     渲染引擎     性能管理(CSS 变量)   ...</div></div></div></a></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><a class="pagination-related" href="/2026/08/21/projects/01-%E6%B6%B2%E6%80%81%E7%8E%BB%E7%92%83-%E5%8E%9F%E7%90%86%E7%AF%87/" title="给博客做一套液态玻璃（一）：玻璃到底是什么"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-08-21</div><div class="info-item-2">给博客做一套液态玻璃（一）：玻璃到底是什么</div></div><div class="info-2"><div class="info-item-1"> 适用读者：想在网页上做出「真玻璃」质感的前端开发者。本篇不写代码，只讲清楚一件事——为什么 backdrop-filter: blur() 做不出玻璃。   从一个失败的起点说起想在网页上做玻璃，几乎所有教程都会给你这三行： 123background: rgba(255, 255, 255, 0.1);backdrop-filter: blur(12px);border: 1px solid rgba(255, 255, 255, 0.3);  这套东西做出来的是毛玻璃（frosted glass），不是玻璃。区别在哪？ 去找一块真的玻璃，比如手机屏幕的边缘、一个玻璃杯的杯壁。你会发现：  玻璃中间几乎是完全透明的，不模糊 所有的「玻璃感」都集中在边缘：那里的背景是扭曲的，不是模糊的 边缘还会有一圈亮边，越接近边缘越亮 仔细看，扭曲的地方带一点彩边  上面那三行 CSS 里，没有一条在描述这四件事。blur() 描述的是「隔着一层磨砂」，而不是「隔着一块透明的、有厚度的介质」。 模糊是浴室玻璃，扭曲才是眼镜片。  玻璃的四个光学分量要在网页上重建玻璃，得先知道要重建什么。拆开...</div></div></div></a><a class="pagination-related" href="/2026/08/21/projects/05-%E6%B6%B2%E6%80%81%E7%8E%BB%E7%92%83-%E4%B8%8A%E6%89%8B%E7%AF%87/" title="给博客做一套液态玻璃（五）：从零手写，一步一步"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-08-21</div><div class="info-item-2">给博客做一套液态玻璃（五）：从零手写，一步一步</div></div><div class="info-2"><div class="info-item-1"> 适用读者：完全不需要读过前四篇。只要会写 HTML 和 CSS 就能跟下来。我们从一个空白页面开始，一步一步做出带真实折射的玻璃卡片，每一步都能直接看到效果。 全程只用原生 HTML &#x2F; CSS &#x2F; JS，不装任何东西。建议用 Chrome 或 Edge，原因第 4 步会讲。   我们要做什么先说清楚目标，因为很多人（包括当初的我）会把「玻璃」和「毛玻璃」搞混：  毛玻璃：背景被磨糊了，像浴室的窗户 玻璃：背景是扭曲的，不是糊的，而且扭曲只发生在边缘  区别看一眼就明白：拿起你的手机，看屏幕边缘那圈弧面——底下的东西是被「拉」变形的，不是模糊的。 我们要做的是后者。  第 1 步：准备一个值得折射的背景这一步最容易被跳过，但它决定了后面所有努力是否白费。 折射的本质是「把背景弄弯」。如果背景是一块纯色，弯了也看不出来——纯色弯曲之后还是纯色。 所以先给页面一个有花纹的背景。新建 index.html： 1234567891011121314151617181920212223242526272829303132333435363738394041424344...</div></div></div></a><a class="pagination-related" href="/2026/08/21/projects/04-%E6%B6%B2%E6%80%81%E7%8E%BB%E7%92%83-%E5%8F%96%E8%88%8D%E7%AF%87/" title="给博客做一套液态玻璃（四）：做完又删掉的那些"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-08-21</div><div class="info-item-2">给博客做一套液态玻璃（四）：做完又删掉的那些</div></div><div class="info-2"><div class="info-item-1"> 适用读者：这一篇讲失败。一个完整实现并通过全部测试、最后还是被删掉的功能，以及和主题 CSS 级联缠斗的经历。   一、被删掉的「水融水」交互想要的效果鼠标靠近卡片边缘时，边缘像水一样被”吸”过去；鼠标沿边缘移动，形变跟着流动；停下时微微晃动；离开后慢慢回弹。 实现我做完了整套，而且是认真做的： 局部形变。不是整体位移，而是把圆角矩形边界采样成约 150 个点（法线解析求出），每个点按 smoothstep(到光标距离) 位移，Catmull-Rom 转三次贝塞尔，输出 clip-path: path()。 弹簧物理。弹的不是 240 个点，而是驱动量——光标 x、y 和整体振幅，只有 3 个弹簧。轮廓每帧从弹簧值重算。240 个耦合点弹簧既慢又容易发散。 12345Spring.prototype.step = function (k) &#123;  this.velocity += (this.target - this.value) * this.stiffness * k;  this.velocity *= Math.pow(this.damping, k);  t...</div></div></div></a><a class="pagination-related" href="/2026/08/21/projects/06-%E6%B6%B2%E6%80%81%E7%8E%BB%E7%92%83-%E7%A7%BB%E6%A4%8D%E7%AF%87/" title="给博客做一套液态玻璃（六）：把 Butterfly 改造成液态玻璃（附完整代码）"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-08-21</div><div class="info-item-2">给博客做一套液态玻璃（六）：把 Butterfly 改造成液态玻璃（附完整代码）</div></div><div class="info-2"><div class="info-item-1"> 适用读者：用 Hexo + Butterfly 的人。这一篇给的是能直接拿走用的两个文件，不需要 fork 主题、不需要构建工具、不改一行主题源码。 前几篇讲原理和踩坑，这篇只讲怎么装上。   成果装完之后，Butterfly 页面上所有的面板都会变成带真实折射的玻璃：导航栏、文章卡片、侧栏、目录、代码块、表格、引用块、搜索框、分页、标签。 不是给某几个元素加 class，是整站统一的材质系统——分六档权重，导航轻、文章卡片重、代码块另有配方。 两个文件，677 行：    文件 行数 干什么    glass.css 306 设计令牌、材质、特异性桥接、六档权重、降级   glass.js 371 距离场 → 位移贴图 → SVG 滤镜，选择器映射，生命周期   授权 MIT，随便用。  浏览器支持：完整折射只有 Chromium 内核（Chrome &#x2F; Edge）有。Safari 和 Firefox 会自动降级成模糊玻璃——不会坏，只是没有扭曲。原因见第三篇。   第 1 步：放文件在你的 Hexo 项目里建目录，把两个文件丢进去： 12345your-blog/...</div></div></div></a><a class="pagination-related" href="/2026/08/21/projects/02-%E6%B6%B2%E6%80%81%E7%8E%BB%E7%92%83-%E6%96%B9%E6%A1%88%E7%AF%87/" title="给博客做一套液态玻璃（二）：架构怎么搭"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-08-21</div><div class="info-item-2">给博客做一套液态玻璃（二）：架构怎么搭</div></div><div class="info-2"><div class="info-item-1"> 适用读者：上一篇讲了玻璃的光学原理，这一篇讲怎么把它变成一个能跑在真实博客上、不拖垮性能、不和主题打架的系统。   三条约束动手之前，先把限制写下来。这三条决定了后面所有的设计选择：  不能 fork 主题。Butterfly 会更新，改了主题源码就等于放弃升级。 同屏 30 个玻璃面。文章页上卡片、侧栏、导航、代码块、表格、引用块全是玻璃。 不能降级成毛玻璃。性能不够的时候可以砍效果，但砍到最后必须还是玻璃——退回 blur() 等于承认失败。   分层1234567891011121314           Butterfly 主题                 │           ┌─────┴─────┐           │  适配器层  │   ← 唯一知道 Butterfly 存在的文件           └─────┬─────┘                 │     ┌───────────┼───────────┐     ▼           ▼           ▼ 材质系统     渲染引擎     性能管理(CSS 变量)   ...</div></div></div></a></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" data-lazy-src="/img/avatar.png" onerror="this.onerror=null;this.src='/img/broken-image.svg'" alt="avatar"/></div><div class="author-info-name">Canary</div><div class="author-info-description">Canary 的个人博客，分享 AI、Linux、编程与技术相关内容。</div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">55</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">54</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">3</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/HotcocoaCanary"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons"><a class="social-icon" href="https://github.com/HotcocoaCanary" target="_blank" title="GitHub"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="mailto:Cacao.Canary@outlook.com" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">欢迎来到 Canary 的博客</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#feDisplacementMap-%E6%98%AF%E6%80%8E%E4%B9%88%E5%B7%A5%E4%BD%9C%E7%9A%84"><span class="toc-number">1.</span> <span class="toc-text">feDisplacementMap 是怎么工作的</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80%E3%80%81%E7%94%9F%E6%88%90%E4%BD%8D%E7%A7%BB%E8%B4%B4%E5%9B%BE"><span class="toc-number">2.</span> <span class="toc-text">一、生成位移贴图</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9D%91-%E2%91%A0%EF%BC%9A%E8%A7%A3%E6%9E%90%E6%A2%AF%E5%BA%A6%E6%AF%94%E6%9C%89%E9%99%90%E5%B7%AE%E5%88%86%E5%BF%AB%EF%BC%8C%E4%BD%86%E4%BC%9A%E5%9C%A8%E5%9C%86%E8%A7%92%E7%95%99%E6%8A%98%E7%97%95"><span class="toc-number">2.1.</span> <span class="toc-text">坑 ①：解析梯度比有限差分快，但会在圆角留折痕</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%BC%96%E7%A0%81"><span class="toc-number">2.2.</span> <span class="toc-text">编码</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8C%E3%80%81%E6%BB%A4%E9%95%9C%E9%93%BE"><span class="toc-number">3.</span> <span class="toc-text">二、滤镜链</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9D%91-%E2%91%A1%EF%BC%9A%E4%B8%8D%E8%83%BD%E6%8A%8A-alpha-%E5%BD%92%E9%9B%B6"><span class="toc-number">3.1.</span> <span class="toc-text">坑 ②：不能把 alpha 归零</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%89%E3%80%81Fresnel%EF%BC%9A%E7%94%A8-box-shadow-%E5%81%9A"><span class="toc-number">4.</span> <span class="toc-text">三、Fresnel：用 box-shadow 做</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%9B%E3%80%81%E6%80%A7%E8%83%BD%EF%BC%9A%E4%B8%A4%E4%B8%AA%E7%9C%9F%E5%AE%9E%E7%9A%84%E7%93%B6%E9%A2%88"><span class="toc-number">5.</span> <span class="toc-text">四、性能：两个真实的瓶颈</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%83%8C%E6%99%AF%E5%8A%A8%E7%94%BB%E5%9C%A8%E5%8A%A8%E7%94%BB-background-position"><span class="toc-number">5.1.</span> <span class="toc-text">背景动画在动画 background-position</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#transition-all-%E6%B3%A8%E5%86%8C%E4%BA%86-400-%E5%A4%9A%E4%B8%AA%E8%BF%87%E6%B8%A1"><span class="toc-number">5.2.</span> <span class="toc-text">transition: all 注册了 400 多个过渡</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%B0%8F%E7%BB%93"><span class="toc-number">6.</span> <span class="toc-text">小结</span></a></li></ol></div></div><div class="card-widget card-post-series"><div class="item-headline"><i class="fa-solid fa-layer-group"></i><span>系列文章</span></div><div class="aside-list"><div class="aside-list-item"><div class="content"><a class="title" href="/2026/08/21/projects/01-%E6%B6%B2%E6%80%81%E7%8E%BB%E7%92%83-%E5%8E%9F%E7%90%86%E7%AF%87/" title="给博客做一套液态玻璃（一）：玻璃到底是什么">给博客做一套液态玻璃（一）：玻璃到底是什么</a><time datetime="2026-08-20T16:00:00.000Z" title="发表于 2026-08-21 00:00:00">2026-08-21</time></div></div><div class="aside-list-item"><div class="content"><a class="title" href="/2026/08/21/projects/02-%E6%B6%B2%E6%80%81%E7%8E%BB%E7%92%83-%E6%96%B9%E6%A1%88%E7%AF%87/" title="给博客做一套液态玻璃（二）：架构怎么搭">给博客做一套液态玻璃（二）：架构怎么搭</a><time datetime="2026-08-20T16:00:00.000Z" title="发表于 2026-08-21 00:00:00">2026-08-21</time></div></div><div class="aside-list-item"><div class="content"><a class="title" href="/2026/08/21/projects/03-%E6%B6%B2%E6%80%81%E7%8E%BB%E7%92%83-%E5%AE%9E%E7%8E%B0%E7%AF%87/" title="给博客做一套液态玻璃（三）：位移贴图与滤镜链">给博客做一套液态玻璃（三）：位移贴图与滤镜链</a><time datetime="2026-08-20T16:00:00.000Z" title="发表于 2026-08-21 00:00:00">2026-08-21</time></div></div><div class="aside-list-item"><div class="content"><a class="title" href="/2026/08/21/projects/04-%E6%B6%B2%E6%80%81%E7%8E%BB%E7%92%83-%E5%8F%96%E8%88%8D%E7%AF%87/" title="给博客做一套液态玻璃（四）：做完又删掉的那些">给博客做一套液态玻璃（四）：做完又删掉的那些</a><time datetime="2026-08-20T16:00:00.000Z" title="发表于 2026-08-21 00:00:00">2026-08-21</time></div></div><div class="aside-list-item"><div class="content"><a class="title" href="/2026/08/21/projects/05-%E6%B6%B2%E6%80%81%E7%8E%BB%E7%92%83-%E4%B8%8A%E6%89%8B%E7%AF%87/" title="给博客做一套液态玻璃（五）：从零手写，一步一步">给博客做一套液态玻璃（五）：从零手写，一步一步</a><time datetime="2026-08-20T16:00:00.000Z" title="发表于 2026-08-21 00:00:00">2026-08-21</time></div></div><div class="aside-list-item"><div class="content"><a class="title" href="/2026/08/21/projects/06-%E6%B6%B2%E6%80%81%E7%8E%BB%E7%92%83-%E7%A7%BB%E6%A4%8D%E7%AF%87/" title="给博客做一套液态玻璃（六）：把 Butterfly 改造成液态玻璃（附完整代码）">给博客做一套液态玻璃（六）：把 Butterfly 改造成液态玻璃（附完整代码）</a><time datetime="2026-08-20T16:00:00.000Z" title="发表于 2026-08-21 00:00:00">2026-08-21</time></div></div></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/08/21/projects/01-%E6%B6%B2%E6%80%81%E7%8E%BB%E7%92%83-%E5%8E%9F%E7%90%86%E7%AF%87/" title="给博客做一套液态玻璃（一）：玻璃到底是什么">给博客做一套液态玻璃（一）：玻璃到底是什么</a><time datetime="2026-08-20T16:00:00.000Z" title="发表于 2026-08-21 00:00:00">2026-08-21</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/08/21/projects/02-%E6%B6%B2%E6%80%81%E7%8E%BB%E7%92%83-%E6%96%B9%E6%A1%88%E7%AF%87/" title="给博客做一套液态玻璃（二）：架构怎么搭">给博客做一套液态玻璃（二）：架构怎么搭</a><time datetime="2026-08-20T16:00:00.000Z" title="发表于 2026-08-21 00:00:00">2026-08-21</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/08/21/projects/03-%E6%B6%B2%E6%80%81%E7%8E%BB%E7%92%83-%E5%AE%9E%E7%8E%B0%E7%AF%87/" title="给博客做一套液态玻璃（三）：位移贴图与滤镜链">给博客做一套液态玻璃（三）：位移贴图与滤镜链</a><time datetime="2026-08-20T16:00:00.000Z" title="发表于 2026-08-21 00:00:00">2026-08-21</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/08/21/projects/04-%E6%B6%B2%E6%80%81%E7%8E%BB%E7%92%83-%E5%8F%96%E8%88%8D%E7%AF%87/" title="给博客做一套液态玻璃（四）：做完又删掉的那些">给博客做一套液态玻璃（四）：做完又删掉的那些</a><time datetime="2026-08-20T16:00:00.000Z" title="发表于 2026-08-21 00:00:00">2026-08-21</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2026/08/21/projects/05-%E6%B6%B2%E6%80%81%E7%8E%BB%E7%92%83-%E4%B8%8A%E6%89%8B%E7%AF%87/" title="给博客做一套液态玻璃（五）：从零手写，一步一步">给博客做一套液态玻璃（五）：从零手写，一步一步</a><time datetime="2026-08-20T16:00:00.000Z" title="发表于 2026-08-21 00:00:00">2026-08-21</time></div></div></div></div></div></div></main><footer id="footer"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;&nbsp;2025 - 2026 By Canary</span><span class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 8.1.2</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.7.0</a></span></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=5.7.0"></script><script src="/js/main.js?v=5.7.0"></script><script src="https://cdn.jsdelivr.net/npm/vanilla-lazyload@19.1.3/dist/lazyload.iife.min.js"></script><div class="js-pjax"><script>(() => {
+  const changeScriptToMath = article => {
+    article.querySelectorAll('script[type^="math/tex"]').forEach(el => {
+      const display = /mode=display/.test(el.type)
+      const node = document.createElement(display ? 'div' : 'span')
+      node.textContent = display
+        ? `$$${el.textContent}$$`
+        : `$${el.textContent}$`
+      el.parentNode.replaceChild(node, el)
+    })
+  }
+
+  const loadMathjax = () => {
+    const article = document.getElementById('article-container')
+    if (!article || article.querySelector('.hbe-container')) return
+    changeScriptToMath(article)
+
+    if (!window.MathJax) {
+      window.MathJax = {
+        loader: {
+          load: [
+            // Four font extension packages (optional)
+            //- '[tex]/bbm',
+            //- '[tex]/bboldx',
+            //- '[tex]/dsfont',
+            '[tex]/mhchem',
+            'ui/lazy'
+          ],
+          paths: {
+            'mathjax-newcm': '[mathjax]/../@mathjax/mathjax-newcm-font',
+
+            //- // Four font extension packages (optional)
+            //- 'mathjax-bbm-extension': '[mathjax]/../@mathjax/mathjax-bbm-font-extension',
+            //- 'mathjax-bboldx-extension': '[mathjax]/../@mathjax/mathjax-bboldx-font-extension',
+            //- 'mathjax-dsfont-extension': '[mathjax]/../@mathjax/mathjax-dsfont-font-extension',
+            'mathjax-mhchem-extension': '[mathjax]/../@mathjax/mathjax-mhchem-font-extension'
+          }
+        },
+        output: {
+          font: 'mathjax-newcm',
+        },
+        tex: {
+          inlineMath: [['$', '$'], ['\\(', '\\)']],
+          tags: 'none',
+          packages: {
+            '[+]': [
+              'mhchem'
+            ]
+          }
+        },
+        chtml: {
+          scale: 1.1
+        },
+        options: {
+          lazyMargin: '200px',
+          enableMenu: true,
+          menuOptions: {
+            settings: {
+              enrich: false  // Turn off Braille and voice narration text automatic generation
+            }
+          },
+        }
+      }
+
+      const script = document.createElement('script')
+      script.src = 'https://cdn.jsdelivr.net/npm/mathjax@4.1.3/tex-mml-chtml.min.js'
+      script.id = 'MathJax-script'
+      script.async = true
+      document.head.appendChild(script)
+    } else {
+      MathJax.typesetClear()
+      MathJax.typesetPromise([ article ])
+    }
+  }
+
+  btf.addGlobalFn('encrypt', loadMathjax, 'mathjax')
+  window.pjax ? loadMathjax() : window.addEventListener('load', loadMathjax)
+})()</script><script>(() => {
+  const parseViewBox = viewBox => {
+    if (!viewBox) return null
+    const parts = viewBox.trim().split(/[\s,]+/).map(n => Number(n))
+    if (parts.length !== 4 || parts.some(n => Number.isNaN(n))) return null
+    return parts
+  }
+
+  const getSvgViewBox = svg => {
+    const attr = parseViewBox(svg.getAttribute('viewBox'))
+    if (attr) return attr
+
+    // Fallback: use bbox to build a viewBox
+    try {
+      const bbox = svg.getBBox()
+      if (bbox && bbox.width && bbox.height) return [bbox.x, bbox.y, bbox.width, bbox.height]
+    } catch (e) {
+      // getBBox may fail on some edge cases; ignore
+    }
+
+    const w = Number(svg.getAttribute('width')) || 0
+    const h = Number(svg.getAttribute('height')) || 0
+    if (w > 0 && h > 0) return [0, 0, w, h]
+    return [0, 0, 100, 100]
+  }
+
+  const setSvgViewBox = (svg, vb) => {
+    svg.setAttribute('viewBox', `${vb[0]} ${vb[1]} ${vb[2]} ${vb[3]}`)
+  }
+
+  const clamp = (v, min, max) => Math.max(min, Math.min(max, v))
+
+  const openSvgInNewTab = ({ source, initViewBox }) => {
+    const getClonedSvg = () => {
+      if (typeof source === 'string') {
+        const template = document.createElement('template')
+        template.innerHTML = source.trim()
+        const svg = template.content.querySelector('svg')
+        return svg ? svg.cloneNode(true) : null
+      }
+      if (source && typeof source.cloneNode === 'function') {
+        return source.cloneNode(true)
+      }
+      return null
+    }
+
+    const clone = getClonedSvg()
+    if (!clone) return
+    if (initViewBox && initViewBox.length === 4) {
+      clone.setAttribute('viewBox', initViewBox.join(' '))
+    }
+    if (!clone.getAttribute('xmlns')) clone.setAttribute('xmlns', 'http://www.w3.org/2000/svg')
+    if (!clone.getAttribute('xmlns:xlink') && clone.innerHTML.includes('xlink:')) {
+      clone.setAttribute('xmlns:xlink', 'http://www.w3.org/1999/xlink')
+    }
+    // inject background to match current theme
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark'
+    const bg = getComputedStyle(document.body).backgroundColor || (isDark ? '#1e1e1e' : '#ffffff')
+    if (!clone.style.background) clone.style.background = bg
+
+    const serializer = new XMLSerializer()
+    const svgSource = serializer.serializeToString(clone)
+    const htmlSource = `<!doctype html><html><head><meta charset="utf-8" />
+      <style>
+        html, body { width: 100%; height: 100%; margin: 0; display: flex; align-items: center; justify-content: center; background: ${bg}; }
+        svg { max-width: 100%; max-height: 100%; height: auto; width: auto; }
+      </style>
+      </head><body>${svgSource}</body></html>`
+    const blob = new Blob([htmlSource], { type: 'text/html;charset=utf-8' })
+    const url = URL.createObjectURL(blob)
+    window.open(url, '_blank', 'noopener')
+
+    setTimeout(() => URL.revokeObjectURL(url), 5000)
+  }
+
+  const attachMermaidViewerButton = wrap => {
+    let btn = wrap.querySelector('.mermaid-open-btn')
+    if (!btn) {
+      btn = document.createElement('button')
+      btn.type = 'button'
+      btn.className = 'mermaid-open-btn'
+      wrap.appendChild(btn)
+    }
+
+    btn.innerHTML = '<i class="fa fa-search fa-fw" aria-hidden="true"></i>'
+
+    if (!btn.__mermaidViewerBound) {
+      btn.addEventListener('click', e => {
+        e.preventDefault()
+        e.stopPropagation()
+        const svg = wrap.__mermaidOriginalSvg || wrap.querySelector('svg')
+        if (!svg) return
+        const initViewBox = wrap.__mermaidInitViewBox
+        openSvgInNewTab({ source: svg, initViewBox })
+      })
+      btn.__mermaidViewerBound = true
+    }
+  }
+
+  // Zoom around a point (px, py) in the SVG viewport (in viewBox coordinates)
+  const zoomAtPoint = (vb, factor, px, py) => {
+    const w = vb[2] * factor
+    const h = vb[3] * factor
+    const nx = px - (px - vb[0]) * factor
+    const ny = py - (py - vb[1]) * factor
+    return [nx, ny, w, h]
+  }
+
+  const initMermaidGestures = wrap => {
+    // Clean up previous event listeners and pending frames
+    if (wrap.__mermaidAbortController) {
+      wrap.__mermaidAbortController.abort()
+      if (wrap.__mermaidRafId) cancelAnimationFrame(wrap.__mermaidRafId)
+    }
+    const ac = new AbortController()
+    wrap.__mermaidAbortController = ac
+    const svg = wrap.querySelector('svg')
+    if (!svg) return
+
+    // Ensure viewBox exists so gestures always work
+    const initVb = getSvgViewBox(svg)
+    wrap.__mermaidInitViewBox = initVb
+    wrap.__mermaidCurViewBox = initVb.slice()
+    setSvgViewBox(svg, initVb)
+    // Disable default gestures to prevent scroll chaining and pinch-zoom penetration in Chrome
+    svg.style.touchAction = 'none'
+
+    // Cache BoundingClientRect, throttled on scroll to reduce reflow
+    let cachedRect = svg.getBoundingClientRect()
+    let rectDirty = false
+    const markRectDirty = () => { rectDirty = true }
+    window.addEventListener('resize', markRectDirty, { signal: ac.signal })
+    window.addEventListener('scroll', markRectDirty, { signal: ac.signal, capture: true })
+    const getRect = () => {
+      if (rectDirty) {
+        cachedRect = svg.getBoundingClientRect()
+        rectDirty = false
+      }
+      return cachedRect
+    }
+
+    // Precompute clamp bounds from initial viewBox
+    const minW = initVb[2] * 0.1
+    const maxW = initVb[2] * 10
+    const minH = initVb[3] * 0.1
+    const maxH = initVb[3] * 10
+    const clampVb = vb => {
+      const out = vb.slice()
+      out[2] = clamp(out[2], minW, maxW)
+      out[3] = clamp(out[3], minH, maxH)
+      return out
+    }
+
+    // Throttle DOM updates using requestAnimationFrame
+    let pendingVb = null
+    let rafId = null
+    const applyVb = () => {
+      if (pendingVb) {
+        wrap.__mermaidCurViewBox = pendingVb
+        setSvgViewBox(svg, pendingVb)
+        pendingVb = null
+      }
+      rafId = null
+      wrap.__mermaidRafId = null
+    }
+    const setCurVb = vb => {
+      pendingVb = clampVb(vb)
+      if (!rafId) {
+        rafId = requestAnimationFrame(applyVb)
+        wrap.__mermaidRafId = rafId
+      }
+    }
+
+    const state = {
+      pointers: new Map(),
+      startVb: null,
+      startDist: 0,
+      lastPointerX: 0,
+      lastPointerY: 0
+    }
+
+    const onPointerDown = e => {
+      if (e.pointerType === 'mouse' && e.button !== 0) return
+      svg.setPointerCapture(e.pointerId)
+      const curVb = wrap.__mermaidCurViewBox
+      state.pointers.set(e.pointerId, { x: e.clientX, y: e.clientY })
+      if (state.pointers.size === 1) {
+        state.startVb = curVb.slice()
+        state.lastPointerX = e.clientX
+        state.lastPointerY = e.clientY
+      } else if (state.pointers.size === 2) {
+        const pts = [...state.pointers.values()]
+        const dx = pts[0].x - pts[1].x
+        const dy = pts[0].y - pts[1].y
+        state.startDist = Math.hypot(dx, dy)
+        state.startVb = curVb.slice()
+      }
+    }
+
+    const onPointerMove = e => {
+      if (!state.pointers.has(e.pointerId)) return
+      state.pointers.set(e.pointerId, { x: e.clientX, y: e.clientY })
+      const curVb = wrap.__mermaidCurViewBox
+      const rect = getRect()
+      if (state.pointers.size === 1 && state.startVb) {
+        const p = state.pointers.values().next().value
+        const dxClient = p.x - state.lastPointerX
+        const dyClient = p.y - state.lastPointerY
+        state.lastPointerX = p.x
+        state.lastPointerY = p.y
+        const dx = dxClient * (curVb[2] / rect.width)
+        const dy = dyClient * (curVb[3] / rect.height)
+        setCurVb([curVb[0] - dx, curVb[1] - dy, curVb[2], curVb[3]])
+        return
+      }
+      if (state.pointers.size === 2 && state.startVb && state.startDist > 0) {
+        const pts = [...state.pointers.values()]
+        const dx = pts[0].x - pts[1].x
+        const dy = pts[0].y - pts[1].y
+        const dist = Math.hypot(dx, dy)
+        if (!dist) return
+        const factor = state.startDist / dist
+        const cx = (pts[0].x + pts[1].x) / 2
+        const cy = (pts[0].y + pts[1].y) / 2
+        const px = curVb[0] + (cx - rect.left) * (curVb[2] / rect.width)
+        const py = curVb[1] + (cy - rect.top) * (curVb[3] / rect.height)
+        setCurVb(zoomAtPoint(state.startVb, factor, px, py))
+      }
+    }
+
+    const onPointerUpOrCancel = e => {
+      // Release PointerCapture to avoid event capture anomalies
+      if (svg.hasPointerCapture && svg.hasPointerCapture(e.pointerId)) {
+        svg.releasePointerCapture(e.pointerId)
+      }
+      state.pointers.delete(e.pointerId)
+      if (state.pointers.size === 0) {
+        state.startVb = null
+        state.startDist = 0
+      } else if (state.pointers.size === 1) {
+        const p = state.pointers.values().next().value
+        state.lastPointerX = p.x
+        state.lastPointerY = p.y
+      }
+    }
+
+    const onWheel = e => {
+      // Prevent event bubbling from triggering external scroll
+      e.preventDefault()
+      e.stopPropagation()
+      // Normalize deltaY across deltaMode (Chrome uses pixels, Safari uses lines)
+      let delta = e.deltaY
+      if (e.deltaMode === 1) delta *= 16
+      else if (e.deltaMode === 2) delta *= 400
+
+      // Continuous zoom factor: smoother than fixed 1.1/0.9 steps
+      const zoomFactor = Math.pow(1.001, delta)
+
+      const curVb = wrap.__mermaidCurViewBox
+      const rect = getRect()
+      const px = curVb[0] + (e.clientX - rect.left) * (curVb[2] / rect.width)
+      const py = curVb[1] + (e.clientY - rect.top) * (curVb[3] / rect.height)
+      setCurVb(zoomAtPoint(curVb, zoomFactor, px, py))
+    }
+
+    const onDblClick = () => {
+      const init = wrap.__mermaidInitViewBox
+      if (init) setCurVb(init)
+    }
+
+    svg.addEventListener('pointerdown', onPointerDown, { signal: ac.signal })
+    svg.addEventListener('pointermove', onPointerMove, { signal: ac.signal })
+    svg.addEventListener('pointerup', onPointerUpOrCancel, { signal: ac.signal })
+    svg.addEventListener('pointercancel', onPointerUpOrCancel, { signal: ac.signal })
+    svg.addEventListener('wheel', onWheel, { passive: false, signal: ac.signal })
+    svg.addEventListener('dblclick', onDblClick, { signal: ac.signal })
+  }
+
+  const runMermaid = ele => {
+    window.loadMermaid = true
+    const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'default'
+    ele.forEach((item, index) => {
+      const mermaidSrc = item.firstElementChild
+      // Clean up event listeners before removing old SVG
+      if (item.__mermaidAbortController) {
+        item.__mermaidAbortController.abort()
+      }
+      const oldSvg = item.querySelector('svg')
+      if (oldSvg) oldSvg.remove()
+      let config = {}
+      try {
+        config = mermaidSrc.dataset.config ? JSON.parse(mermaidSrc.dataset.config) : {}
+      } catch (e) {
+        console.warn('[mermaid] failed to parse dataset.config:', e)
+      }
+      if (!config.theme) {
+        config.theme = theme
+      }
+      const mermaidThemeConfig = `%%{init: ${JSON.stringify(config)}}%%\n`
+      const mermaidID = `mermaid-${index}`
+      const mermaidDefinition = mermaidThemeConfig + mermaidSrc.textContent
+
+      const renderMermaid = svg => {
+        mermaidSrc.insertAdjacentHTML('afterend', svg)
+        if (true) initMermaidGestures(item)
+        item.__mermaidOriginalSvg = svg
+        if (true) attachMermaidViewerButton(item)
+      }
+
+      const handleError = err => {
+        console.error(`[mermaid] render failed for block #${index}:`, err)
+        const errorEl = document.createElement('div')
+        errorEl.className = 'mermaid-error'
+        errorEl.textContent = `Mermaid render error: ${err.message || err}`
+        mermaidSrc.insertAdjacentElement('afterend', errorEl)
+      }
+
+      try {
+        const renderFn = mermaid.render(mermaidID, mermaidDefinition)
+        // mermaid v9 and v10 compatibility
+        if (typeof renderFn === 'string') {
+          renderMermaid(renderFn)
+        } else {
+          renderFn.then(({ svg }) => renderMermaid(svg)).catch(handleError)
+        }
+      } catch (err) {
+        handleError(err)
+      }
+    })
+  }
+
+  const codeToMermaid = $article => {
+    const codeMermaidEle = $article.querySelectorAll('pre > code.mermaid')
+    if (codeMermaidEle.length === 0) return
+
+    codeMermaidEle.forEach(ele => {
+      const preEle = document.createElement('pre')
+      preEle.className = 'mermaid-src'
+      preEle.hidden = true
+      preEle.textContent = ele.textContent
+      const newEle = document.createElement('div')
+      newEle.className = 'mermaid-wrap'
+      newEle.appendChild(preEle)
+      ele.parentNode.replaceWith(newEle)
+    })
+  }
+
+  const loadMermaid = () => {
+    const $article = document.getElementById('article-container')
+    if (!$article) return
+
+    if (false) codeToMermaid($article)
+    const $mermaid = $article.querySelectorAll('.mermaid-wrap')
+    if ($mermaid.length === 0) return
+
+    const runMermaidFn = () => runMermaid($mermaid)
+    btf.addGlobalFn('themeChange', runMermaidFn, 'mermaid')
+    window.loadMermaid ? runMermaidFn() : btf.getScript('https://cdn.jsdelivr.net/npm/mermaid@11.16.0/dist/mermaid.min.js').then(runMermaidFn)
+  }
+
+  btf.addGlobalFn('encrypt', loadMermaid, 'mermaid')
+  window.pjax ? loadMermaid() : document.addEventListener('DOMContentLoaded', loadMermaid)
+})()</script><script>(() => {
+  const applyThemeDefaultsConfig = theme => {
+    if (theme === 'dark-mode') {
+      Chart.defaults.color = "rgba(255, 255, 255, 0.8)"
+      Chart.defaults.borderColor = "rgba(255, 255, 255, 0.2)"
+      Chart.defaults.scale.ticks.backdropColor = "transparent"
+    } else {
+      Chart.defaults.color = "rgba(0, 0, 0, 0.8)"
+      Chart.defaults.borderColor = "rgba(0, 0, 0, 0.1)"
+      Chart.defaults.scale.ticks.backdropColor = "transparent"
+    }
+  }
+
+  // Recursively traverse the config object and automatically apply theme-specific color schemes
+  const applyThemeConfig = (obj, theme) => {
+    if (typeof obj !== 'object' || obj === null) return
+
+    Object.keys(obj).forEach(key => {
+      const value = obj[key]
+      // If the property is an object and has theme-specific options, apply them
+      if (typeof value === 'object' && value !== null) {
+        if (value[theme]) {
+          obj[key] = value[theme] // Apply the value for the current theme
+        } else {
+          // Recursively process child objects
+          applyThemeConfig(value, theme)
+        }
+      }
+    })
+  }
+
+  const runChartJS = ele => {
+    window.loadChartJS = true
+
+    Array.from(ele).forEach((item, index) => {
+      const chartSrc = item.firstElementChild
+      const chartID = item.getAttribute('data-chartjs-id') || ('chartjs-' + index) // Use custom ID or default ID
+      const width = item.getAttribute('data-width')
+      const existingCanvas = document.getElementById(chartID)
+
+      // If a canvas already exists, remove it to avoid rendering duplicates
+      if (existingCanvas) {
+          existingCanvas.parentNode.remove()
+      }
+
+      const chartDefinition = chartSrc.textContent
+      const canvas = document.createElement('canvas')
+      canvas.id = chartID
+
+      const div = document.createElement('div')
+      div.className = 'chartjs-wrap'
+
+      if (width) {
+        div.style.width = width
+      }
+
+      div.appendChild(canvas)
+      chartSrc.insertAdjacentElement('afterend', div)
+
+      const ctx = document.getElementById(chartID).getContext('2d')
+
+      const config = JSON.parse(chartDefinition)
+
+      const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark-mode' : 'light-mode'
+
+      // Set default styles (initial setup)
+      applyThemeDefaultsConfig(theme)
+
+      // Automatically traverse the config and apply dual-mode color schemes
+      applyThemeConfig(config, theme)
+
+      new Chart(ctx, config)
+    })
+  }
+
+  const loadChartJS = () => {
+    const chartJSEle = document.querySelectorAll('#article-container .chartjs-container')
+    if (chartJSEle.length === 0) return
+
+    window.loadChartJS ? runChartJS(chartJSEle) : btf.getScript('https://cdn.jsdelivr.net/npm/chart.js@4.5.1/dist/chart.umd.min.js').then(() => runChartJS(chartJSEle))
+  }
+
+  // Listen for theme change events
+  btf.addGlobalFn('themeChange', loadChartJS, 'chartjs')
+  btf.addGlobalFn('encrypt', loadChartJS, 'chartjs')
+
+  window.pjax ? loadChartJS() : document.addEventListener('DOMContentLoaded', loadChartJS)
+})()</script></div><script src="/js/glass/glass-sdf.js"></script><script src="/js/glass/glass-core.js"></script><script src="/js/glass/glass-performance.js"></script><script src="/js/glass/glass-motion.js"></script><script src="/js/glass/glass-adapter.js"></script><script defer="defer" id="ribbon" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc@1.1.6/dist/canvas-ribbon.min.js" size="150" alpha="0.6" zIndex="-1" mobile="false" data-click="false"></script><script src="https://cdn.jsdelivr.net/npm/pjax@0.2.8/pjax.min.js" defer="defer"></script><script>document.addEventListener('DOMContentLoaded', () => {
+  const pjaxSelectors = ["head > title","#config-diff","#body-wrap","#rightside-config-hide","#rightside-config-show",".js-pjax"]
+
+  window.pjax = new Pjax({
+    elements: 'a:not([target="_blank"]):not([data-fancybox])',
+    selectors: pjaxSelectors,
+    cacheBust: false,
+    analytics: false,
+    scrollRestoration: false
+  })
+
+  const triggerPjaxFn = (val) => {
+    if (!val) return
+    Object.values(val).forEach(fn => {
+      try {
+        fn()
+      } catch (err) {
+        console.debug('Pjax callback failed:', err)
+      }
+    })
+  }
+
+  document.addEventListener('pjax:send', () => {
+    // removeEventListener
+    btf.removeGlobalFnEvent('pjaxSendOnce')
+    btf.removeGlobalFnEvent('themeChange')
+
+    // reset readmode
+    const $bodyClassList = document.body.classList
+    if ($bodyClassList.contains('read-mode')) $bodyClassList.remove('read-mode')
+
+    triggerPjaxFn(window.globalFn.pjaxSend)
+  })
+
+  document.addEventListener('pjax:complete', () => {
+    btf.removeGlobalFnEvent('pjaxCompleteOnce')
+    document.querySelectorAll('script[data-pjax]').forEach(item => {
+      if (!item.parentNode) return
+      const newScript = document.createElement('script')
+      const content = item.text || item.textContent || ''
+      Array.from(item.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value))
+      newScript.appendChild(document.createTextNode(content))
+      item.parentNode.replaceChild(newScript, item)
+    })
+
+    triggerPjaxFn(window.globalFn.pjaxComplete)
+  })
+
+  document.addEventListener('pjax:error', e => {
+    const responseURL = e.request && e.request.responseURL
+    if (e.request && e.request.status === 404) {
+      true
+        ? pjax.loadUrl('/404.html')
+        : responseURL && (window.location.href = responseURL)
+    } else if (responseURL) {
+      window.location.href = responseURL
+    }
+  })
+})</script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><i class="fas fa-spinner fa-pulse" id="loading-status" hidden="hidden"></i><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="text-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据加载中</span></div><div class="local-search-input"><input placeholder="搜索文章..." type="text"/></div><hr/><div id="local-search-results"></div><div class="ais-Pagination" id="local-search-pagination" style="display:none;"><ul class="ais-Pagination-list"></ul></div><div id="local-search-stats"></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=5.7.0"></script></div></div></body></html>

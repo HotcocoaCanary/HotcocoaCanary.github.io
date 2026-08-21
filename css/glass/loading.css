@@ -15,9 +15,18 @@
          .configure-border-2 > .configure-core
          .loading-word
 
-   The two .configure-border-* squares are retired and the spinner is redrawn
-   on .spinner-box's own pseudo-elements: a glass bead with a fixed top-left
-   highlight, and a specular sweep rotating behind it.
+   Rather than hide both squares and rebuild the spinner on .spinner-box's own
+   pseudo-elements, .configure-border-1 is repurposed as the bead and the
+   sweep goes on ITS ::after.
+
+   That distinction is the whole fix. Every child of .spinner-box is
+   absolutely positioned -- .loading-word is, and an ::after given
+   `position: absolute` is too -- so none of them participate in flex layout.
+   Laying the bead and the sweep out as flex siblings with a gap therefore did
+   nothing, and the sweep had to be nudged onto the bead with a hand-guessed
+   `margin-bottom`, which drifted out of alignment the moment the font metrics
+   changed. Anchored to the bead with `inset: 0`, the sweep is concentric by
+   construction and there is no number left to get wrong.
 
    This file loads with the design tokens, before the glass engine runs -- the
    loader is on screen precisely while the JS has not started -- so everything
@@ -30,41 +39,49 @@
   background-color: var(--g-bg);
 }
 
-/* Retire the stock spinner. */
-#loading-box .configure-border-1,
+#loading-box .spinner-box {
+  position: fixed;
+  z-index: 1001;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100vh;
+}
+
+/* The second square is retired outright. */
 #loading-box .configure-border-2 {
   display: none;
 }
 
-#loading-box .spinner-box {
-  position: fixed;
-  z-index: 1001;
-  flex-direction: column;
-  gap: 26px;
-}
-
-/* The bead. */
-#loading-box .spinner-box::before {
-  content: "";
+/* The first one becomes the bead. */
+#loading-box .configure-border-1 {
+  position: absolute;
   width: 104px;
   height: 104px;
+  padding: 0;
   border-radius: 50%;
   background:
     radial-gradient(circle at 34% 28%, rgba(255, 255, 255, 0.55), transparent 52%),
     var(--g-tint);
   box-shadow: var(--g-shine), var(--g-shadow);
+  /* Kill the theme's configure-clockwise rotation. */
+  animation: none;
+  transform: none;
+}
+
+/* .configure-core exists to fill the square; the bead has no use for it. */
+#loading-box .configure-border-1 .configure-core {
+  display: none;
 }
 
 /* The sweep: one bright arc travelling around the rim, masked to a ring so it
    reads as light running around the edge of the bead rather than a spinning
-   disc sitting on top of it. */
-#loading-box .spinner-box::after {
+   disc sitting on top of it. Anchored to the bead, so it cannot drift. */
+#loading-box .configure-border-1::after {
   content: "";
   position: absolute;
-  width: 104px;
-  height: 104px;
-  /* Sits on the bead, which is the first of the two flex children. */
-  margin-bottom: 66px;
+  inset: 0;
   border-radius: 50%;
   background: conic-gradient(
     from 0turn,
@@ -84,8 +101,13 @@
   to { transform: rotate(1turn); }
 }
 
+/* The word is absolutely positioned and centred like everything else here, so
+   it lands on top of the bead. Half the bead plus a little air puts it under.
+   This one offset is unavoidable -- but it only moves text, and text sitting a
+   few pixels high is nothing like a ring sitting off-centre. */
 #loading-box .loading-word {
-  position: static;
+  position: absolute;
+  transform: translateY(84px);
   color: var(--g-ink-dim, var(--g-ink));
   font-size: 0.92rem;
   letter-spacing: 0.08em;
@@ -93,7 +115,7 @@
 }
 
 @media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) #loading-box .spinner-box::after {
+  :root:not([data-theme="light"]) #loading-box .configure-border-1::after {
     background: conic-gradient(
       from 0turn,
       transparent 0deg,
@@ -106,7 +128,7 @@
   }
 }
 
-:root[data-theme="dark"] #loading-box .spinner-box::after {
+:root[data-theme="dark"] #loading-box .configure-border-1::after {
   background: conic-gradient(
     from 0turn,
     transparent 0deg,
@@ -121,7 +143,7 @@
 /* A spinner is the one animation a reader cannot opt out of by not scrolling,
    so honour the preference: keep the bead, stop the sweep. */
 @media (prefers-reduced-motion: reduce) {
-  #loading-box .spinner-box::after {
+  #loading-box .configure-border-1::after {
     animation: none;
     opacity: 0.5;
   }

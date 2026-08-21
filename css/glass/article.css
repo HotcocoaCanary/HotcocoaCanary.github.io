@@ -156,7 +156,7 @@
   border-radius: var(--g-r-md);
   padding: 1.15em 1.5em;
   margin: 1.6em 0;
-  color: #f2e6da;
+  color: var(--g-code-ink);
 }
 
 #article-container blockquote.glass p:last-child {
@@ -179,7 +179,7 @@
    not roomier. */
 #article-container figure.highlight.glass,
 #article-container pre.glass {
-  border: 1px solid rgba(255, 226, 196, 0.14);
+  border: 1px solid var(--g-code-edge);
   border-radius: var(--g-r-md);
   overflow: hidden;
   margin: 1.6em 0;
@@ -202,19 +202,60 @@
   padding: 6px 14px;
 }
 
+/* ---- 长代码块的展开按钮 ------------------------------------------------
+   Butterfly 给它的是 var(--hlexpand-bg)：代码主题背景色 60% → 90% 的实心
+   渐变。那是为不透明代码块画的——压在半透明玻璃上，会变成一条颜色对不上
+   的实心条横在玻璃中间。
+
+   改成从透明渐到玻璃自己的着色，读起来就是代码在薄雾下淡出。
+
+   注意这里**不能**用 backdrop-filter：.glass 有 isolation: isolate，
+   它是一个 backdrop root，子元素的 backdrop-filter 采样不到任何东西。 */
+
+#article-container figure.highlight .code-expand-btn {
+  /* 外层有 6px padding，绝对定位的 width:100% 会算到 padding box 上，
+     导致右边溢出 6px。显式拉到两端。 */
+  left: 0;
+  right: 0;
+  width: auto;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    color-mix(in srgb, var(--g-tint) 55%, transparent) 42%,
+    var(--g-tint) 100%
+  );
+  border-radius: 0 0 calc(var(--g-r-md) - 6px) calc(var(--g-r-md) - 6px);
+}
+
+#article-container figure.highlight .code-expand-btn i {
+  color: var(--g-code-ink-dim);
+}
+
+/* 展开之后不再需要遮罩，只留下收起的箭头 */
+#article-container figure.highlight .code-expand-btn.expand-done {
+  background: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #article-container figure.highlight .code-expand-btn i {
+    animation: none;
+    opacity: 0.7;
+  }
+}
+
 #article-container figure.highlight .highlight-tools {
   background: transparent;
-  color: #cdb6a2;
+  color: var(--g-code-head);
 }
 
 #article-container figure.highlight table,
 #article-container figure.highlight pre {
   background: transparent !important;
-  color: #f2e7dc;
+  color: var(--g-code-ink);
 }
 
 #article-container figure.highlight .gutter pre {
-  color: rgba(242, 231, 220, 0.38);
+  color: var(--g-code-ink-dim);
 }
 
 #article-container figure.highlight .line {
@@ -233,40 +274,84 @@
   background: transparent;
   border: none;
   margin: 0;
-  color: #f4e9de;
+  color: var(--g-code-ink);
 }
 
 #article-container .table-wrap th,
 #article-container .table-wrap td {
-  border-color: rgba(255, 226, 196, 0.14);
+  border-color: var(--g-code-edge);
   background: transparent;
 }
 
 #article-container .table-wrap thead {
-  background: rgba(255, 226, 196, 0.08);
+  background: var(--g-code-head-bg);
 }
 
 /* ---- Copyright / related ----------------------------------------------- */
 
+/* The copyright block is small print sitting over whatever the background
+   ornament happens to be doing, and on the brighter ribbons it was being read
+   straight through. A tint that is 8% of anything is not a surface; this takes
+   the medium weight's own tint so the text has something to sit on, and the
+   labels and links take the ink tokens rather than Butterfly's blue. */
 #post .post-copyright {
+  --g-tint: rgba(255, 250, 243, 0.30);
   border: 1px solid var(--g-edge);
   border-radius: var(--g-r-md);
-  background: color-mix(in srgb, var(--g-accent) 8%, transparent);
+  background: var(--g-tint);
   max-width: 46rem;
   margin: 2.4em auto 0;
+  padding: 14px 20px;
 }
 
+/* Butterfly stamps a second copyright glyph (\f1f9) on the block through
+   ::before, on top of the per-row icons that already say the same thing. */
 #post .post-copyright::before {
+  content: none;
+}
+
+#post .post-copyright .post-copyright-meta {
   color: var(--g-accent);
 }
 
-.relatedPosts .relatedPosts-list > div.glass {
+#post .post-copyright .post-copyright-info,
+#post .post-copyright .post-copyright-info a {
+  color: var(--g-ink);
+}
+
+#post .post-copyright .post-copyright-info a {
+  text-decoration-color: color-mix(in srgb, var(--g-ink) 40%, transparent);
+}
+
+#post .post-copyright .post-copyright-info a:hover {
+  color: var(--g-accent);
+}
+
+/* ---- Post footer navigation: previous / next / related ------------------ */
+
+#pagination.pagination-post .pagination-related.glass,
+.relatedPosts .relatedPosts-list .pagination-related.glass {
   --g-radius: var(--g-r-md);
   overflow: hidden;
 }
 
-.relatedPosts .relatedPosts-list > div.glass .cover {
+#pagination.pagination-post .pagination-related.glass .cover,
+.relatedPosts .relatedPosts-list .pagination-related.glass .cover {
   border-radius: inherit;
+}
+
+/* The prev/next pair sit side by side; without a gap the two glass edges
+   touch and read as one panel with a seam. */
+#pagination.pagination-post {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--g-gap);
+  background: none;
+}
+
+#pagination.pagination-post .pagination-related {
+  flex: 1 1 260px;
+  width: auto;
 }
 
 /* ---- Reading progress bar (Butterfly's) -------------------------------- */

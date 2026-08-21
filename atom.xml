@@ -10,46 +10,129 @@
   <rights>All rights reserved 2026, Canary</rights>
   <subtitle>鸢作江虞的小金丝雀</subtitle>
   <title>𝒞𝒶𝓃𝒶𝓇𝓎</title>
-  <updated>2026-08-19T04:01:39.793Z</updated>
+  <updated>2026-08-21T10:34:00.391Z</updated>
   <entry>
     <author>
       <name>Canary</name>
     </author>
-    <category term="linux" scheme="https://hotcocoacanary.github.io/categories/linux/"/>
-    <category term="Arch Linux" scheme="https://hotcocoacanary.github.io/tags/Arch-Linux/"/>
-    <category term="WSL" scheme="https://hotcocoacanary.github.io/tags/WSL/"/>
-    <category term="Windows" scheme="https://hotcocoacanary.github.io/tags/Windows/"/>
-    <id>https://hotcocoacanary.github.io/2026/06/17/linux/02-WSL%E5%AE%89%E8%A3%85Arch-Linux/</id>
-    <link href="https://hotcocoacanary.github.io/2026/06/17/linux/02-WSL%E5%AE%89%E8%A3%85Arch-Linux/"/>
-    <published>2026-06-16T16:00:00.000Z</published>
+    <category term="projects" scheme="https://hotcocoacanary.github.io/categories/projects/"/>
+    <category term="液态玻璃" scheme="https://hotcocoacanary.github.io/tags/%E6%B6%B2%E6%80%81%E7%8E%BB%E7%92%83/"/>
+    <category term="CSS" scheme="https://hotcocoacanary.github.io/tags/CSS/"/>
+    <category term="SVG" scheme="https://hotcocoacanary.github.io/tags/SVG/"/>
+    <category term="图形学" scheme="https://hotcocoacanary.github.io/tags/%E5%9B%BE%E5%BD%A2%E5%AD%A6/"/>
+    <id>https://hotcocoacanary.github.io/2026/08/21/projects/01-%E6%B6%B2%E6%80%81%E7%8E%BB%E7%92%83-%E5%8E%9F%E7%90%86%E7%AF%87/</id>
+    <link href="https://hotcocoacanary.github.io/2026/08/21/projects/01-%E6%B6%B2%E6%80%81%E7%8E%BB%E7%92%83-%E5%8E%9F%E7%90%86%E7%AF%87/"/>
+    <published>2026-08-20T16:00:00.000Z</published>
     <summary>
-      <![CDATA[<h1 id="通过-WSL-安装-Arch-Linux"><a href="#通过-WSL-安装-Arch-Linux" class="headerlink" title="通过 WSL 安装 Arch Linux"></a>通过 WSL 安装 Arch]]>
+      <![CDATA[<blockquote>
+<p><strong>适用读者</strong>：想在网页上做出「真玻璃」质感的前端开发者。本篇不写代码，只讲清楚一件事——为什么 <code>backdrop-filter: blur()</code>]]>
     </summary>
-    <title>通过 WSL 安装 Arch Linux</title>
-    <updated>2026-08-19T04:01:39.793Z</updated>
+    <title>给博客做一套液态玻璃（一）：玻璃到底是什么</title>
+    <updated>2026-08-21T10:34:00.391Z</updated>
   </entry>
   <entry>
     <author>
       <name>Canary</name>
     </author>
-    <category term="linux" scheme="https://hotcocoacanary.github.io/categories/linux/"/>
-    <category term="Java" scheme="https://hotcocoacanary.github.io/tags/Java/"/>
-    <category term="开发环境" scheme="https://hotcocoacanary.github.io/tags/%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83/"/>
-    <category term="yay" scheme="https://hotcocoacanary.github.io/tags/yay/"/>
-    <category term="Neovim" scheme="https://hotcocoacanary.github.io/tags/Neovim/"/>
-    <category term="Docker" scheme="https://hotcocoacanary.github.io/tags/Docker/"/>
-    <category term="Node.js" scheme="https://hotcocoacanary.github.io/tags/Node-js/"/>
-    <category term="Python" scheme="https://hotcocoacanary.github.io/tags/Python/"/>
-    <category term="Go" scheme="https://hotcocoacanary.github.io/tags/Go/"/>
-    <id>https://hotcocoacanary.github.io/2026/06/17/linux/03-%E5%AE%89%E8%A3%85%E9%80%9A%E7%94%A8%E5%BC%80%E5%8F%91%E5%B7%A5%E5%85%B7/</id>
-    <link href="https://hotcocoacanary.github.io/2026/06/17/linux/03-%E5%AE%89%E8%A3%85%E9%80%9A%E7%94%A8%E5%BC%80%E5%8F%91%E5%B7%A5%E5%85%B7/"/>
-    <published>2026-06-16T16:00:00.000Z</published>
+    <category term="projects" scheme="https://hotcocoacanary.github.io/categories/projects/"/>
+    <category term="液态玻璃" scheme="https://hotcocoacanary.github.io/tags/%E6%B6%B2%E6%80%81%E7%8E%BB%E7%92%83/"/>
+    <category term="架构设计" scheme="https://hotcocoacanary.github.io/tags/%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1/"/>
+    <category term="Hexo" scheme="https://hotcocoacanary.github.io/tags/Hexo/"/>
+    <category term="Butterfly" scheme="https://hotcocoacanary.github.io/tags/Butterfly/"/>
+    <id>https://hotcocoacanary.github.io/2026/08/21/projects/02-%E6%B6%B2%E6%80%81%E7%8E%BB%E7%92%83-%E6%96%B9%E6%A1%88%E7%AF%87/</id>
+    <link href="https://hotcocoacanary.github.io/2026/08/21/projects/02-%E6%B6%B2%E6%80%81%E7%8E%BB%E7%92%83-%E6%96%B9%E6%A1%88%E7%AF%87/"/>
+    <published>2026-08-20T16:00:00.000Z</published>
     <summary>
-      <![CDATA[<h1 id="安装通用开发工具"><a href="#安装通用开发工具" class="headerlink" title="安装通用开发工具"></a>安装通用开发工具</h1><blockquote>
-<p><strong>适用读者</strong>：已完成 Arch]]>
+      <![CDATA[<blockquote>
+<p><strong>适用读者</strong>：上一篇讲了玻璃的光学原理，这一篇讲怎么把它变成一个能跑在真实博客上、不拖垮性能、不和主题打架的系统。</p>
+</blockquote>
+<hr>
+<h2 id="三条约束"><a]]>
     </summary>
-    <title>安装通用开发工具</title>
-    <updated>2026-08-19T04:01:39.793Z</updated>
+    <title>给博客做一套液态玻璃（二）：架构怎么搭</title>
+    <updated>2026-08-21T10:35:05.376Z</updated>
+  </entry>
+  <entry>
+    <author>
+      <name>Canary</name>
+    </author>
+    <category term="projects" scheme="https://hotcocoacanary.github.io/categories/projects/"/>
+    <category term="液态玻璃" scheme="https://hotcocoacanary.github.io/tags/%E6%B6%B2%E6%80%81%E7%8E%BB%E7%92%83/"/>
+    <category term="CSS" scheme="https://hotcocoacanary.github.io/tags/CSS/"/>
+    <category term="SVG" scheme="https://hotcocoacanary.github.io/tags/SVG/"/>
+    <category term="Canvas" scheme="https://hotcocoacanary.github.io/tags/Canvas/"/>
+    <id>https://hotcocoacanary.github.io/2026/08/21/projects/03-%E6%B6%B2%E6%80%81%E7%8E%BB%E7%92%83-%E5%AE%9E%E7%8E%B0%E7%AF%87/</id>
+    <link href="https://hotcocoacanary.github.io/2026/08/21/projects/03-%E6%B6%B2%E6%80%81%E7%8E%BB%E7%92%83-%E5%AE%9E%E7%8E%B0%E7%AF%87/"/>
+    <published>2026-08-20T16:00:00.000Z</published>
+    <summary>
+      <![CDATA[<blockquote>
+<p><strong>适用读者</strong>：想知道 <code>feDisplacementMap</code> 到底怎么用的人。这一篇是实现细节，包含两个我调了很久才想明白的坑。</p>
+</blockquote>
+<hr>
+<h2]]>
+    </summary>
+    <title>给博客做一套液态玻璃（三）：位移贴图与滤镜链</title>
+    <updated>2026-08-21T10:37:14.029Z</updated>
+  </entry>
+  <entry>
+    <author>
+      <name>Canary</name>
+    </author>
+    <category term="projects" scheme="https://hotcocoacanary.github.io/categories/projects/"/>
+    <category term="液态玻璃" scheme="https://hotcocoacanary.github.io/tags/%E6%B6%B2%E6%80%81%E7%8E%BB%E7%92%83/"/>
+    <category term="CSS" scheme="https://hotcocoacanary.github.io/tags/CSS/"/>
+    <category term="工程取舍" scheme="https://hotcocoacanary.github.io/tags/%E5%B7%A5%E7%A8%8B%E5%8F%96%E8%88%8D/"/>
+    <category term="性能优化" scheme="https://hotcocoacanary.github.io/tags/%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96/"/>
+    <id>https://hotcocoacanary.github.io/2026/08/21/projects/04-%E6%B6%B2%E6%80%81%E7%8E%BB%E7%92%83-%E5%8F%96%E8%88%8D%E7%AF%87/</id>
+    <link href="https://hotcocoacanary.github.io/2026/08/21/projects/04-%E6%B6%B2%E6%80%81%E7%8E%BB%E7%92%83-%E5%8F%96%E8%88%8D%E7%AF%87/"/>
+    <published>2026-08-20T16:00:00.000Z</published>
+    <summary>
+      <![CDATA[<blockquote>
+<p><strong>适用读者</strong>：这一篇讲失败。一个完整实现并通过全部测试、最后还是被删掉的功能，以及和主题 CSS 级联缠斗的经历。</p>
+</blockquote>
+<hr>
+<h2 id="一、被删掉的「水融水」交互"><a]]>
+    </summary>
+    <title>给博客做一套液态玻璃（四）：做完又删掉的那些</title>
+    <updated>2026-08-21T10:42:32.104Z</updated>
+  </entry>
+  <entry>
+    <author>
+      <name>Canary</name>
+    </author>
+    <category term="projects" scheme="https://hotcocoacanary.github.io/categories/projects/"/>
+    <category term="液态玻璃" scheme="https://hotcocoacanary.github.io/tags/%E6%B6%B2%E6%80%81%E7%8E%BB%E7%92%83/"/>
+    <category term="CSS" scheme="https://hotcocoacanary.github.io/tags/CSS/"/>
+    <category term="SVG" scheme="https://hotcocoacanary.github.io/tags/SVG/"/>
+    <category term="教程" scheme="https://hotcocoacanary.github.io/tags/%E6%95%99%E7%A8%8B/"/>
+    <id>https://hotcocoacanary.github.io/2026/08/21/projects/05-%E6%B6%B2%E6%80%81%E7%8E%BB%E7%92%83-%E4%B8%8A%E6%89%8B%E7%AF%87/</id>
+    <link href="https://hotcocoacanary.github.io/2026/08/21/projects/05-%E6%B6%B2%E6%80%81%E7%8E%BB%E7%92%83-%E4%B8%8A%E6%89%8B%E7%AF%87/"/>
+    <published>2026-08-20T16:00:00.000Z</published>
+    <summary>
+      <![CDATA[<blockquote>
+<p><strong>适用读者</strong>：<strong>完全不需要</strong>读过前四篇。只要会写 HTML 和 CSS]]>
+    </summary>
+    <title>给博客做一套液态玻璃（五）：从零手写，一步一步</title>
+    <updated>2026-08-21T10:50:16.437Z</updated>
+  </entry>
+  <entry>
+    <author>
+      <name>Canary</name>
+    </author>
+    <category term="projects" scheme="https://hotcocoacanary.github.io/categories/projects/"/>
+    <category term="液态玻璃" scheme="https://hotcocoacanary.github.io/tags/%E6%B6%B2%E6%80%81%E7%8E%BB%E7%92%83/"/>
+    <category term="CSS" scheme="https://hotcocoacanary.github.io/tags/CSS/"/>
+    <category term="Hexo" scheme="https://hotcocoacanary.github.io/tags/Hexo/"/>
+    <category term="Butterfly" scheme="https://hotcocoacanary.github.io/tags/Butterfly/"/>
+    <id>https://hotcocoacanary.github.io/2026/08/21/projects/06-%E6%B6%B2%E6%80%81%E7%8E%BB%E7%92%83-%E7%A7%BB%E6%A4%8D%E7%AF%87/</id>
+    <link href="https://hotcocoacanary.github.io/2026/08/21/projects/06-%E6%B6%B2%E6%80%81%E7%8E%BB%E7%92%83-%E7%A7%BB%E6%A4%8D%E7%AF%87/"/>
+    <published>2026-08-20T16:00:00.000Z</published>
+    <summary>
+      <![CDATA[<blockquote>
+<p><strong>适用读者</strong>：用 Hexo + Butterfly 的人。这一篇给的是<strong>能直接拿走用的两个文件</strong>，不需要 fork]]>
+    </summary>
+    <title>给博客做一套液态玻璃（六）：把 Butterfly 改造成液态玻璃（附完整代码）</title>
+    <updated>2026-08-21T11:29:00.213Z</updated>
   </entry>
   <entry>
     <author>
@@ -73,18 +156,39 @@
       <name>Canary</name>
     </author>
     <category term="linux" scheme="https://hotcocoacanary.github.io/categories/linux/"/>
-    <category term="niri" scheme="https://hotcocoacanary.github.io/tags/niri/"/>
-    <category term="Hyprland" scheme="https://hotcocoacanary.github.io/tags/Hyprland/"/>
-    <category term="DMS" scheme="https://hotcocoacanary.github.io/tags/DMS/"/>
-    <category term="Wayland" scheme="https://hotcocoacanary.github.io/tags/Wayland/"/>
-    <category term="窗口管理器" scheme="https://hotcocoacanary.github.io/tags/%E7%AA%97%E5%8F%A3%E7%AE%A1%E7%90%86%E5%99%A8/"/>
-    <id>https://hotcocoacanary.github.io/2026/06/17/linux/04-niri%E5%92%8CHyprland%E9%85%8D%E7%BD%AEDMS/</id>
-    <link href="https://hotcocoacanary.github.io/2026/06/17/linux/04-niri%E5%92%8CHyprland%E9%85%8D%E7%BD%AEDMS/"/>
+    <category term="Arch Linux" scheme="https://hotcocoacanary.github.io/tags/Arch-Linux/"/>
+    <category term="WSL" scheme="https://hotcocoacanary.github.io/tags/WSL/"/>
+    <category term="Windows" scheme="https://hotcocoacanary.github.io/tags/Windows/"/>
+    <id>https://hotcocoacanary.github.io/2026/06/17/linux/02-WSL%E5%AE%89%E8%A3%85Arch-Linux/</id>
+    <link href="https://hotcocoacanary.github.io/2026/06/17/linux/02-WSL%E5%AE%89%E8%A3%85Arch-Linux/"/>
     <published>2026-06-16T16:00:00.000Z</published>
     <summary>
-      <![CDATA[<h1 id="niri-和-Hyprland-配置（DMS）"><a href="#niri-和-Hyprland-配置（DMS）" class="headerlink" title="niri 和 Hyprland 配置（DMS）"></a>niri 和 Hyprland]]>
+      <![CDATA[<h1 id="通过-WSL-安装-Arch-Linux"><a href="#通过-WSL-安装-Arch-Linux" class="headerlink" title="通过 WSL 安装 Arch Linux"></a>通过 WSL 安装 Arch]]>
     </summary>
-    <title>niri 和 Hyprland 配置（DMS）</title>
+    <title>通过 WSL 安装 Arch Linux</title>
+    <updated>2026-08-19T04:01:39.793Z</updated>
+  </entry>
+  <entry>
+    <author>
+      <name>Canary</name>
+    </author>
+    <category term="linux" scheme="https://hotcocoacanary.github.io/categories/linux/"/>
+    <category term="开发环境" scheme="https://hotcocoacanary.github.io/tags/%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83/"/>
+    <category term="yay" scheme="https://hotcocoacanary.github.io/tags/yay/"/>
+    <category term="Neovim" scheme="https://hotcocoacanary.github.io/tags/Neovim/"/>
+    <category term="Docker" scheme="https://hotcocoacanary.github.io/tags/Docker/"/>
+    <category term="Java" scheme="https://hotcocoacanary.github.io/tags/Java/"/>
+    <category term="Node.js" scheme="https://hotcocoacanary.github.io/tags/Node-js/"/>
+    <category term="Python" scheme="https://hotcocoacanary.github.io/tags/Python/"/>
+    <category term="Go" scheme="https://hotcocoacanary.github.io/tags/Go/"/>
+    <id>https://hotcocoacanary.github.io/2026/06/17/linux/03-%E5%AE%89%E8%A3%85%E9%80%9A%E7%94%A8%E5%BC%80%E5%8F%91%E5%B7%A5%E5%85%B7/</id>
+    <link href="https://hotcocoacanary.github.io/2026/06/17/linux/03-%E5%AE%89%E8%A3%85%E9%80%9A%E7%94%A8%E5%BC%80%E5%8F%91%E5%B7%A5%E5%85%B7/"/>
+    <published>2026-06-16T16:00:00.000Z</published>
+    <summary>
+      <![CDATA[<h1 id="安装通用开发工具"><a href="#安装通用开发工具" class="headerlink" title="安装通用开发工具"></a>安装通用开发工具</h1><blockquote>
+<p><strong>适用读者</strong>：已完成 Arch]]>
+    </summary>
+    <title>安装通用开发工具</title>
     <updated>2026-08-19T04:01:39.793Z</updated>
   </entry>
   <entry>
@@ -104,6 +208,25 @@
       <![CDATA[<h1 id="中文环境配置和中文输入法"><a href="#中文环境配置和中文输入法" class="headerlink"]]>
     </summary>
     <title>中文环境配置和中文输入法</title>
+    <updated>2026-08-19T04:01:39.793Z</updated>
+  </entry>
+  <entry>
+    <author>
+      <name>Canary</name>
+    </author>
+    <category term="linux" scheme="https://hotcocoacanary.github.io/categories/linux/"/>
+    <category term="niri" scheme="https://hotcocoacanary.github.io/tags/niri/"/>
+    <category term="Hyprland" scheme="https://hotcocoacanary.github.io/tags/Hyprland/"/>
+    <category term="DMS" scheme="https://hotcocoacanary.github.io/tags/DMS/"/>
+    <category term="Wayland" scheme="https://hotcocoacanary.github.io/tags/Wayland/"/>
+    <category term="窗口管理器" scheme="https://hotcocoacanary.github.io/tags/%E7%AA%97%E5%8F%A3%E7%AE%A1%E7%90%86%E5%99%A8/"/>
+    <id>https://hotcocoacanary.github.io/2026/06/17/linux/04-niri%E5%92%8CHyprland%E9%85%8D%E7%BD%AEDMS/</id>
+    <link href="https://hotcocoacanary.github.io/2026/06/17/linux/04-niri%E5%92%8CHyprland%E9%85%8D%E7%BD%AEDMS/"/>
+    <published>2026-06-16T16:00:00.000Z</published>
+    <summary>
+      <![CDATA[<h1 id="niri-和-Hyprland-配置（DMS）"><a href="#niri-和-Hyprland-配置（DMS）" class="headerlink" title="niri 和 Hyprland 配置（DMS）"></a>niri 和 Hyprland]]>
+    </summary>
+    <title>niri 和 Hyprland 配置（DMS）</title>
     <updated>2026-08-19T04:01:39.793Z</updated>
   </entry>
   <entry>
@@ -257,108 +380,6 @@
       <![CDATA[<h2 id="题目描述"><a href="#题目描述" class="headerlink" title="题目描述"></a>题目描述</h2><p>给你一个字符串 <code>date</code>，它的格式为 <code>Day Month]]>
     </summary>
     <title>LeetCode 1507. Reformat Date</title>
-    <updated>2026-08-19T04:01:39.792Z</updated>
-  </entry>
-  <entry>
-    <author>
-      <name>Canary</name>
-    </author>
-    <category term="leetcode" scheme="https://hotcocoacanary.github.io/categories/leetcode/"/>
-    <category term="Java" scheme="https://hotcocoacanary.github.io/tags/Java/"/>
-    <category term="字符串" scheme="https://hotcocoacanary.github.io/tags/%E5%AD%97%E7%AC%A6%E4%B8%B2/"/>
-    <id>https://hotcocoacanary.github.io/2026/02/25/java/LeetCode-1668-Maximum-Repeating-Substring/</id>
-    <link href="https://hotcocoacanary.github.io/2026/02/25/java/LeetCode-1668-Maximum-Repeating-Substring/"/>
-    <published>2026-02-24T16:00:00.000Z</published>
-    <summary>
-      <![CDATA[<h2 id="题目描述"><a href="#题目描述" class="headerlink" title="题目描述"></a>题目描述</h2><p>给你一个字符串 <code>sequence</code>，如果字符串 <code>word</code> 连续重复]]>
-    </summary>
-    <title>LeetCode 1668. Maximum Repeating Substring</title>
-    <updated>2026-08-19T04:01:39.792Z</updated>
-  </entry>
-  <entry>
-    <author>
-      <name>Canary</name>
-    </author>
-    <category term="leetcode" scheme="https://hotcocoacanary.github.io/categories/leetcode/"/>
-    <category term="堆" scheme="https://hotcocoacanary.github.io/tags/%E5%A0%86/"/>
-    <category term="最小堆" scheme="https://hotcocoacanary.github.io/tags/%E6%9C%80%E5%B0%8F%E5%A0%86/"/>
-    <category term="Java" scheme="https://hotcocoacanary.github.io/tags/Java/"/>
-    <category term="贪心" scheme="https://hotcocoacanary.github.io/tags/%E8%B4%AA%E5%BF%83/"/>
-    <id>https://hotcocoacanary.github.io/2026/02/25/java/LeetCode-1705-Maximum-Number-of-Eaten-Apples/</id>
-    <link href="https://hotcocoacanary.github.io/2026/02/25/java/LeetCode-1705-Maximum-Number-of-Eaten-Apples/"/>
-    <published>2026-02-24T16:00:00.000Z</published>
-    <summary>
-      <![CDATA[<h2 id="题目描述"><a href="#题目描述" class="headerlink" title="题目描述"></a>题目描述</h2><p>有一棵特殊的苹果树，一连 <code>n</code> 天，每天都可以长出若干个苹果。在第 <code>i</code>]]>
-    </summary>
-    <title>LeetCode 1705. Maximum Number of Eaten Apples</title>
-    <updated>2026-08-19T04:01:39.792Z</updated>
-  </entry>
-  <entry>
-    <author>
-      <name>Canary</name>
-    </author>
-    <category term="leetcode" scheme="https://hotcocoacanary.github.io/categories/leetcode/"/>
-    <category term="Java" scheme="https://hotcocoacanary.github.io/tags/Java/"/>
-    <category term="链表" scheme="https://hotcocoacanary.github.io/tags/%E9%93%BE%E8%A1%A8/"/>
-    <category term="递归" scheme="https://hotcocoacanary.github.io/tags/%E9%80%92%E5%BD%92/"/>
-    <id>https://hotcocoacanary.github.io/2026/02/25/java/LeetCode-206-Reverse-Linked-List/</id>
-    <link href="https://hotcocoacanary.github.io/2026/02/25/java/LeetCode-206-Reverse-Linked-List/"/>
-    <published>2026-02-24T16:00:00.000Z</published>
-    <summary>
-      <![CDATA[<h2 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h2><p>给你单链表的头节点 <code>head</code>，请你反转链表，并返回反转后的链表。</p>
-<h2]]>
-    </summary>
-    <title>LeetCode 206. Reverse Linked List</title>
-    <updated>2026-08-19T04:01:39.792Z</updated>
-  </entry>
-  <entry>
-    <author>
-      <name>Canary</name>
-    </author>
-    <category term="leetcode" scheme="https://hotcocoacanary.github.io/categories/leetcode/"/>
-    <category term="Java" scheme="https://hotcocoacanary.github.io/tags/Java/"/>
-    <category term="链表" scheme="https://hotcocoacanary.github.io/tags/%E9%93%BE%E8%A1%A8/"/>
-    <id>https://hotcocoacanary.github.io/2026/02/25/java/LeetCode-328-Odd-Even-Linked-List/</id>
-    <link href="https://hotcocoacanary.github.io/2026/02/25/java/LeetCode-328-Odd-Even-Linked-List/"/>
-    <published>2026-02-24T16:00:00.000Z</published>
-    <summary>
-      <![CDATA[<h2 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h2><p>给定单链表的头节点]]>
-    </summary>
-    <title>LeetCode 328. Odd Even Linked List</title>
-    <updated>2026-08-19T04:01:39.792Z</updated>
-  </entry>
-  <entry>
-    <author>
-      <name>Canary</name>
-    </author>
-    <category term="leetcode" scheme="https://hotcocoacanary.github.io/categories/leetcode/"/>
-    <category term="Java" scheme="https://hotcocoacanary.github.io/tags/Java/"/>
-    <category term="数学" scheme="https://hotcocoacanary.github.io/tags/%E6%95%B0%E5%AD%A6/"/>
-    <category term="字符串" scheme="https://hotcocoacanary.github.io/tags/%E5%AD%97%E7%AC%A6%E4%B8%B2/"/>
-    <id>https://hotcocoacanary.github.io/2026/02/25/java/LeetCode-459-Repeated-Substring-Pattern/</id>
-    <link href="https://hotcocoacanary.github.io/2026/02/25/java/LeetCode-459-Repeated-Substring-Pattern/"/>
-    <published>2026-02-24T16:00:00.000Z</published>
-    <summary>
-      <![CDATA[<h2 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h2><p>给定一个非空的字符串 <code>s</code>，检查是否可以通过由它的一个子串重复多次构成。</p>
-<h2]]>
-    </summary>
-    <title>LeetCode 459. Repeated Substring Pattern</title>
-    <updated>2026-08-19T04:01:39.792Z</updated>
-  </entry>
-  <entry>
-    <author>
-      <name>Canary</name>
-    </author>
-    <category term="leetcode" scheme="https://hotcocoacanary.github.io/categories/leetcode/"/>
-    <category term="Java" scheme="https://hotcocoacanary.github.io/tags/Java/"/>
-    <category term="字符串" scheme="https://hotcocoacanary.github.io/tags/%E5%AD%97%E7%AC%A6%E4%B8%B2/"/>
-    <id>https://hotcocoacanary.github.io/2026/02/25/java/LeetCode-686-Repeated-String-Match/</id>
-    <link href="https://hotcocoacanary.github.io/2026/02/25/java/LeetCode-686-Repeated-String-Match/"/>
-    <published>2026-02-24T16:00:00.000Z</published>
-    <summary>
-      <![CDATA[<h2 id="题目描述"><a href="#题目描述" class="headerlink" title="题目描述"></a>题目描述</h2><p>给定两个字符串 <code>a</code> 和 <code>b</code>，寻找重复叠加字符串]]>
-    </summary>
-    <title>LeetCode 686. Repeated String Match</title>
     <updated>2026-08-19T04:01:39.792Z</updated>
   </entry>
 </feed>

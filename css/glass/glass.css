@@ -224,18 +224,33 @@
   --g-tint-hover: rgba(255, 250, 243, 0.18);
 }
 
+/* Dense — code, tables, quotes.
+   This was the one weight that never actually read as glass. A 72% tint with
+   2px of blur behind it is a frosted slab, and the bezel was both too narrow
+   and too weak (28 over 22px, against strong's 94 over 100px) to bend anything
+   a reader would notice. Both are now in line with the rest of the system: no
+   frost at all, a real refracting rim, and a tint low enough to let the page
+   show through the face.
+
+   The tint is the one number here that cannot simply be minimised. These
+   surfaces carry light text -- a dark pane is what keeps a code block readable
+   over a bright page -- so it has to stay dark enough to hold that contrast.
+   Half opacity is about where it still reads as dark glass rather than as
+   either a solid block or unreadable code. */
 .glass--dense {
   --g-radius: var(--g-r-md);
-  --g-blur: 2px;
-  /* §24 — high opacity, low distortion, but still a refracting bezel. */
-  --glass-refraction: 28;
-  --glass-bezel-width: 22;
-  --glass-edge-depth: 2.8;
-  --glass-chromatic: 0.015;
-  --g-tint: rgba(46, 32, 24, 0.72);
-  --g-tint-hover: rgba(46, 32, 24, 0.78);
+  --g-blur: 0px;
+  --glass-refraction: 58;
+  --glass-bezel-width: 48;
+  --glass-edge-depth: 1.9;
+  --glass-chromatic: 0.024;
+  /* Light, and translucent enough to actually be glass. The dark slab this
+     used to be existed to carry light text; the ink is tokenised now, so the
+     pane can be a pane. */
+  --g-tint: rgba(255, 252, 246, 0.44);
+  --g-tint-hover: rgba(255, 252, 246, 0.52);
   --g-saturate: 1.2;
-  color: #f6ece2;
+  color: var(--g-code-ink);
 }
 
 .glass--floating {
@@ -261,8 +276,8 @@
     --g-tint-hover: rgba(100, 74, 56, 0.32);
   }
   :root:not([data-theme="light"]) .glass--dense {
-    --g-tint: rgba(24, 17, 13, 0.78);
-    --g-tint-hover: rgba(24, 17, 13, 0.84);
+    --g-tint: rgba(24, 17, 13, 0.56);
+    --g-tint-hover: rgba(24, 17, 13, 0.62);
   }
   :root:not([data-theme="light"]) .glass--floating {
     --g-tint: rgba(84, 62, 46, 0.24);
@@ -278,8 +293,8 @@
   --g-tint-hover: rgba(100, 74, 56, 0.32);
 }
 [data-theme="dark"] .glass--dense {
-  --g-tint: rgba(24, 17, 13, 0.78);
-  --g-tint-hover: rgba(24, 17, 13, 0.84);
+  --g-tint: rgba(24, 17, 13, 0.56);
+  --g-tint-hover: rgba(24, 17, 13, 0.62);
 }
 [data-theme="dark"] .glass--floating {
   --g-tint: rgba(84, 62, 46, 0.24);

@@ -22,6 +22,17 @@
   --g-ink-dim:  #7d6a5c;
   --g-ink-mute: #a8968a;
 
+  /* ---- Dense surfaces (code, tables, quotes) --------------------------- *
+     These were painted for a dark slab and hard-coded to it, which is what
+     kept them from ever being glass: light text needs an opaque dark pane
+     behind it. Tokenised so the pane can be a light, genuinely translucent
+     one in light mode and stay dark in dark mode, with the ink following. */
+  --g-code-ink:      #33261e;
+  --g-code-ink-dim:  rgba(51, 38, 30, 0.42);
+  --g-code-edge:     rgba(120, 80, 50, 0.20);
+  --g-code-head:     rgba(90, 62, 42, 0.72);
+  --g-code-head-bg:  rgba(120, 80, 50, 0.07);
+
   /* ---- Background base ------------------------------------------------ */
   --g-bg:       #f7ece0;
   --g-bg-deep:  #efdfcd;
@@ -95,11 +106,11 @@
      together where neither directional layer reaches. */
   --g-shine:
     /* specular catch where the light lands */
-    inset 1px 1px 1.5px -0.5px rgba(255, 255, 255, 0.80),
+    inset 1px 1px 1.5px -0.5px rgba(255, 255, 255, 0.50),
     /* the dimmer bounce off the far rim */
-    inset -1px -1px 2px -1px rgba(255, 255, 255, 0.50),
+    inset -1px -1px 2px -1px rgba(255, 255, 255, 0.30),
     /* just enough definition to hold the silhouette */
-    inset 0 0 0 1px rgba(255, 255, 255, 0.16),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.07),
     /* Fresnel. The reference WebGL implementation weights this at 1.0 by
        default -- its single strongest term -- and it is the cue we had none
        of. At a rim you are looking through the glass at a grazing angle, so
@@ -109,7 +120,7 @@
        fills the gap between that hairline and where the displacement band
        begins, which is exactly where the edge was reading as a cut rather
        than a curve. */
-    inset 0 0 22px -11px rgba(255, 255, 255, 0.75),
+    inset 0 0 22px -11px rgba(255, 255, 255, 0.44),
     /* thickness */
     inset 0 0 12px -7px rgba(120, 62, 24, 0.18);
   --g-edge: rgba(255, 255, 255, 0.50);
@@ -154,6 +165,12 @@
     --g-ink-dim:  #bda694;
     --g-ink-mute: #8d7a6c;
 
+    --g-code-ink:      #f2e7dc;
+    --g-code-ink-dim:  rgba(242, 231, 220, 0.38);
+    --g-code-edge:     rgba(255, 226, 196, 0.14);
+    --g-code-head:     #cdb6a2;
+    --g-code-head-bg:  rgba(255, 226, 196, 0.08);
+
     --g-accent:   #f0a35e;
 
     --g-bg:       #191210;
@@ -166,10 +183,10 @@
     --g-contrast:   1.05;
 
     --g-shine:
-      inset 1px 1px 1.5px -0.5px rgba(255, 236, 212, 0.60),
-      inset -1px -1px 2px -1px rgba(255, 236, 212, 0.32),
-      inset 0 0 0 1px rgba(255, 236, 212, 0.11),
-      inset 0 0 22px -11px rgba(255, 236, 212, 0.42),
+      inset 1px 1px 1.5px -0.5px rgba(255, 236, 212, 0.38),
+      inset -1px -1px 2px -1px rgba(255, 236, 212, 0.19),
+      inset 0 0 0 1px rgba(255, 236, 212, 0.05),
+      inset 0 0 22px -11px rgba(255, 236, 212, 0.26),
       inset 0 0 12px -7px rgba(0, 0, 0, 0.32);
     --g-edge: rgba(255, 236, 212, 0.34);
 
@@ -188,6 +205,12 @@
   --g-ink-dim:  #bda694;
   --g-ink-mute: #8d7a6c;
 
+  --g-code-ink:      #f2e7dc;
+  --g-code-ink-dim:  rgba(242, 231, 220, 0.38);
+  --g-code-edge:     rgba(255, 226, 196, 0.14);
+  --g-code-head:     #cdb6a2;
+  --g-code-head-bg:  rgba(255, 226, 196, 0.08);
+
   --g-accent:   #f0a35e;
 
   --g-bg:       #191210;
@@ -200,10 +223,10 @@
   --g-contrast:   1.05;
 
   --g-shine:
-    inset 1px 1px 1.5px -0.5px rgba(255, 236, 212, 0.60),
-    inset -1px -1px 2px -1px rgba(255, 236, 212, 0.32),
-    inset 0 0 0 1px rgba(255, 236, 212, 0.11),
-    inset 0 0 22px -11px rgba(255, 236, 212, 0.42),
+    inset 1px 1px 1.5px -0.5px rgba(255, 236, 212, 0.38),
+    inset -1px -1px 2px -1px rgba(255, 236, 212, 0.19),
+    inset 0 0 0 1px rgba(255, 236, 212, 0.05),
+    inset 0 0 22px -11px rgba(255, 236, 212, 0.26),
     inset 0 0 12px -7px rgba(0, 0, 0, 0.32);
   --g-edge: rgba(255, 236, 212, 0.34);
 
