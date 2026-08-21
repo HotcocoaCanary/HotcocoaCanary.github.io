@@ -196,25 +196,6 @@
       <name>Canary</name>
     </author>
     <category term="linux" scheme="https://hotcocoacanary.github.io/categories/linux/"/>
-    <category term="中文环境" scheme="https://hotcocoacanary.github.io/tags/%E4%B8%AD%E6%96%87%E7%8E%AF%E5%A2%83/"/>
-    <category term="fcitx5" scheme="https://hotcocoacanary.github.io/tags/fcitx5/"/>
-    <category term="ibus" scheme="https://hotcocoacanary.github.io/tags/ibus/"/>
-    <category term="输入法" scheme="https://hotcocoacanary.github.io/tags/%E8%BE%93%E5%85%A5%E6%B3%95/"/>
-    <category term="locale" scheme="https://hotcocoacanary.github.io/tags/locale/"/>
-    <id>https://hotcocoacanary.github.io/2026/06/17/linux/05-%E4%B8%AD%E6%96%87%E7%8E%AF%E5%A2%83%E5%92%8C%E8%BE%93%E5%85%A5%E6%B3%95%E9%85%8D%E7%BD%AE/</id>
-    <link href="https://hotcocoacanary.github.io/2026/06/17/linux/05-%E4%B8%AD%E6%96%87%E7%8E%AF%E5%A2%83%E5%92%8C%E8%BE%93%E5%85%A5%E6%B3%95%E9%85%8D%E7%BD%AE/"/>
-    <published>2026-06-16T16:00:00.000Z</published>
-    <summary>
-      <![CDATA[<h1 id="中文环境配置和中文输入法"><a href="#中文环境配置和中文输入法" class="headerlink"]]>
-    </summary>
-    <title>中文环境配置和中文输入法</title>
-    <updated>2026-08-19T04:01:39.793Z</updated>
-  </entry>
-  <entry>
-    <author>
-      <name>Canary</name>
-    </author>
-    <category term="linux" scheme="https://hotcocoacanary.github.io/categories/linux/"/>
     <category term="niri" scheme="https://hotcocoacanary.github.io/tags/niri/"/>
     <category term="Hyprland" scheme="https://hotcocoacanary.github.io/tags/Hyprland/"/>
     <category term="DMS" scheme="https://hotcocoacanary.github.io/tags/DMS/"/>
@@ -227,6 +208,25 @@
       <![CDATA[<h1 id="niri-和-Hyprland-配置（DMS）"><a href="#niri-和-Hyprland-配置（DMS）" class="headerlink" title="niri 和 Hyprland 配置（DMS）"></a>niri 和 Hyprland]]>
     </summary>
     <title>niri 和 Hyprland 配置（DMS）</title>
+    <updated>2026-08-19T04:01:39.793Z</updated>
+  </entry>
+  <entry>
+    <author>
+      <name>Canary</name>
+    </author>
+    <category term="linux" scheme="https://hotcocoacanary.github.io/categories/linux/"/>
+    <category term="中文环境" scheme="https://hotcocoacanary.github.io/tags/%E4%B8%AD%E6%96%87%E7%8E%AF%E5%A2%83/"/>
+    <category term="fcitx5" scheme="https://hotcocoacanary.github.io/tags/fcitx5/"/>
+    <category term="ibus" scheme="https://hotcocoacanary.github.io/tags/ibus/"/>
+    <category term="输入法" scheme="https://hotcocoacanary.github.io/tags/%E8%BE%93%E5%85%A5%E6%B3%95/"/>
+    <category term="locale" scheme="https://hotcocoacanary.github.io/tags/locale/"/>
+    <id>https://hotcocoacanary.github.io/2026/06/17/linux/05-%E4%B8%AD%E6%96%87%E7%8E%AF%E5%A2%83%E5%92%8C%E8%BE%93%E5%85%A5%E6%B3%95%E9%85%8D%E7%BD%AE/</id>
+    <link href="https://hotcocoacanary.github.io/2026/06/17/linux/05-%E4%B8%AD%E6%96%87%E7%8E%AF%E5%A2%83%E5%92%8C%E8%BE%93%E5%85%A5%E6%B3%95%E9%85%8D%E7%BD%AE/"/>
+    <published>2026-06-16T16:00:00.000Z</published>
+    <summary>
+      <![CDATA[<h1 id="中文环境配置和中文输入法"><a href="#中文环境配置和中文输入法" class="headerlink"]]>
+    </summary>
+    <title>中文环境配置和中文输入法</title>
     <updated>2026-08-19T04:01:39.793Z</updated>
   </entry>
   <entry>

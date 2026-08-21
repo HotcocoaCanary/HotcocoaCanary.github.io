@@ -593,209 +593,6 @@ Docker → 容器化运行环境
       </tags>
   </entry>
   <entry>
-    <title>中文环境配置和中文输入法</title>
-    <url>/2026/06/17/linux/05-%E4%B8%AD%E6%96%87%E7%8E%AF%E5%A2%83%E5%92%8C%E8%BE%93%E5%85%A5%E6%B3%95%E9%85%8D%E7%BD%AE/</url>
-    <content><![CDATA[中文环境配置和中文输入法
-适用读者：已完成前四篇配置、需要在 Arch Linux 上使用中文界面和输入法的读者。
-
-
-前言：中文支持的两个层面在 Linux 上”用中文”包含两件事：
-
-中文显示：系统界面、终端、应用程序能正确显示中文字符（需要正确的 locale 和字体）
-中文输入：能通过拼音等方式输入汉字（需要输入法框架）
-
-两者都需要配置，缺一不可。
-
-一、配置系统中文环境（locale）1.1 什么是 locale？locale 是操作系统的本地化设置，决定系统使用的语言、字符编码、日期格式、货币符号等。zh_CN.UTF-8 就是”中国大陆简体中文、UTF-8 编码”的 locale。
-1.2 生成中文 locale编辑 /etc/locale.gen，取消注释中文和英文的 UTF-8 行：
-sudo nano /etc/locale.gen
-
-找到并去掉这两行的 #：
-en_US.UTF-8 UTF-8zh_CN.UTF-8 UTF-8
-
-然后生成：
-sudo locale-gen
-
-为什么要同时保留英文 locale？
-某些程序在中文 locale 下会产生乱码（尤其是终端里的错误信息、man 页面），保留 en_US.UTF-8 作为备选可以避免这类问题。
-1.3 设置默认语言编辑 /etc/locale.conf：
-sudo nano /etc/locale.conf
-
-桌面环境用户（GNOME &#x2F; KDE &#x2F; niri &#x2F; Hyprland），设置为中文：
-LANG=zh_CN.UTF-8
-
-纯终端用户（WSL 或无桌面），建议保持英文，否则终端里的中文提示符和错误信息可能显示异常：
-LANG=en_US.UTF-8
-
-修改 /etc/locale.conf 后需要重新登录才能生效，或者执行：
-export LANG=zh_CN.UTF-8
-
-（仅对当前 shell 临时生效）
-1.4 安装中文字体设置了中文 locale 但没有中文字体，屏幕上的汉字会显示为方块。安装常用字体：
-# 思源黑体（Adobe/Google 联合发布，高质量开源字体）sudo pacman -S adobe-source-han-sans-cn-fonts# 思源宋体（衬线体）sudo pacman -S adobe-source-han-serif-cn-fonts# Noto 字体（Google 出品，覆盖所有 Unicode 字符，防止&quot;豆腐块&quot;）sudo pacman -S noto-fonts noto-fonts-cjk noto-fonts-emoji
-
-安装后刷新字体缓存：
-fc-cache -fv
-
-
-二、GNOME 下配置中文输入法（ibus-pinyin）GNOME 内置了对 ibus 输入法框架的深度集成——GNOME 在登录时会自动启动 ibus 守护进程，无需额外配置启动。
-2.1 什么是 ibus？ibus（Intelligent Input Bus）是 Linux 下的输入法框架，负责在应用程序和具体输入法引擎之间传递按键事件。GNOME 选择 ibus 作为官方支持的输入法框架。
-2.2 安装 ibus-pinyinsudo pacman -S ibus ibus-pinyin
-
-
-ibus：输入法框架本体
-ibus-pinyin：拼音输入法引擎
-
-2.3 配置 ibus打开 GNOME 的”设置”→”键盘”→”输入源”，点击 + 号，选择”汉语（中国）”→”中文（Intelligent Pinyin）”添加。
-或者通过命令行配置：
-# 添加中文拼音输入源gsettings set org.gnome.desktop.input-sources sources &quot;[(&#x27;xkb&#x27;, &#x27;us&#x27;), (&#x27;ibus&#x27;, &#x27;pinyin&#x27;)]&quot;
-
-2.4 切换输入法GNOME 默认使用 Super + Space 切换输入法。也可以在设置里改成 Ctrl + Space 或其他快捷键。
-2.5 为什么 GNOME 用 ibus 而不是 fcitx5？GNOME 通过 XDG Autostart 和 D-Bus 与 ibus 深度绑定，ibus 在 GNOME 下的体验更原生，无需额外配置。而 fcitx5 虽然功能更丰富，但在 GNOME 下需要额外处理与 ibus 的冲突（GNOME 登录时会同时启动两个输入法框架，造成混乱）。
-
-三、niri 和 Hyprland 下配置中文输入法（fcitx5）3.1 为什么 niri&#x2F;Hyprland 用 fcitx5？ibus 与 GNOME 耦合较深，在 niri、Hyprland 等独立窗口管理器下问题较多：输入法候选框位置错误、GTK 应用无法输入等。fcitx5 对 Wayland 合成器的支持更好，是平铺式窗口管理器用户的首选。
-fcitx5 支持的输入方案也更丰富：除了拼音，还有五笔、仓颉、Rime（支持各种方言输入）等。
-3.2 安装 fcitx5# fcitx5 本体sudo pacman -S fcitx5# Rime 输入法引擎（包含拼音、五笔等多种方案）sudo pacman -S fcitx5-rime# fcitx5 图形配置工具sudo pacman -S fcitx5-configtool# GTK 和 Qt 输入法模块（让 GTK/Qt 应用能使用 fcitx5）sudo pacman -S fcitx5-gtk fcitx5-qt
-
-为什么要安装 fcitx5-gtk 和 fcitx5-qt？
-在 Wayland 下，输入法有两种通信方式：
-
-Wayland text-input 协议（原生，效果最好）
-输入法模块（GTK&#x2F;Qt 各自的模块，兼容性更广）
-
-安装 fcitx5-gtk 和 fcitx5-qt 确保更多应用能正常调用输入法。
-3.3 处理与 ibus 的冲突fcitx5 安装后，会在 /etc/xdg/autostart/ 下放置一个自启文件 fcitx5.desktop。如果你的系统同时安装了 GNOME（或者之前用过 GNOME），登录桌面时可能同时启动 ibus 和 fcitx5 两个输入法框架，造成冲突。
-处理方法：删除 fcitx5 的 XDG autostart 文件
-sudo rm /etc/xdg/autostart/fcitx5.desktop
-
-删掉之后，fcitx5 不再通过 XDG 自动启动，改为由合成器（niri&#x2F;Hyprland）的配置文件显式启动。这样 GNOME 用 ibus，niri&#x2F;Hyprland 用 fcitx5，互不干扰。
-
-⚠️ 注意：如果你只用 niri&#x2F;Hyprland，不用 GNOME，也建议这样操作，因为手动在合成器配置里启动 fcitx5 比 XDG autostart 更可控，可以精确控制启动时机。
-
-3.4 配置环境变量输入法框架需要通过环境变量告知各个工具包（GTK、Qt）应该使用哪个输入法：
-niri 配置（~/.config/niri/config.kdl）：
-environment &#123;    GTK_IM_MODULE &quot;fcitx&quot;    QT_IM_MODULE &quot;fcitx&quot;    XMODIFIERS &quot;@im=fcitx&quot;    SDL_IM_MODULE &quot;fcitx&quot;&#125;spawn-at-startup &quot;fcitx5&quot; &quot;-d&quot;
-
-解析：
-
-GTK_IM_MODULE &quot;fcitx&quot;：告诉所有 GTK 应用（如 Firefox、Nautilus）使用 fcitx 输入法模块
-QT_IM_MODULE &quot;fcitx&quot;：告诉所有 Qt 应用（如 JetBrains IDE、VLC）使用 fcitx 输入法模块
-XMODIFIERS &quot;@im=fcitx&quot;：XIM 协议的输入法设置，用于老旧的 X11 应用（通过 XWayland 运行时）
-SDL_IM_MODULE &quot;fcitx&quot;：告诉 SDL2 应用（如某些游戏）使用 fcitx
-spawn-at-startup &quot;fcitx5&quot; &quot;-d&quot;：niri 启动时自动以后台模式（-d）运行 fcitx5
-
-Hyprland 配置（新版 Lua 格式，~/.config/hypr/hyprland.lua）：
--- 设置输入法环境变量hl.env(&quot;GTK_IM_MODULE&quot;, &quot;fcitx&quot;)hl.env(&quot;QT_IM_MODULE&quot;, &quot;fcitx&quot;)hl.env(&quot;XMODIFIERS&quot;, &quot;@im=fcitx&quot;)hl.env(&quot;SDL_IM_MODULE&quot;, &quot;fcitx&quot;)-- 开机自启 fcitx5hl.on(&quot;hyprland.start&quot;, function()    hl.exec_cmd(&quot;fcitx5 -d&quot;)end)
-
-Hyprland 配置（旧版 hyprlang 格式，~/.config/hypr/hyprland.conf）：
-# 输入法环境变量env = GTK_IM_MODULE,fcitxenv = QT_IM_MODULE,fcitxenv = XMODIFIERS,@im=fcitxenv = SDL_IM_MODULE,fcitx# 开机自启 fcitx5（后台静默模式）exec-once = fcitx5 -d
-
-3.5 配置 fcitx5-rime 拼音输入首次启动 fcitx5 后，打开配置工具：
-fcitx5-configtool
-
-在图形界面里：
-
-点击左下角 + 号添加输入法
-取消勾选”只显示当前语言”
-搜索 “rime” 或 “中文”，添加 Rime
-点击 OK 保存
-
-Rime 默认包含”朙月拼音”（繁体）和”仓颉五代”。要使用简体拼音，有两种方式：
-方式 A：切换 Rime 内置方案
-fcitx5-rime 安装后，默认会包含简体拼音。在输入法激活状态下，按 F4 或 Ctrl+~ 可以打开方案选择菜单，选择”朙月拼音·简化字”。
-方式 B：安装 rime-pinyin-zhwiki 词库（可选，扩充词汇量）
-yay -S rime-pinyin-zhwiki
-
-安装后在 fcitx5-configtool 里点击”重新部署 Rime”即可。
-3.6 切换输入法fcitx5 默认用 Ctrl + Space 切换中英文，用 Ctrl + Shift 切换不同输入法。可以在 fcitx5-configtool 的”全局选项”里修改。
-3.7 验证输入法是否工作打开 kitty 终端，切换到中文输入法，输入拼音，应该能看到候选词列表浮现。
-如果没有出现候选框，执行诊断：
-fcitx5-diagnose
-
-这个命令会详细检查 fcitx5 的运行状态和环境变量配置，并给出修复建议。
-
-四、中文字体渲染优化（可选）4.1 配置字体优先级在某些情况下，系统可能会选择日文版本的汉字字体，导致字形看起来”怪怪的”（日文汉字和中文简体字形有细微差异）。通过字体配置文件指定优先使用中文字体：
-mkdir -p ~/.config/fontconfignano ~/.config/fontconfig/fonts.conf
-
-写入：
-&lt;?xml version=&quot;1.0&quot;?&gt;&lt;!DOCTYPE fontconfig SYSTEM &quot;fonts.dtd&quot;&gt;&lt;fontconfig&gt;  &lt;!-- 优先使用中文字体渲染中文 --&gt;  &lt;match&gt;    &lt;test name=&quot;lang&quot; compare=&quot;contains&quot;&gt;      &lt;string&gt;zh&lt;/string&gt;    &lt;/test&gt;    &lt;edit name=&quot;family&quot; mode=&quot;prepend&quot;&gt;      &lt;string&gt;Noto Sans CJK SC&lt;/string&gt;    &lt;/edit&gt;  &lt;/match&gt;    &lt;!-- 优先使用中文字体渲染日文 Unicode 区的汉字 --&gt;  &lt;alias&gt;    &lt;family&gt;serif&lt;/family&gt;    &lt;prefer&gt;      &lt;family&gt;Noto Serif CJK SC&lt;/family&gt;    &lt;/prefer&gt;  &lt;/alias&gt;  &lt;alias&gt;    &lt;family&gt;sans-serif&lt;/family&gt;    &lt;prefer&gt;      &lt;family&gt;Noto Sans CJK SC&lt;/family&gt;    &lt;/prefer&gt;  &lt;/alias&gt;  &lt;alias&gt;    &lt;family&gt;monospace&lt;/family&gt;    &lt;prefer&gt;      &lt;family&gt;Noto Sans Mono CJK SC&lt;/family&gt;    &lt;/prefer&gt;  &lt;/alias&gt;&lt;/fontconfig&gt;
-
-刷新字体缓存：
-fc-cache -fv
-
-
-五、常见问题排查问题：终端里中文显示为乱码原因：终端的字体不包含中文字符，或者编码设置有问题。
-解决：
-# 确认当前编码是 UTF-8echo $LANG# 在 kitty 的配置里设置中文字体回退echo &#x27;font_family      JetBrains Monofont_size 13.0# 中文回退字体symbol_map U+4E00-U+9FFF,U+3400-U+4DBF Noto Sans CJK SC&#x27; &gt;&gt; ~/.config/kitty/kitty.conf
-
-问题：fcitx5 启动了但无法输入中文原因：环境变量没有被程序读取到（程序在 fcitx5 设置环境变量之前启动）。
-解决：
-
-确认 niri&#x2F;Hyprland 配置文件里的 GTK_IM_MODULE 等变量已正确设置
-关闭并重新打开应用
-运行 fcitx5-diagnose 查看详细信息
-
-问题：GNOME 下同时运行了 ibus 和 fcitx5原因：忘记删除 /etc/xdg/autostart/fcitx5.desktop。
-解决：
-sudo rm /etc/xdg/autostart/fcitx5.desktop
-
-然后注销重新登录。
-问题：JetBrains IDE 无法使用 fcitx5 输入中文原因：JetBrains IDE 默认运行在 XWayland 下，需要 XIM 支持。
-解决：在 IDE 的 JVM 选项里添加：
--Drecreate.x11.input.method=true
-
-在 IDE 里通过 Help → Edit Custom VM Options 添加。
-
-小结至此，五篇博客的全部内容已经完成：
-
-
-
-篇
-内容
-
-
-
-第一篇
-通过 archinstall 安装 Arch Linux + 多种桌面环境
-
-
-第二篇
-通过 WSL 在 Windows 上安装 Arch Linux
-
-
-第三篇
-安装 git、yay、sdkman、nvm、uv、Go、Docker、LazyVim
-
-
-第四篇
-通过 DMS 配置 niri 和 Hyprland
-
-
-第五篇
-中文 locale、字体、ibus（GNOME）、fcitx5（niri&#x2F;Hyprland）
-
-
-通过这五篇的配置，你拥有了一个：
-
-完整的中文支持（界面 + 输入）
-现代化的开发环境（Java&#x2F;Node&#x2F;Python&#x2F;Go&#x2F;Docker）
-高效的编辑器（Neovim + LazyVim）
-漂亮可用的桌面（DMS + niri 或 Hyprland）
-
-的 Arch Linux 系统。
-]]></content>
-      <categories>
-        <category>linux</category>
-      </categories>
-      <tags>
-        <tag>中文环境</tag>
-        <tag>fcitx5</tag>
-        <tag>ibus</tag>
-        <tag>输入法</tag>
-        <tag>locale</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>niri 和 Hyprland 配置（DMS）</title>
     <url>/2026/06/17/linux/04-niri%E5%92%8CHyprland%E9%85%8D%E7%BD%AEDMS/</url>
     <content><![CDATA[niri 和 Hyprland 配置（DMS）
@@ -1013,6 +810,209 @@ dms ipc call wallpaper set ~/Pictures/my-wallpaper.jpg
       <tags>
         <tag>Python</tag>
         <tag>数组</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>中文环境配置和中文输入法</title>
+    <url>/2026/06/17/linux/05-%E4%B8%AD%E6%96%87%E7%8E%AF%E5%A2%83%E5%92%8C%E8%BE%93%E5%85%A5%E6%B3%95%E9%85%8D%E7%BD%AE/</url>
+    <content><![CDATA[中文环境配置和中文输入法
+适用读者：已完成前四篇配置、需要在 Arch Linux 上使用中文界面和输入法的读者。
+
+
+前言：中文支持的两个层面在 Linux 上”用中文”包含两件事：
+
+中文显示：系统界面、终端、应用程序能正确显示中文字符（需要正确的 locale 和字体）
+中文输入：能通过拼音等方式输入汉字（需要输入法框架）
+
+两者都需要配置，缺一不可。
+
+一、配置系统中文环境（locale）1.1 什么是 locale？locale 是操作系统的本地化设置，决定系统使用的语言、字符编码、日期格式、货币符号等。zh_CN.UTF-8 就是”中国大陆简体中文、UTF-8 编码”的 locale。
+1.2 生成中文 locale编辑 /etc/locale.gen，取消注释中文和英文的 UTF-8 行：
+sudo nano /etc/locale.gen
+
+找到并去掉这两行的 #：
+en_US.UTF-8 UTF-8zh_CN.UTF-8 UTF-8
+
+然后生成：
+sudo locale-gen
+
+为什么要同时保留英文 locale？
+某些程序在中文 locale 下会产生乱码（尤其是终端里的错误信息、man 页面），保留 en_US.UTF-8 作为备选可以避免这类问题。
+1.3 设置默认语言编辑 /etc/locale.conf：
+sudo nano /etc/locale.conf
+
+桌面环境用户（GNOME &#x2F; KDE &#x2F; niri &#x2F; Hyprland），设置为中文：
+LANG=zh_CN.UTF-8
+
+纯终端用户（WSL 或无桌面），建议保持英文，否则终端里的中文提示符和错误信息可能显示异常：
+LANG=en_US.UTF-8
+
+修改 /etc/locale.conf 后需要重新登录才能生效，或者执行：
+export LANG=zh_CN.UTF-8
+
+（仅对当前 shell 临时生效）
+1.4 安装中文字体设置了中文 locale 但没有中文字体，屏幕上的汉字会显示为方块。安装常用字体：
+# 思源黑体（Adobe/Google 联合发布，高质量开源字体）sudo pacman -S adobe-source-han-sans-cn-fonts# 思源宋体（衬线体）sudo pacman -S adobe-source-han-serif-cn-fonts# Noto 字体（Google 出品，覆盖所有 Unicode 字符，防止&quot;豆腐块&quot;）sudo pacman -S noto-fonts noto-fonts-cjk noto-fonts-emoji
+
+安装后刷新字体缓存：
+fc-cache -fv
+
+
+二、GNOME 下配置中文输入法（ibus-pinyin）GNOME 内置了对 ibus 输入法框架的深度集成——GNOME 在登录时会自动启动 ibus 守护进程，无需额外配置启动。
+2.1 什么是 ibus？ibus（Intelligent Input Bus）是 Linux 下的输入法框架，负责在应用程序和具体输入法引擎之间传递按键事件。GNOME 选择 ibus 作为官方支持的输入法框架。
+2.2 安装 ibus-pinyinsudo pacman -S ibus ibus-pinyin
+
+
+ibus：输入法框架本体
+ibus-pinyin：拼音输入法引擎
+
+2.3 配置 ibus打开 GNOME 的”设置”→”键盘”→”输入源”，点击 + 号，选择”汉语（中国）”→”中文（Intelligent Pinyin）”添加。
+或者通过命令行配置：
+# 添加中文拼音输入源gsettings set org.gnome.desktop.input-sources sources &quot;[(&#x27;xkb&#x27;, &#x27;us&#x27;), (&#x27;ibus&#x27;, &#x27;pinyin&#x27;)]&quot;
+
+2.4 切换输入法GNOME 默认使用 Super + Space 切换输入法。也可以在设置里改成 Ctrl + Space 或其他快捷键。
+2.5 为什么 GNOME 用 ibus 而不是 fcitx5？GNOME 通过 XDG Autostart 和 D-Bus 与 ibus 深度绑定，ibus 在 GNOME 下的体验更原生，无需额外配置。而 fcitx5 虽然功能更丰富，但在 GNOME 下需要额外处理与 ibus 的冲突（GNOME 登录时会同时启动两个输入法框架，造成混乱）。
+
+三、niri 和 Hyprland 下配置中文输入法（fcitx5）3.1 为什么 niri&#x2F;Hyprland 用 fcitx5？ibus 与 GNOME 耦合较深，在 niri、Hyprland 等独立窗口管理器下问题较多：输入法候选框位置错误、GTK 应用无法输入等。fcitx5 对 Wayland 合成器的支持更好，是平铺式窗口管理器用户的首选。
+fcitx5 支持的输入方案也更丰富：除了拼音，还有五笔、仓颉、Rime（支持各种方言输入）等。
+3.2 安装 fcitx5# fcitx5 本体sudo pacman -S fcitx5# Rime 输入法引擎（包含拼音、五笔等多种方案）sudo pacman -S fcitx5-rime# fcitx5 图形配置工具sudo pacman -S fcitx5-configtool# GTK 和 Qt 输入法模块（让 GTK/Qt 应用能使用 fcitx5）sudo pacman -S fcitx5-gtk fcitx5-qt
+
+为什么要安装 fcitx5-gtk 和 fcitx5-qt？
+在 Wayland 下，输入法有两种通信方式：
+
+Wayland text-input 协议（原生，效果最好）
+输入法模块（GTK&#x2F;Qt 各自的模块，兼容性更广）
+
+安装 fcitx5-gtk 和 fcitx5-qt 确保更多应用能正常调用输入法。
+3.3 处理与 ibus 的冲突fcitx5 安装后，会在 /etc/xdg/autostart/ 下放置一个自启文件 fcitx5.desktop。如果你的系统同时安装了 GNOME（或者之前用过 GNOME），登录桌面时可能同时启动 ibus 和 fcitx5 两个输入法框架，造成冲突。
+处理方法：删除 fcitx5 的 XDG autostart 文件
+sudo rm /etc/xdg/autostart/fcitx5.desktop
+
+删掉之后，fcitx5 不再通过 XDG 自动启动，改为由合成器（niri&#x2F;Hyprland）的配置文件显式启动。这样 GNOME 用 ibus，niri&#x2F;Hyprland 用 fcitx5，互不干扰。
+
+⚠️ 注意：如果你只用 niri&#x2F;Hyprland，不用 GNOME，也建议这样操作，因为手动在合成器配置里启动 fcitx5 比 XDG autostart 更可控，可以精确控制启动时机。
+
+3.4 配置环境变量输入法框架需要通过环境变量告知各个工具包（GTK、Qt）应该使用哪个输入法：
+niri 配置（~/.config/niri/config.kdl）：
+environment &#123;    GTK_IM_MODULE &quot;fcitx&quot;    QT_IM_MODULE &quot;fcitx&quot;    XMODIFIERS &quot;@im=fcitx&quot;    SDL_IM_MODULE &quot;fcitx&quot;&#125;spawn-at-startup &quot;fcitx5&quot; &quot;-d&quot;
+
+解析：
+
+GTK_IM_MODULE &quot;fcitx&quot;：告诉所有 GTK 应用（如 Firefox、Nautilus）使用 fcitx 输入法模块
+QT_IM_MODULE &quot;fcitx&quot;：告诉所有 Qt 应用（如 JetBrains IDE、VLC）使用 fcitx 输入法模块
+XMODIFIERS &quot;@im=fcitx&quot;：XIM 协议的输入法设置，用于老旧的 X11 应用（通过 XWayland 运行时）
+SDL_IM_MODULE &quot;fcitx&quot;：告诉 SDL2 应用（如某些游戏）使用 fcitx
+spawn-at-startup &quot;fcitx5&quot; &quot;-d&quot;：niri 启动时自动以后台模式（-d）运行 fcitx5
+
+Hyprland 配置（新版 Lua 格式，~/.config/hypr/hyprland.lua）：
+-- 设置输入法环境变量hl.env(&quot;GTK_IM_MODULE&quot;, &quot;fcitx&quot;)hl.env(&quot;QT_IM_MODULE&quot;, &quot;fcitx&quot;)hl.env(&quot;XMODIFIERS&quot;, &quot;@im=fcitx&quot;)hl.env(&quot;SDL_IM_MODULE&quot;, &quot;fcitx&quot;)-- 开机自启 fcitx5hl.on(&quot;hyprland.start&quot;, function()    hl.exec_cmd(&quot;fcitx5 -d&quot;)end)
+
+Hyprland 配置（旧版 hyprlang 格式，~/.config/hypr/hyprland.conf）：
+# 输入法环境变量env = GTK_IM_MODULE,fcitxenv = QT_IM_MODULE,fcitxenv = XMODIFIERS,@im=fcitxenv = SDL_IM_MODULE,fcitx# 开机自启 fcitx5（后台静默模式）exec-once = fcitx5 -d
+
+3.5 配置 fcitx5-rime 拼音输入首次启动 fcitx5 后，打开配置工具：
+fcitx5-configtool
+
+在图形界面里：
+
+点击左下角 + 号添加输入法
+取消勾选”只显示当前语言”
+搜索 “rime” 或 “中文”，添加 Rime
+点击 OK 保存
+
+Rime 默认包含”朙月拼音”（繁体）和”仓颉五代”。要使用简体拼音，有两种方式：
+方式 A：切换 Rime 内置方案
+fcitx5-rime 安装后，默认会包含简体拼音。在输入法激活状态下，按 F4 或 Ctrl+~ 可以打开方案选择菜单，选择”朙月拼音·简化字”。
+方式 B：安装 rime-pinyin-zhwiki 词库（可选，扩充词汇量）
+yay -S rime-pinyin-zhwiki
+
+安装后在 fcitx5-configtool 里点击”重新部署 Rime”即可。
+3.6 切换输入法fcitx5 默认用 Ctrl + Space 切换中英文，用 Ctrl + Shift 切换不同输入法。可以在 fcitx5-configtool 的”全局选项”里修改。
+3.7 验证输入法是否工作打开 kitty 终端，切换到中文输入法，输入拼音，应该能看到候选词列表浮现。
+如果没有出现候选框，执行诊断：
+fcitx5-diagnose
+
+这个命令会详细检查 fcitx5 的运行状态和环境变量配置，并给出修复建议。
+
+四、中文字体渲染优化（可选）4.1 配置字体优先级在某些情况下，系统可能会选择日文版本的汉字字体，导致字形看起来”怪怪的”（日文汉字和中文简体字形有细微差异）。通过字体配置文件指定优先使用中文字体：
+mkdir -p ~/.config/fontconfignano ~/.config/fontconfig/fonts.conf
+
+写入：
+&lt;?xml version=&quot;1.0&quot;?&gt;&lt;!DOCTYPE fontconfig SYSTEM &quot;fonts.dtd&quot;&gt;&lt;fontconfig&gt;  &lt;!-- 优先使用中文字体渲染中文 --&gt;  &lt;match&gt;    &lt;test name=&quot;lang&quot; compare=&quot;contains&quot;&gt;      &lt;string&gt;zh&lt;/string&gt;    &lt;/test&gt;    &lt;edit name=&quot;family&quot; mode=&quot;prepend&quot;&gt;      &lt;string&gt;Noto Sans CJK SC&lt;/string&gt;    &lt;/edit&gt;  &lt;/match&gt;    &lt;!-- 优先使用中文字体渲染日文 Unicode 区的汉字 --&gt;  &lt;alias&gt;    &lt;family&gt;serif&lt;/family&gt;    &lt;prefer&gt;      &lt;family&gt;Noto Serif CJK SC&lt;/family&gt;    &lt;/prefer&gt;  &lt;/alias&gt;  &lt;alias&gt;    &lt;family&gt;sans-serif&lt;/family&gt;    &lt;prefer&gt;      &lt;family&gt;Noto Sans CJK SC&lt;/family&gt;    &lt;/prefer&gt;  &lt;/alias&gt;  &lt;alias&gt;    &lt;family&gt;monospace&lt;/family&gt;    &lt;prefer&gt;      &lt;family&gt;Noto Sans Mono CJK SC&lt;/family&gt;    &lt;/prefer&gt;  &lt;/alias&gt;&lt;/fontconfig&gt;
+
+刷新字体缓存：
+fc-cache -fv
+
+
+五、常见问题排查问题：终端里中文显示为乱码原因：终端的字体不包含中文字符，或者编码设置有问题。
+解决：
+# 确认当前编码是 UTF-8echo $LANG# 在 kitty 的配置里设置中文字体回退echo &#x27;font_family      JetBrains Monofont_size 13.0# 中文回退字体symbol_map U+4E00-U+9FFF,U+3400-U+4DBF Noto Sans CJK SC&#x27; &gt;&gt; ~/.config/kitty/kitty.conf
+
+问题：fcitx5 启动了但无法输入中文原因：环境变量没有被程序读取到（程序在 fcitx5 设置环境变量之前启动）。
+解决：
+
+确认 niri&#x2F;Hyprland 配置文件里的 GTK_IM_MODULE 等变量已正确设置
+关闭并重新打开应用
+运行 fcitx5-diagnose 查看详细信息
+
+问题：GNOME 下同时运行了 ibus 和 fcitx5原因：忘记删除 /etc/xdg/autostart/fcitx5.desktop。
+解决：
+sudo rm /etc/xdg/autostart/fcitx5.desktop
+
+然后注销重新登录。
+问题：JetBrains IDE 无法使用 fcitx5 输入中文原因：JetBrains IDE 默认运行在 XWayland 下，需要 XIM 支持。
+解决：在 IDE 的 JVM 选项里添加：
+-Drecreate.x11.input.method=true
+
+在 IDE 里通过 Help → Edit Custom VM Options 添加。
+
+小结至此，五篇博客的全部内容已经完成：
+
+
+
+篇
+内容
+
+
+
+第一篇
+通过 archinstall 安装 Arch Linux + 多种桌面环境
+
+
+第二篇
+通过 WSL 在 Windows 上安装 Arch Linux
+
+
+第三篇
+安装 git、yay、sdkman、nvm、uv、Go、Docker、LazyVim
+
+
+第四篇
+通过 DMS 配置 niri 和 Hyprland
+
+
+第五篇
+中文 locale、字体、ibus（GNOME）、fcitx5（niri&#x2F;Hyprland）
+
+
+通过这五篇的配置，你拥有了一个：
+
+完整的中文支持（界面 + 输入）
+现代化的开发环境（Java&#x2F;Node&#x2F;Python&#x2F;Go&#x2F;Docker）
+高效的编辑器（Neovim + LazyVim）
+漂亮可用的桌面（DMS + niri 或 Hyprland）
+
+的 Arch Linux 系统。
+]]></content>
+      <categories>
+        <category>linux</category>
+      </categories>
+      <tags>
+        <tag>中文环境</tag>
+        <tag>fcitx5</tag>
+        <tag>ibus</tag>
+        <tag>输入法</tag>
+        <tag>locale</tag>
       </tags>
   </entry>
   <entry>
@@ -1908,6 +1908,32 @@ drift 时长
       </tags>
   </entry>
   <entry>
+    <title>LeetCode 1. Two Sum</title>
+    <url>/2026/02/28/java/LeetCode-1-Two-Sum/</url>
+    <content><![CDATA[题目描述给定一个整数数组 nums 和一个整数目标值 target，请你在该数组中找出和为目标值 target 的那两个整数，并返回它们的数组下标。你可以假设每种输入只会对应一个答案，并且你不能使用两次相同的元素。
+解题思路本题要求在一个数组中找出两个和为 target 的数，并返回它们的下标。最直观的做法是双重循环遍历，时间复杂度为 O(n²)，但这不是最优解。
+更高效的做法是使用哈希表。核心思路是：遍历数组，对于每个元素 nums[i]，我们计算出它需要的配对值 target - nums[i]，然后在哈希表中查找该配对值是否已经出现过。如果出现过，说明我们找到了答案，直接返回两个下标即可；如果没有出现，则将当前元素的值和下标存入哈希表，供后面的元素查找。
+这样做的好处是：
+
+每个元素只需要遍历一次，时间复杂度为 O(n)
+通过哈希表的 O(1) 查找，快速判断配对值是否存在
+一次遍历即可完成查找和存储，简洁高效
+
+复杂度分析
+时间复杂度：O(n)，其中 n 是数组长度。只需要遍历一次数组，每次查找和插入哈希表都是 O(1)。
+空间复杂度：O(n)，哈希表中最多存储 n 个元素。
+
+代码package code.J1;import java.util.HashMap;import java.util.Map;public class J1 &#123;    public int[] twoSum(int[] nums, int target) &#123;        Map&lt;Integer, Integer&gt; map = new HashMap&lt;&gt;();        for (int i = 0; i &lt; nums.length; i++) &#123;            if (map.containsKey(target - nums[i])) &#123;                return new int[]&#123;map.get(target - nums[i]), i&#125;;            &#125;            map.put(nums[i], i);        &#125;        return null;    &#125;&#125;
+]]></content>
+      <categories>
+        <category>leetcode</category>
+      </categories>
+      <tags>
+        <tag>Java</tag>
+        <tag>哈希表</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>给博客做一套液态玻璃（六）：把 Butterfly 改造成液态玻璃（附完整代码）</title>
     <url>/2026/08/21/projects/06-%E6%B6%B2%E6%80%81%E7%8E%BB%E7%92%83-%E7%A7%BB%E6%A4%8D%E7%AF%87/</url>
     <content><![CDATA[
@@ -2169,32 +2195,6 @@ Butterfly 一键接入
       </tags>
   </entry>
   <entry>
-    <title>LeetCode 1. Two Sum</title>
-    <url>/2026/02/28/java/LeetCode-1-Two-Sum/</url>
-    <content><![CDATA[题目描述给定一个整数数组 nums 和一个整数目标值 target，请你在该数组中找出和为目标值 target 的那两个整数，并返回它们的数组下标。你可以假设每种输入只会对应一个答案，并且你不能使用两次相同的元素。
-解题思路本题要求在一个数组中找出两个和为 target 的数，并返回它们的下标。最直观的做法是双重循环遍历，时间复杂度为 O(n²)，但这不是最优解。
-更高效的做法是使用哈希表。核心思路是：遍历数组，对于每个元素 nums[i]，我们计算出它需要的配对值 target - nums[i]，然后在哈希表中查找该配对值是否已经出现过。如果出现过，说明我们找到了答案，直接返回两个下标即可；如果没有出现，则将当前元素的值和下标存入哈希表，供后面的元素查找。
-这样做的好处是：
-
-每个元素只需要遍历一次，时间复杂度为 O(n)
-通过哈希表的 O(1) 查找，快速判断配对值是否存在
-一次遍历即可完成查找和存储，简洁高效
-
-复杂度分析
-时间复杂度：O(n)，其中 n 是数组长度。只需要遍历一次数组，每次查找和插入哈希表都是 O(1)。
-空间复杂度：O(n)，哈希表中最多存储 n 个元素。
-
-代码package code.J1;import java.util.HashMap;import java.util.Map;public class J1 &#123;    public int[] twoSum(int[] nums, int target) &#123;        Map&lt;Integer, Integer&gt; map = new HashMap&lt;&gt;();        for (int i = 0; i &lt; nums.length; i++) &#123;            if (map.containsKey(target - nums[i])) &#123;                return new int[]&#123;map.get(target - nums[i]), i&#125;;            &#125;            map.put(nums[i], i);        &#125;        return null;    &#125;&#125;
-]]></content>
-      <categories>
-        <category>leetcode</category>
-      </categories>
-      <tags>
-        <tag>Java</tag>
-        <tag>哈希表</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>LeetCode 1019. Next Greater Node In Linked List</title>
     <url>/2026/02/28/java/LeetCode-1019-Next-Greater-Node-In-Linked-List/</url>
     <content><![CDATA[题目描述给定一个长度为 n 的链表，对于列表中的每个节点，查找下一个更大节点的值。返回一个整数数组 answer，其中 answer[i] 是第 i 个节点下一个更大节点的值。如果第 i 个节点没有下一个更大节点的值，设置 answer[i] = 0。
@@ -2349,6 +2349,35 @@ Butterfly 一键接入
       </tags>
   </entry>
   <entry>
+    <title>LeetCode 138. Copy List with Random Pointer</title>
+    <url>/2026/02/28/java/LeetCode-138-Copy-List-with-Random-Pointer/</url>
+    <content><![CDATA[题目描述给你一个长度为 n 的链表，每个节点包含一个额外增加的随机指针 random，该指针可以指向链表中的任何节点或空节点。构造这个链表的深拷贝。深拷贝应该正好由 n 个全新节点组成，其中每个新节点的值都设为其对应的原节点的值。新节点的 next 指针和 random 指针也都应指向新链表中的对应节点，从而使原链表和新链表中的这些指针能够表示相同的链表状态。
+解题思路本题的难点在于处理 random 指针。由于 random 指针可以指向链表中的任意节点，在普通遍历中，我们可能还没有创建该目标节点，导致无法直接设置 random 指针。
+使用哈希表可以优雅地解决这个问题，具体分为两趟遍历：
+第一趟遍历：创建所有新节点，并建立原节点到新节点的映射关系（map&lt;原节点, 新节点&gt;）。此时新节点的 next 和 random 指针暂时为 null。这一步确保了所有节点都已经被创建，后续可以放心地引用它们。
+第二趟遍历：再次遍历原链表，通过哈希表查找：
+
+当前新节点的 next 应该指向 map.get(原节点.next)（即原节点 next 对应的新节点）
+当前新节点的 random 应该指向 map.get(原节点.random)（即原节点 random 对应的新节点）
+
+由于 HashMap 中 map.get(null) 返回 null，所以当 random 指向空时也能正确处理。
+这种方法直观易懂，两趟遍历即可完成深拷贝。
+复杂度分析
+时间复杂度：O(n)，其中 n 是链表节点数。遍历了两次链表。
+空间复杂度：O(n)，哈希表中存储了 n 个节点的映射关系。
+
+代码package code.J138;import java.util.HashMap;import java.util.List;import java.util.Map;public class J138 &#123;    private static class Node &#123;        int val;        Node next;        Node random;        public Node(int val) &#123;            this.val = val;            this.next = null;            this.random = null;        &#125;    &#125;    public Node copyRandomList(Node head) &#123;        Map&lt;Node, Node&gt; map = new HashMap&lt;&gt;();        Node cur = head;        while (cur != null) &#123;            map.put(cur, new Node(cur.val));            cur = cur.next;        &#125;        cur = head;        while (cur != null) &#123;            Node newNode = map.get(cur);            newNode.next = map.get(cur.next);            newNode.random = map.get(cur.random);            cur = cur.next;        &#125;        return map.get(head);    &#125;&#125;
+]]></content>
+      <categories>
+        <category>leetcode</category>
+      </categories>
+      <tags>
+        <tag>Java</tag>
+        <tag>哈希表</tag>
+        <tag>链表</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>LeetCode 1365. How Many Numbers Are Smaller Than the Current Number</title>
     <url>/2026/02/14/java/LeetCode-1365-How-Many-Numbers-Are-Smaller-Than-the-Current-Number/</url>
     <content><![CDATA[题目描述给你一个数组 nums，对于其中每个元素 nums[i]，请你统计数组中比它小的所有数字的数目。以数组形式返回答案。
@@ -2388,32 +2417,44 @@ Butterfly 一键接入
       </tags>
   </entry>
   <entry>
-    <title>LeetCode 138. Copy List with Random Pointer</title>
-    <url>/2026/02/28/java/LeetCode-138-Copy-List-with-Random-Pointer/</url>
-    <content><![CDATA[题目描述给你一个长度为 n 的链表，每个节点包含一个额外增加的随机指针 random，该指针可以指向链表中的任何节点或空节点。构造这个链表的深拷贝。深拷贝应该正好由 n 个全新节点组成，其中每个新节点的值都设为其对应的原节点的值。新节点的 next 指针和 random 指针也都应指向新链表中的对应节点，从而使原链表和新链表中的这些指针能够表示相同的链表状态。
-解题思路本题的难点在于处理 random 指针。由于 random 指针可以指向链表中的任意节点，在普通遍历中，我们可能还没有创建该目标节点，导致无法直接设置 random 指针。
-使用哈希表可以优雅地解决这个问题，具体分为两趟遍历：
-第一趟遍历：创建所有新节点，并建立原节点到新节点的映射关系（map&lt;原节点, 新节点&gt;）。此时新节点的 next 和 random 指针暂时为 null。这一步确保了所有节点都已经被创建，后续可以放心地引用它们。
-第二趟遍历：再次遍历原链表，通过哈希表查找：
+    <title>LeetCode 1470. Shuffle the Array</title>
+    <url>/2026/02/14/java/LeetCode-1470-Shuffle-the-Array/</url>
+    <content><![CDATA[题目描述给你一个数组 nums，数组中有 2n 个元素，按 [x1,x2,...,xn,y1,y2,...,yn] 的格式排列。请你将数组按 [x1,y1,x2,y2,...,xn,yn] 格式重新排列，返回重排后的数组。
+例如：nums = [2,5,1,3,4,7]，n = 3，输出 [2,3,5,4,1,7]。
+解释：x1=2, x2=5, x3=1，y1=3, y2=4, y3=7，交错排列得 [2,3,5,4,1,7]。
+解题思路核心思想这是一个数组重排问题，本质是双指针或交错填充。给定 n，我们知道：
 
-当前新节点的 next 应该指向 map.get(原节点.next)（即原节点 next 对应的新节点）
-当前新节点的 random 应该指向 map.get(原节点.random)（即原节点 random 对应的新节点）
+x 部分的元素在 nums[0] 到 nums[n-1]。
+y 部分的元素在 nums[n] 到 nums[2n-1]。
 
-由于 HashMap 中 map.get(null) 返回 null，所以当 random 指向空时也能正确处理。
-这种方法直观易懂，两趟遍历即可完成深拷贝。
+目标是将两个部分交错：x1, y1, x2, y2, ..., xn, yn。
+步骤
+创建结果数组 ans，长度为 2n。
+使用指针 i 在结果数组中填充，使用指针 j 遍历 x 部分和 y 部分：
+每次迭代，先放入 nums[j]（来自 x 部分），然后放入 nums[j + n]（来自 y 部分）。
+j 从 0 到 n-1。
+
+
+
+示例以 nums = [2,5,1,3,4,7]，n = 3 为例：
+
+j&#x3D;0：ans[0]&#x3D;nums[0]&#x3D;2, ans[1]&#x3D;nums[3]&#x3D;3
+j&#x3D;1：ans[2]&#x3D;nums[1]&#x3D;5, ans[3]&#x3D;nums[4]&#x3D;4
+j&#x3D;2：ans[4]&#x3D;nums[2]&#x3D;1, ans[5]&#x3D;nums[5]&#x3D;7
+结果：[2,3,5,4,1,7]
+
 复杂度分析
-时间复杂度：O(n)，其中 n 是链表节点数。遍历了两次链表。
-空间复杂度：O(n)，哈希表中存储了 n 个节点的映射关系。
+时间复杂度：O(n)，一次遍历即可完成。
+空间复杂度：O(n)（不计结果数组），结果数组长度为 2n。
 
-代码package code.J138;import java.util.HashMap;import java.util.List;import java.util.Map;public class J138 &#123;    private static class Node &#123;        int val;        Node next;        Node random;        public Node(int val) &#123;            this.val = val;            this.next = null;            this.random = null;        &#125;    &#125;    public Node copyRandomList(Node head) &#123;        Map&lt;Node, Node&gt; map = new HashMap&lt;&gt;();        Node cur = head;        while (cur != null) &#123;            map.put(cur, new Node(cur.val));            cur = cur.next;        &#125;        cur = head;        while (cur != null) &#123;            Node newNode = map.get(cur);            newNode.next = map.get(cur.next);            newNode.random = map.get(cur.random);            cur = cur.next;        &#125;        return map.get(head);    &#125;&#125;
+代码package code.J1470;public class J1470 &#123;    public int[] shuffle(int[] nums, int n) &#123;        int[] ans = new int[2 * n];        int i = 0;        for (int j = 0; j &lt; n; j++) &#123;            ans[i++] = nums[j];            ans[i++] = nums[j + n];        &#125;        return ans;    &#125;&#125;
 ]]></content>
       <categories>
         <category>leetcode</category>
       </categories>
       <tags>
         <tag>Java</tag>
-        <tag>哈希表</tag>
-        <tag>链表</tag>
+        <tag>数组</tag>
       </tags>
   </entry>
   <entry>
@@ -2460,47 +2501,6 @@ i&#x3D;2（数字 3标记&#x3D;1）→ Push
         <tag>Java</tag>
         <tag>栈</tag>
         <tag>模拟</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>LeetCode 1470. Shuffle the Array</title>
-    <url>/2026/02/14/java/LeetCode-1470-Shuffle-the-Array/</url>
-    <content><![CDATA[题目描述给你一个数组 nums，数组中有 2n 个元素，按 [x1,x2,...,xn,y1,y2,...,yn] 的格式排列。请你将数组按 [x1,y1,x2,y2,...,xn,yn] 格式重新排列，返回重排后的数组。
-例如：nums = [2,5,1,3,4,7]，n = 3，输出 [2,3,5,4,1,7]。
-解释：x1=2, x2=5, x3=1，y1=3, y2=4, y3=7，交错排列得 [2,3,5,4,1,7]。
-解题思路核心思想这是一个数组重排问题，本质是双指针或交错填充。给定 n，我们知道：
-
-x 部分的元素在 nums[0] 到 nums[n-1]。
-y 部分的元素在 nums[n] 到 nums[2n-1]。
-
-目标是将两个部分交错：x1, y1, x2, y2, ..., xn, yn。
-步骤
-创建结果数组 ans，长度为 2n。
-使用指针 i 在结果数组中填充，使用指针 j 遍历 x 部分和 y 部分：
-每次迭代，先放入 nums[j]（来自 x 部分），然后放入 nums[j + n]（来自 y 部分）。
-j 从 0 到 n-1。
-
-
-
-示例以 nums = [2,5,1,3,4,7]，n = 3 为例：
-
-j&#x3D;0：ans[0]&#x3D;nums[0]&#x3D;2, ans[1]&#x3D;nums[3]&#x3D;3
-j&#x3D;1：ans[2]&#x3D;nums[1]&#x3D;5, ans[3]&#x3D;nums[4]&#x3D;4
-j&#x3D;2：ans[4]&#x3D;nums[2]&#x3D;1, ans[5]&#x3D;nums[5]&#x3D;7
-结果：[2,3,5,4,1,7]
-
-复杂度分析
-时间复杂度：O(n)，一次遍历即可完成。
-空间复杂度：O(n)（不计结果数组），结果数组长度为 2n。
-
-代码package code.J1470;public class J1470 &#123;    public int[] shuffle(int[] nums, int n) &#123;        int[] ans = new int[2 * n];        int i = 0;        for (int j = 0; j &lt; n; j++) &#123;            ans[i++] = nums[j];            ans[i++] = nums[j + n];        &#125;        return ans;    &#125;&#125;
-]]></content>
-      <categories>
-        <category>leetcode</category>
-      </categories>
-      <tags>
-        <tag>Java</tag>
-        <tag>数组</tag>
       </tags>
   </entry>
   <entry>
@@ -2673,56 +2673,47 @@ i&#x3D;3（2）：curSum &#x3D; 4，needed &#x3D; 0，在 map（位置 -1）→ 
       </tags>
   </entry>
   <entry>
-    <title>LeetCode 1700. Number of Students Unable to Eat Lunch</title>
-    <url>/2026/02/21/java/LeetCode-1700-Number-of-Students-Unable-to-Eat-Lunch/</url>
-    <content><![CDATA[题目描述学校的自助午餐提供圆形和方形的三明治，分别用 0 和 1 表示。所有学生站在一个队列里，每个学生要么喜欢圆形的要么喜欢方形的。餐厅里三明治的数量与学生的数量相同。所有三明治都放在一个栈里，每一轮：
+    <title>LeetCode 1668. Maximum Repeating Substring</title>
+    <url>/2026/02/25/java/LeetCode-1668-Maximum-Repeating-Substring/</url>
+    <content><![CDATA[题目描述给你一个字符串 sequence，如果字符串 word 连续重复 k 次形成的字符串是 sequence 的一个子字符串，那么单词 word 的重复值为 k。单词 word 的最大重复值是单词 word 在 sequence 中最大的重复值。返回单词 word 的最大重复值。
+例如：sequence = &quot;ababc&quot;，word = &quot;ab&quot;，输出 2。
+解释：&quot;abab&quot;（word 重复 2 次）是 &quot;ababc&quot; 的子串；但 &quot;ababab&quot;（重复 3 次）不是 &quot;ababc&quot; 的子串。所以最大重复值为 2。
+解题思路核心思想要找到 word 重复 k 次后成为 sequence 子串的最大 k 值，我们可以从小到大尝试：
 
-如果队列最前面的学生喜欢栈顶的三明治，会拿走它并离开队列；
-否则学生会放弃这个三明治并回到队列的尾部。这个过程会一直持续到队列里所有学生都不喜欢栈顶的三明治为止。返回无法吃上午餐的学生数量。
+不断将 word 拼接自身，检查拼接后的字符串是否是 sequence 的子串。
+只要匹配，就增加计数，继续尝试。
+直到匹配失败则停止。
 
-例如：students = [1,1,0,0]，sandwiches = [0,1,0,1]，输出 0。
-解释：所有学生最终都能拿到喜欢的三明治。
-解题思路核心思想这是一个模拟问题，使用队列来模拟学生的排队行为。
 步骤
-将所有学生放入队列 queue 中。
-遍历三明治栈（sandwiches），对于每个三明治：
-记录已检查的学生数 r = 0。
-不断检查队首学生是否喜欢当前三明治：
-如果喜欢（queue.peek() == sandwich），该学生拿走三明治并出队，跳出内层循环。
-如果不喜欢，该学生回到队尾（queue.offer(queue.poll())），r++。
-关键：如果 r == queue.size()，说明所有剩余学生都不喜欢当前栈顶三明治，此后的学生都无法吃饭，直接返回 queue.size()。
+初始化计数器 res = 0，保存原始字符串 wordBK = word。
+进入循环：如果 sequence 包含 word：
+计数 res++。
+将 word 拼接一次自身（word += wordBK），尝试下一个更大的 k 值。
 
 
-如果学生喜欢三明治，出队（该学生已吃饭），继续处理下一个三明治。
+返回 res。
 
+为什么这种方法可行？每次拼接后，word 的长度增加 wordBK.length()。当 word 的长度超过 sequence 的长度时，contains() 必然返回 false，循环自动终止。
+重复 k 次形成的字符串长度是 k * |word|，因此 k 的最大可能值为 |sequence| / |word|，最多尝试 O(n&#x2F;m) 次。
+示例说明以 sequence = &quot;ababc&quot;，word = &quot;ab&quot; 为例：
 
-返回 queue.size()。
-
-为什么需要内层循环计数 r？学生在队列中循环，如果一轮遍历完所有学生后仍然没有人喜欢栈顶的三明治，那么之后的循环也无法改变结果（学生不变，三明治不变），因此可以提前终止。
-示例说明以 students = [1,1,0,0]，sandwiches = [0,1,0,1] 为例：
-
-队列：[1,1,0,0]，栈顶三明治&#x3D;0
-队首&#x3D;1，不喜欢，转到队尾：[1,0,0,1]
-队首&#x3D;1，不喜欢，转到队尾：[0,0,1,1]
-队首&#x3D;0，喜欢！出队，三明治消耗
-队列：[0,1,1]，栈顶三明治&#x3D;1
-队首&#x3D;0，不喜欢，转到队尾：[1,1,0]
-队首&#x3D;1，喜欢！出队
-依此类推…最终 queue 为空，返回 0。
+word &#x3D; “ab”：sequence 包含 “ab” ✓，res&#x3D;1，word &#x3D; “abab”
+word &#x3D; “abab”：sequence 包含 “abab” ✓，res&#x3D;2，word &#x3D; “ababab”
+word &#x3D; “ababab”：长度 6 &gt; sequence 长度 5，不包含 ✗
+返回 2
 
 复杂度分析
-时间复杂度：O(n²)，每个学生可能被反复移到队尾多次。
-空间复杂度：O(n)，队列存储所有学生。
+时间复杂度：O(n² / m)，最坏情况下需要检查 n/m 次 contains()，每次 O(n)。
+空间复杂度：O(n)，拼接的字符串长度最多达到 n。
 
-代码package code.J1700;import java.util.LinkedList;import java.util.Queue;public class J1700 &#123;    public int countStudents(int[] students, int[] sandwiches) &#123;        Queue&lt;Integer&gt; queue = new LinkedList&lt;&gt;();        for (int student : students) queue.offer(student);        for (int sandwich : sandwiches) &#123;            int r = 0;            while (!queue.isEmpty() &amp;&amp; queue.peek() != sandwich)&#123;                if (r == queue.size()) break;                queue.offer(queue.poll());                r++;            &#125;            if (!queue.isEmpty() &amp;&amp; queue.peek() != sandwich) return queue.size();            queue.poll();        &#125;        return queue.size();    &#125;&#125;
+代码package code.J1668;public class J1668 &#123;    public int maxRepeating(String sequence, String word) &#123;        int res = 0;        String wordBK = word;        while (sequence.contains(word)) &#123;            res++;            word += wordBK;        &#125;        return res;    &#125;&#125;
 ]]></content>
       <categories>
         <category>leetcode</category>
       </categories>
       <tags>
         <tag>Java</tag>
-        <tag>模拟</tag>
-        <tag>队列</tag>
+        <tag>字符串</tag>
       </tags>
   </entry>
   <entry>
@@ -2793,47 +2784,56 @@ i&#x3D;3（奇数）：新偶 &#x3D; 8+(5-1-4) &#x3D; 8，新奇 &#x3D; 1+(8-8) 
       </tags>
   </entry>
   <entry>
-    <title>LeetCode 1668. Maximum Repeating Substring</title>
-    <url>/2026/02/25/java/LeetCode-1668-Maximum-Repeating-Substring/</url>
-    <content><![CDATA[题目描述给你一个字符串 sequence，如果字符串 word 连续重复 k 次形成的字符串是 sequence 的一个子字符串，那么单词 word 的重复值为 k。单词 word 的最大重复值是单词 word 在 sequence 中最大的重复值。返回单词 word 的最大重复值。
-例如：sequence = &quot;ababc&quot;，word = &quot;ab&quot;，输出 2。
-解释：&quot;abab&quot;（word 重复 2 次）是 &quot;ababc&quot; 的子串；但 &quot;ababab&quot;（重复 3 次）不是 &quot;ababc&quot; 的子串。所以最大重复值为 2。
-解题思路核心思想要找到 word 重复 k 次后成为 sequence 子串的最大 k 值，我们可以从小到大尝试：
+    <title>LeetCode 1700. Number of Students Unable to Eat Lunch</title>
+    <url>/2026/02/21/java/LeetCode-1700-Number-of-Students-Unable-to-Eat-Lunch/</url>
+    <content><![CDATA[题目描述学校的自助午餐提供圆形和方形的三明治，分别用 0 和 1 表示。所有学生站在一个队列里，每个学生要么喜欢圆形的要么喜欢方形的。餐厅里三明治的数量与学生的数量相同。所有三明治都放在一个栈里，每一轮：
 
-不断将 word 拼接自身，检查拼接后的字符串是否是 sequence 的子串。
-只要匹配，就增加计数，继续尝试。
-直到匹配失败则停止。
+如果队列最前面的学生喜欢栈顶的三明治，会拿走它并离开队列；
+否则学生会放弃这个三明治并回到队列的尾部。这个过程会一直持续到队列里所有学生都不喜欢栈顶的三明治为止。返回无法吃上午餐的学生数量。
 
+例如：students = [1,1,0,0]，sandwiches = [0,1,0,1]，输出 0。
+解释：所有学生最终都能拿到喜欢的三明治。
+解题思路核心思想这是一个模拟问题，使用队列来模拟学生的排队行为。
 步骤
-初始化计数器 res = 0，保存原始字符串 wordBK = word。
-进入循环：如果 sequence 包含 word：
-计数 res++。
-将 word 拼接一次自身（word += wordBK），尝试下一个更大的 k 值。
+将所有学生放入队列 queue 中。
+遍历三明治栈（sandwiches），对于每个三明治：
+记录已检查的学生数 r = 0。
+不断检查队首学生是否喜欢当前三明治：
+如果喜欢（queue.peek() == sandwich），该学生拿走三明治并出队，跳出内层循环。
+如果不喜欢，该学生回到队尾（queue.offer(queue.poll())），r++。
+关键：如果 r == queue.size()，说明所有剩余学生都不喜欢当前栈顶三明治，此后的学生都无法吃饭，直接返回 queue.size()。
 
 
-返回 res。
+如果学生喜欢三明治，出队（该学生已吃饭），继续处理下一个三明治。
 
-为什么这种方法可行？每次拼接后，word 的长度增加 wordBK.length()。当 word 的长度超过 sequence 的长度时，contains() 必然返回 false，循环自动终止。
-重复 k 次形成的字符串长度是 k * |word|，因此 k 的最大可能值为 |sequence| / |word|，最多尝试 O(n&#x2F;m) 次。
-示例说明以 sequence = &quot;ababc&quot;，word = &quot;ab&quot; 为例：
 
-word &#x3D; “ab”：sequence 包含 “ab” ✓，res&#x3D;1，word &#x3D; “abab”
-word &#x3D; “abab”：sequence 包含 “abab” ✓，res&#x3D;2，word &#x3D; “ababab”
-word &#x3D; “ababab”：长度 6 &gt; sequence 长度 5，不包含 ✗
-返回 2
+返回 queue.size()。
+
+为什么需要内层循环计数 r？学生在队列中循环，如果一轮遍历完所有学生后仍然没有人喜欢栈顶的三明治，那么之后的循环也无法改变结果（学生不变，三明治不变），因此可以提前终止。
+示例说明以 students = [1,1,0,0]，sandwiches = [0,1,0,1] 为例：
+
+队列：[1,1,0,0]，栈顶三明治&#x3D;0
+队首&#x3D;1，不喜欢，转到队尾：[1,0,0,1]
+队首&#x3D;1，不喜欢，转到队尾：[0,0,1,1]
+队首&#x3D;0，喜欢！出队，三明治消耗
+队列：[0,1,1]，栈顶三明治&#x3D;1
+队首&#x3D;0，不喜欢，转到队尾：[1,1,0]
+队首&#x3D;1，喜欢！出队
+依此类推…最终 queue 为空，返回 0。
 
 复杂度分析
-时间复杂度：O(n² / m)，最坏情况下需要检查 n/m 次 contains()，每次 O(n)。
-空间复杂度：O(n)，拼接的字符串长度最多达到 n。
+时间复杂度：O(n²)，每个学生可能被反复移到队尾多次。
+空间复杂度：O(n)，队列存储所有学生。
 
-代码package code.J1668;public class J1668 &#123;    public int maxRepeating(String sequence, String word) &#123;        int res = 0;        String wordBK = word;        while (sequence.contains(word)) &#123;            res++;            word += wordBK;        &#125;        return res;    &#125;&#125;
+代码package code.J1700;import java.util.LinkedList;import java.util.Queue;public class J1700 &#123;    public int countStudents(int[] students, int[] sandwiches) &#123;        Queue&lt;Integer&gt; queue = new LinkedList&lt;&gt;();        for (int student : students) queue.offer(student);        for (int sandwich : sandwiches) &#123;            int r = 0;            while (!queue.isEmpty() &amp;&amp; queue.peek() != sandwich)&#123;                if (r == queue.size()) break;                queue.offer(queue.poll());                r++;            &#125;            if (!queue.isEmpty() &amp;&amp; queue.peek() != sandwich) return queue.size();            queue.poll();        &#125;        return queue.size();    &#125;&#125;
 ]]></content>
       <categories>
         <category>leetcode</category>
       </categories>
       <tags>
         <tag>Java</tag>
-        <tag>字符串</tag>
+        <tag>模拟</tag>
+        <tag>队列</tag>
       </tags>
   </entry>
   <entry>
@@ -3505,6 +3505,68 @@ factor&#x3D;3：&quot;abc&quot; 重复 3 次 &#x3D; 原串，返回 true
       </tags>
   </entry>
   <entry>
+    <title>LeetCode 482. License Key Formatting</title>
+    <url>/2026/02/21/java/LeetCode-482-License-Key-Formatting/</url>
+    <content><![CDATA[问题描述给定一个许可密钥字符串 s，仅由字母、数字字符和破折号组成。字符串由 n 个破折号分成 n+1 组。给定一个整数 k，重新格式化字符串，使每一组恰好包含 k 个字符，第一组可以少于 k 个字符但至少包含一个字符。用破折号分隔组，所有小写字母转换为大写。
+解题思路本题的要点在于理解分组规则：除了第一组外，其余每组恰好 k 个字符。这意味着我们需要先计算出总的有效字符数，然后确定第一组的大小。
+算法步骤
+去除破折号：
+
+使用 s.split(&quot;-&quot;) 将原字符串按破折号分割
+将所有非破折号部分拼接起来，得到所有有效字符的连续字符串
+
+
+计算第一组长度：
+
+设总有效字符数为 sumLength
+第一组的长度 firstLen = sumLength % k
+如果 firstLen == 0（恰好整除），则第一组也应取 k 个字符
+
+
+按组格式化：
+
+取前 firstLen 个字符作为第一组，转为大写
+从 firstLen 位置开始，每次取 k 个字符作为一组，组间用 &quot;-&quot; 分隔，每组转为大写
+
+
+
+举例说明示例 1：s = &quot;5F3Z-2e-9-w&quot;, k = 4
+
+去除破折号后：&quot;5F3Z2e9w&quot;，共 8 个字符
+firstLen = 8 % 4 = 0，所以 firstLen = 4（整除时每组都取 4 个）
+第一组：&quot;5F3Z&quot; → &quot;5F3Z&quot;
+第二组：&quot;2e9w&quot; → &quot;2E9W&quot;
+结果：&quot;5F3Z-2E9W&quot;
+
+示例 2：s = &quot;2-5g-3-J&quot;, k = 2
+
+去除破折号后：&quot;25g3J&quot;，共 5 个字符
+firstLen = 5 % 2 = 1
+第一组：&quot;2&quot; → &quot;2&quot;
+第二组：&quot;5g&quot; → &quot;5G&quot;
+第三组：&quot;3J&quot; → &quot;3J&quot;
+结果：&quot;2-5G-3J&quot;
+
+关键点
+第一组可以比其他组短，但不能为空
+破折号在格式化后的字符串中仅作为分隔符出现，不能出现在开头或结尾
+所有字母必须转换为大写
+
+复杂度分析
+时间复杂度：O(n)，需要遍历字符串一次，其中 n 为字符串长度。
+空间复杂度：O(n)，需要额外空间存储处理后的字符串。
+
+代码package code.J482;public class J482 &#123;    public String licenseKeyFormatting(String s, int k) &#123;        StringBuilder sb = new StringBuilder();        String[] strings = s.split(&quot;-&quot;);        if (strings.length &lt; 1) return &quot;&quot;;        int sumLength = 0;        for (String string : strings) &#123;            sb.append(string);            sumLength += string.length();        &#125;        int firstLen = sumLength % k;        if (firstLen == 0) firstLen = k;        StringBuilder result = new StringBuilder();        String str = sb.toString();        result.append(str.substring(0, firstLen).toUpperCase());        for (int i = firstLen; i &lt; str.length(); i += k) &#123;            if (!result.isEmpty()) result.append(&quot;-&quot;);            int end = Math.min(i + k, s.length());            result.append(str.substring(i, end).toUpperCase());        &#125;        return result.toString();    &#125;&#125;
+]]></content>
+      <categories>
+        <category>leetcode</category>
+      </categories>
+      <tags>
+        <tag>Java</tag>
+        <tag>字符串</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>LeetCode 485. Max Consecutive Ones</title>
     <url>/2026/02/14/java/LeetCode-485-Max-Consecutive-Ones/</url>
     <content><![CDATA[问题描述给定一个二进制数组 nums，计算其中最大连续 1 的个数。
@@ -3603,68 +3665,6 @@ max(2,3)&#x3D;3
       <tags>
         <tag>Java</tag>
         <tag>数组</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>LeetCode 482. License Key Formatting</title>
-    <url>/2026/02/21/java/LeetCode-482-License-Key-Formatting/</url>
-    <content><![CDATA[问题描述给定一个许可密钥字符串 s，仅由字母、数字字符和破折号组成。字符串由 n 个破折号分成 n+1 组。给定一个整数 k，重新格式化字符串，使每一组恰好包含 k 个字符，第一组可以少于 k 个字符但至少包含一个字符。用破折号分隔组，所有小写字母转换为大写。
-解题思路本题的要点在于理解分组规则：除了第一组外，其余每组恰好 k 个字符。这意味着我们需要先计算出总的有效字符数，然后确定第一组的大小。
-算法步骤
-去除破折号：
-
-使用 s.split(&quot;-&quot;) 将原字符串按破折号分割
-将所有非破折号部分拼接起来，得到所有有效字符的连续字符串
-
-
-计算第一组长度：
-
-设总有效字符数为 sumLength
-第一组的长度 firstLen = sumLength % k
-如果 firstLen == 0（恰好整除），则第一组也应取 k 个字符
-
-
-按组格式化：
-
-取前 firstLen 个字符作为第一组，转为大写
-从 firstLen 位置开始，每次取 k 个字符作为一组，组间用 &quot;-&quot; 分隔，每组转为大写
-
-
-
-举例说明示例 1：s = &quot;5F3Z-2e-9-w&quot;, k = 4
-
-去除破折号后：&quot;5F3Z2e9w&quot;，共 8 个字符
-firstLen = 8 % 4 = 0，所以 firstLen = 4（整除时每组都取 4 个）
-第一组：&quot;5F3Z&quot; → &quot;5F3Z&quot;
-第二组：&quot;2e9w&quot; → &quot;2E9W&quot;
-结果：&quot;5F3Z-2E9W&quot;
-
-示例 2：s = &quot;2-5g-3-J&quot;, k = 2
-
-去除破折号后：&quot;25g3J&quot;，共 5 个字符
-firstLen = 5 % 2 = 1
-第一组：&quot;2&quot; → &quot;2&quot;
-第二组：&quot;5g&quot; → &quot;5G&quot;
-第三组：&quot;3J&quot; → &quot;3J&quot;
-结果：&quot;2-5G-3J&quot;
-
-关键点
-第一组可以比其他组短，但不能为空
-破折号在格式化后的字符串中仅作为分隔符出现，不能出现在开头或结尾
-所有字母必须转换为大写
-
-复杂度分析
-时间复杂度：O(n)，需要遍历字符串一次，其中 n 为字符串长度。
-空间复杂度：O(n)，需要额外空间存储处理后的字符串。
-
-代码package code.J482;public class J482 &#123;    public String licenseKeyFormatting(String s, int k) &#123;        StringBuilder sb = new StringBuilder();        String[] strings = s.split(&quot;-&quot;);        if (strings.length &lt; 1) return &quot;&quot;;        int sumLength = 0;        for (String string : strings) &#123;            sb.append(string);            sumLength += string.length();        &#125;        int firstLen = sumLength % k;        if (firstLen == 0) firstLen = k;        StringBuilder result = new StringBuilder();        String str = sb.toString();        result.append(str.substring(0, firstLen).toUpperCase());        for (int i = firstLen; i &lt; str.length(); i += k) &#123;            if (!result.isEmpty()) result.append(&quot;-&quot;);            int end = Math.min(i + k, s.length());            result.append(str.substring(i, end).toUpperCase());        &#125;        return result.toString();    &#125;&#125;
-]]></content>
-      <categories>
-        <category>leetcode</category>
-      </categories>
-      <tags>
-        <tag>Java</tag>
-        <tag>字符串</tag>
       </tags>
   </entry>
   <entry>
@@ -4121,52 +4121,6 @@ a = &quot;a&quot;, b = &quot;aa&quot; → 输出 2。
       </tags>
   </entry>
   <entry>
-    <title>LeetCode 796. Rotate String</title>
-    <url>/2026/02/25/java/LeetCode-796-Rotate-String/</url>
-    <content><![CDATA[题目描述给定两个字符串 s 和 goal，如果在若干次旋转操作之后，s 能变成 goal，那么返回 true。
-s 的旋转操作就是将 s 最左边的字符移动到最右边。
-例如：
-
-s = &quot;abcde&quot;, goal = &quot;cdeab&quot; → 输出 true
-s = &quot;abcde&quot;, goal = &quot;abced&quot; → 输出 false
-
-解题思路本题有一个非常巧妙的技巧。
-核心观察如果我们把 s 和自己拼接起来得到 s + s，那么 s 的所有旋转结果都一定是 s + s 的一个子串。
-例如 s = &quot;abcde&quot;：
-
-s + s = &quot;abcdeabcde&quot;
-旋转 1 次：&quot;bcdea&quot; → 是 s + s 从下标 1 开始的子串
-旋转 2 次：&quot;cdeab&quot; → 是 s + s 从下标 2 开始的子串
-旋转 3 次：&quot;deabc&quot; → 是 s + s 从下标 3 开始的子串
-旋转 4 次：&quot;eabcd&quot; → 是 s + s 从下标 4 开始的子串
-
-所以，s 能否通过旋转变成 goal，等价于：
-
-s 和 goal 长度相同（否则不可能通过旋转得到）；
-goal 是 s + s 的子串。
-
-算法步骤
-先判断 s.length() 是否等于 goal.length()，不相等直接返回 false。
-将 s 拼接自身得到 s + s，使用 contains 方法检查是否包含 goal。
-返回 contains 的结果。
-
-正确性证明设 s 的长度为 n，对 s 进行 k 次旋转（0 ≤ k &lt; n）后得到的结果，等价于将 s 的前 k 个字符移动到末尾。这一结果恰好等于 s + s 中从下标 k 开始、长度为 n 的子串。
-反过来，如果 goal 是 s + s 的子串，那么 goal 在 s + s 中的起始下标 i 一定满足 0 ≤ i &lt; n（因为 goal 的长度也是 n），这意味着对 s 进行 i 次旋转后即可得到 goal。
-复杂度分析
-时间复杂度：O(n)，其中 n 是字符串长度。Java 中 contains 的内部实现（如 indexOf）在最坏情况下为 O(n)。
-空间复杂度：O(n)，拼接 s + s 需要一个长度为 2n 的字符串。
-
-代码package code.J796;public class J796 &#123;    public boolean rotateString(String s, String goal) &#123;        if (s.length() != goal.length()) return false;        return (s + s).contains(goal);    &#125;&#125;
-]]></content>
-      <categories>
-        <category>leetcode</category>
-      </categories>
-      <tags>
-        <tag>Java</tag>
-        <tag>字符串</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>LeetCode 83. Remove Duplicates from Sorted List</title>
     <url>/2026/02/25/java/LeetCode-83-Remove-Duplicates-from-Sorted-List/</url>
     <content><![CDATA[题目描述给定一个已排序的链表的头 head，删除所有重复的元素，使每个元素只出现一次。返回已排序的链表。
@@ -4250,6 +4204,52 @@ goal 是 s + s 的子串。
         <tag>Java</tag>
         <tag>字符串</tag>
         <tag>正则表达式</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>LeetCode 796. Rotate String</title>
+    <url>/2026/02/25/java/LeetCode-796-Rotate-String/</url>
+    <content><![CDATA[题目描述给定两个字符串 s 和 goal，如果在若干次旋转操作之后，s 能变成 goal，那么返回 true。
+s 的旋转操作就是将 s 最左边的字符移动到最右边。
+例如：
+
+s = &quot;abcde&quot;, goal = &quot;cdeab&quot; → 输出 true
+s = &quot;abcde&quot;, goal = &quot;abced&quot; → 输出 false
+
+解题思路本题有一个非常巧妙的技巧。
+核心观察如果我们把 s 和自己拼接起来得到 s + s，那么 s 的所有旋转结果都一定是 s + s 的一个子串。
+例如 s = &quot;abcde&quot;：
+
+s + s = &quot;abcdeabcde&quot;
+旋转 1 次：&quot;bcdea&quot; → 是 s + s 从下标 1 开始的子串
+旋转 2 次：&quot;cdeab&quot; → 是 s + s 从下标 2 开始的子串
+旋转 3 次：&quot;deabc&quot; → 是 s + s 从下标 3 开始的子串
+旋转 4 次：&quot;eabcd&quot; → 是 s + s 从下标 4 开始的子串
+
+所以，s 能否通过旋转变成 goal，等价于：
+
+s 和 goal 长度相同（否则不可能通过旋转得到）；
+goal 是 s + s 的子串。
+
+算法步骤
+先判断 s.length() 是否等于 goal.length()，不相等直接返回 false。
+将 s 拼接自身得到 s + s，使用 contains 方法检查是否包含 goal。
+返回 contains 的结果。
+
+正确性证明设 s 的长度为 n，对 s 进行 k 次旋转（0 ≤ k &lt; n）后得到的结果，等价于将 s 的前 k 个字符移动到末尾。这一结果恰好等于 s + s 中从下标 k 开始、长度为 n 的子串。
+反过来，如果 goal 是 s + s 的子串，那么 goal 在 s + s 中的起始下标 i 一定满足 0 ≤ i &lt; n（因为 goal 的长度也是 n），这意味着对 s 进行 i 次旋转后即可得到 goal。
+复杂度分析
+时间复杂度：O(n)，其中 n 是字符串长度。Java 中 contains 的内部实现（如 indexOf）在最坏情况下为 O(n)。
+空间复杂度：O(n)，拼接 s + s 需要一个长度为 2n 的字符串。
+
+代码package code.J796;public class J796 &#123;    public boolean rotateString(String s, String goal) &#123;        if (s.length() != goal.length()) return false;        return (s + s).contains(goal);    &#125;&#125;
+]]></content>
+      <categories>
+        <category>leetcode</category>
+      </categories>
+      <tags>
+        <tag>Java</tag>
+        <tag>字符串</tag>
       </tags>
   </entry>
   <entry>

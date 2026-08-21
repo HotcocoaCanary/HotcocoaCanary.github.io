@@ -1,51 +1,714 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" width="1600" height="900" preserveAspectRatio="xMidYMid slice">
+<svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 1200 900"
+        width="1200"
+        height="900"
+        fill="none"
+>
   <defs>
-    <linearGradient id="sky" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#2e1811"/>
-      <stop offset="45%" stop-color="#5c2c1a"/>
-      <stop offset="100%" stop-color="#150e0a"/>
+    <!-- 金丝雀 -->
+    <linearGradient id="canary" x1="420" y1="250" x2="760" y2="720">
+      <stop offset="0" stop-color="#FFE95A"/>
+      <stop offset="0.55" stop-color="#FFD32A"/>
+      <stop offset="1" stop-color="#F4A916"/>
     </linearGradient>
-    <radialGradient id="sun" cx="50%" cy="34%" r="38%">
-      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.85"/>
-      <stop offset="45%" stop-color="#e0745a" stop-opacity="0.45"/>
-      <stop offset="100%" stop-color="#e0745a" stop-opacity="0"/>
-    </radialGradient>
-    <radialGradient id="pool" cx="78%" cy="88%" r="46%">
-      <stop offset="0%" stop-color="#d2643f" stop-opacity="0.62"/>
-      <stop offset="100%" stop-color="#d2643f" stop-opacity="0"/>
-    </radialGradient>
-    <linearGradient id="vig" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stop-color="#000000" stop-opacity="0.10"/>
-      <stop offset="55%" stop-color="#000000" stop-opacity="0"/>
-      <stop offset="100%" stop-color="#000000" stop-opacity="0.42"/>
+
+    <!-- 404 -->
+    <linearGradient id="gold404" x1="0" y1="150" x2="0" y2="600">
+      <stop offset="0" stop-color="#FFE66D"/>
+      <stop offset="0.45" stop-color="#FFD02C"/>
+      <stop offset="1" stop-color="#F4A914"/>
     </linearGradient>
-    <filter id="blob" x="-30%" y="-30%" width="160%" height="160%">
-      <feGaussianBlur stdDeviation="62"/>
-    </filter>
-    <filter id="gr">
-      <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="3" seed="31"/>
-      <feColorMatrix type="saturate" values="0"/>
+
+    <!-- 404 阴影 -->
+    <linearGradient id="numberShadow" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#344C7A"/>
+      <stop offset="1" stop-color="#182846"/>
+    </linearGradient>
+
+    <!-- 树枝 -->
+    <linearGradient id="branch" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#7A4526"/>
+      <stop offset="0.5" stop-color="#9A5B32"/>
+      <stop offset="1" stop-color="#6A3A22"/>
+    </linearGradient>
+
+    <!-- 帽子 -->
+    <linearGradient id="hat" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#596579"/>
+      <stop offset="1" stop-color="#26344D"/>
+    </linearGradient>
+
+    <!-- 地图 -->
+    <linearGradient id="map" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FFF5D8"/>
+      <stop offset="1" stop-color="#E7D3A1"/>
+    </linearGradient>
+
+    <filter id="softShadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow
+              dx="0"
+              dy="12"
+              stdDeviation="12"
+              flood-color="#182846"
+              flood-opacity="0.22"
+      />
     </filter>
   </defs>
 
-  <rect width="1600" height="900" fill="url(#sky)"/>
+  <!-- ========================================================= -->
+  <!-- 404 BACK SHADOW -->
+  <!-- ========================================================= -->
 
-  <g filter="url(#blob)">
-    <ellipse cx="330" cy="230" rx="290" ry="210" fill="#e0745a" opacity="0.50"/>
-    <ellipse cx="1240" cy="200" rx="260" ry="190" fill="#ffffff" opacity="0.26"/>
-    <ellipse cx="980" cy="700" rx="330" ry="230" fill="#d2643f" opacity="0.48"/>
-    <ellipse cx="240" cy="740" rx="250" ry="180" fill="#5c2c1a" opacity="0.42"/>
+  <g
+          font-family="Arial, Helvetica, sans-serif"
+          font-size="390"
+          font-weight="900"
+          text-anchor="middle"
+          stroke="#162846"
+          stroke-width="28"
+          stroke-linejoin="round"
+  >
+    <text
+            x="600"
+            y="590"
+            fill="url(#numberShadow)"
+    >
+      404
+    </text>
+
+    <text
+            x="600"
+            y="560"
+            fill="url(#gold404)"
+    >
+      404
+    </text>
   </g>
 
-  <rect width="1600" height="900" fill="url(#sun)"/>
-  <rect width="1600" height="900" fill="url(#pool)"/>
-
-  <g opacity="0.16" stroke="#ffffff" fill="none" stroke-width="1.1">
-    <path d="M-40 640 C 300 560, 620 700, 900 610 S 1400 500, 1660 590"/>
-    <path d="M-40 700 C 320 620, 640 760, 920 672 S 1420 566, 1660 654"/>
-    <path d="M-40 760 C 340 686, 660 820, 940 736 S 1440 630, 1660 716"/>
+  <!-- 404 高光 -->
+  <g
+          fill="none"
+          stroke="#FFF5A6"
+          stroke-width="14"
+          stroke-linecap="round"
+          opacity="0.85"
+  >
+    <path d="M245 315 L285 270"/>
+    <path d="M915 315 L955 270"/>
   </g>
 
-  <rect width="1600" height="900" fill="url(#vig)"/>
-  <rect width="1600" height="900" filter="url(#gr)" opacity="0.045"/>
+
+  <!-- ========================================================= -->
+  <!-- QUESTION BUBBLE -->
+  <!-- ========================================================= -->
+
+  <g filter="url(#softShadow)">
+    <path
+            d="
+        M815 145
+        C815 92 856 52 910 52
+        C964 52 1005 92 1005 145
+        C1005 198 964 237 910 237
+        C895 237 881 234 868 229
+        L836 255
+        L845 218
+        C826 200 815 175 815 145
+        Z
+      "
+            fill="#FFFDF6"
+            stroke="#26344D"
+            stroke-width="12"
+            stroke-linejoin="round"
+    />
+
+    <text
+            x="910"
+            y="175"
+            text-anchor="middle"
+            font-family="Arial, Helvetica, sans-serif"
+            font-size="105"
+            font-weight="900"
+            fill="#26344D"
+    >
+      ?
+    </text>
+  </g>
+
+  <!-- 问号旁边的感叹装饰 -->
+  <g
+          stroke="#FFD12C"
+          stroke-width="15"
+          stroke-linecap="round"
+  >
+    <path d="M1035 125 L1065 92"/>
+    <path d="M1050 160 L1087 146"/>
+  </g>
+
+
+  <!-- ========================================================= -->
+  <!-- CANARY TAIL -->
+  <!-- ========================================================= -->
+
+  <g filter="url(#softShadow)">
+
+    <path
+            d="
+        M490 650
+        C440 650 390 675 335 715
+        C390 718 445 708 510 678
+        Z
+      "
+            fill="url(#canary)"
+            stroke="#172846"
+            stroke-width="12"
+            stroke-linejoin="round"
+    />
+
+    <path
+            d="
+        M450 675
+        C400 694 367 713 335 715
+      "
+            stroke="#F2A914"
+            stroke-width="10"
+            stroke-linecap="round"
+    />
+
+    <!-- ======================================================= -->
+    <!-- CANARY BODY -->
+    <!-- ======================================================= -->
+
+    <path
+            d="
+        M465 400
+        C400 438 374 520 399 596
+        C420 662 493 703 584 692
+        C671 682 731 630 734 552
+        C737 471 684 414 616 395
+        C562 380 509 382 465 400
+        Z
+      "
+            fill="url(#canary)"
+            stroke="#172846"
+            stroke-width="13"
+            stroke-linejoin="round"
+    />
+
+    <!-- ======================================================= -->
+    <!-- CANARY HEAD -->
+    <!-- ======================================================= -->
+
+    <path
+            d="
+        M500 392
+        C477 358 483 310 514 278
+        C548 243 604 235 650 260
+        C699 287 719 337 706 382
+        C695 421 660 447 616 451
+        C567 456 522 433 500 392
+        Z
+      "
+            fill="#FFD82F"
+            stroke="#172846"
+            stroke-width="13"
+            stroke-linejoin="round"
+    />
+
+    <!-- 脸部高光 -->
+    <path
+            d="M525 319 C540 287 567 272 595 269"
+            stroke="#FFF49A"
+            stroke-width="15"
+            stroke-linecap="round"
+            opacity="0.85"
+    />
+
+    <!-- ======================================================= -->
+    <!-- CREST / FEATHER -->
+    <!-- ======================================================= -->
+
+    <path
+            d="
+        M535 283
+        C510 255 510 219 533 190
+        C544 215 559 228 578 232
+        C570 201 588 174 618 169
+        C608 203 618 225 639 239
+      "
+            fill="#FFD12A"
+            stroke="#172846"
+            stroke-width="12"
+            stroke-linejoin="round"
+    />
+
+    <path
+            d="M535 197 C555 213 571 224 590 231"
+            stroke="#FFF49A"
+            stroke-width="9"
+            stroke-linecap="round"
+    />
+
+
+    <!-- ======================================================= -->
+    <!-- HAT -->
+    <!-- ======================================================= -->
+
+    <path
+            d="
+        M492 286
+        C500 232 543 202 599 201
+        C655 200 697 227 713 271
+        C675 253 637 249 595 255
+        C558 261 527 274 492 286
+        Z
+      "
+            fill="url(#hat)"
+            stroke="#172846"
+            stroke-width="13"
+            stroke-linejoin="round"
+    />
+
+    <!-- 帽檐 -->
+    <path
+            d="
+        M486 282
+        C536 267 588 257 644 258
+        C675 259 700 265 720 276
+        C681 291 642 297 602 298
+        C559 299 519 293 486 282
+        Z
+      "
+            fill="#26344D"
+            stroke="#172846"
+            stroke-width="12"
+    />
+
+    <!-- 帽子高光 -->
+    <path
+            d="M530 245 C553 225 581 218 609 220"
+            stroke="#8893A4"
+            stroke-width="10"
+            stroke-linecap="round"
+            opacity="0.65"
+    />
+
+
+    <!-- ======================================================= -->
+    <!-- EYE -->
+    <!-- ======================================================= -->
+
+    <circle
+            cx="642"
+            cy="337"
+            r="31"
+            fill="#172846"
+    />
+
+    <circle
+            cx="651"
+            cy="326"
+            r="10"
+            fill="#FFFFFF"
+    />
+
+
+    <!-- ======================================================= -->
+    <!-- BEAK -->
+    <!-- ======================================================= -->
+
+    <path
+            d="
+        M697 360
+        L751 371
+        L708 400
+        L684 390
+        Z
+      "
+            fill="#F6A329"
+            stroke="#172846"
+            stroke-width="11"
+            stroke-linejoin="round"
+    />
+
+    <path
+            d="M703 384 L741 374"
+            stroke="#D97919"
+            stroke-width="6"
+            stroke-linecap="round"
+    />
+
+
+    <!-- ======================================================= -->
+    <!-- WING -->
+    <!-- ======================================================= -->
+
+    <path
+            d="
+        M470 457
+        C504 421 557 418 596 449
+        C570 466 552 486 538 507
+        C560 500 582 500 600 508
+        C581 560 533 594 479 586
+        C446 580 427 556 433 523
+        C438 496 451 472 470 457
+        Z
+      "
+            fill="#FFD02C"
+            stroke="#172846"
+            stroke-width="12"
+            stroke-linejoin="round"
+    />
+
+    <!-- 羽毛 -->
+    <g
+            fill="none"
+            stroke="#EBAA16"
+            stroke-width="9"
+            stroke-linecap="round"
+    >
+      <path d="M455 535 C487 531 515 516 538 491"/>
+      <path d="M465 558 C502 551 531 532 552 506"/>
+    </g>
+
+
+    <!-- ======================================================= -->
+    <!-- SCARF -->
+    <!-- ======================================================= -->
+
+    <path
+            d="
+        M493 421
+        C536 445 589 455 651 439
+        L682 492
+        C622 520 550 507 500 477
+        Z
+      "
+            fill="#315E9A"
+            stroke="#172846"
+            stroke-width="11"
+            stroke-linejoin="round"
+    />
+
+    <!-- 围巾尾巴 -->
+    <path
+            d="
+        M502 466
+        C474 467 451 478 433 500
+        C459 507 485 503 511 487
+        Z
+      "
+            fill="#315E9A"
+            stroke="#172846"
+            stroke-width="10"
+    />
+
+    <!-- 羽毛标志 -->
+    <path
+            d="
+        M602 462
+        C614 447 627 438 641 432
+        C634 449 626 461 612 474
+        C608 470 605 466 602 462
+        Z
+      "
+            fill="#FFFFFF"
+    />
+
+    <path
+            d="M611 471 L638 438"
+            stroke="#FFFFFF"
+            stroke-width="5"
+            stroke-linecap="round"
+    />
+
+
+    <!-- ======================================================= -->
+    <!-- MAP -->
+    <!-- ======================================================= -->
+
+    <g transform="rotate(-8 680 530)">
+      <path
+              d="
+          M575 470
+          L635 448
+          L696 466
+          L757 440
+          L755 568
+          L695 588
+          L635 570
+          L575 594
+          Z
+        "
+              fill="url(#map)"
+              stroke="#172846"
+              stroke-width="11"
+              stroke-linejoin="round"
+      />
+
+      <!-- 折痕 -->
+      <path
+              d="M635 448 L635 570"
+              stroke="#C4AC78"
+              stroke-width="6"
+              stroke-dasharray="8 8"
+      />
+
+      <path
+              d="M696 466 L695 588"
+              stroke="#C4AC78"
+              stroke-width="6"
+              stroke-dasharray="8 8"
+      />
+
+      <!-- 地图路线 -->
+      <path
+              d="
+          M600 535
+          C625 500 646 520 663 500
+          C682 478 696 508 715 489
+        "
+              fill="none"
+              stroke="#9C9278"
+              stroke-width="8"
+              stroke-dasharray="9 10"
+              stroke-linecap="round"
+      />
+
+      <!-- X -->
+      <g stroke="#E94B2E" stroke-width="13" stroke-linecap="round">
+        <path d="M691 516 L725 550"/>
+        <path d="M725 516 L691 550"/>
+      </g>
+
+      <!-- 地图小山 -->
+      <path
+              d="M605 480 L620 462 L635 481"
+              stroke="#B4A47D"
+              stroke-width="6"
+              fill="none"
+      />
+
+      <path
+              d="M707 473 L719 458 L732 476"
+              stroke="#B4A47D"
+              stroke-width="6"
+              fill="none"
+      />
+    </g>
+
+
+    <!-- ======================================================= -->
+    <!-- LEGS -->
+    <!-- ======================================================= -->
+
+    <g
+            stroke="#172846"
+            stroke-width="12"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+    >
+      <path d="M540 675 L540 715"/>
+      <path d="M650 674 L650 712"/>
+    </g>
+
+    <g
+            fill="#F29D27"
+            stroke="#172846"
+            stroke-width="10"
+            stroke-linejoin="round"
+    >
+      <path
+              d="
+          M540 700
+          C520 710 520 729 540 735
+          C549 727 557 717 560 704
+          Z
+        "
+      />
+
+      <path
+              d="
+          M650 700
+          C632 712 635 730 653 735
+          C663 727 670 717 671 704
+          Z
+        "
+      />
+    </g>
+
+  </g>
+
+
+  <!-- ========================================================= -->
+  <!-- BRANCH -->
+  <!-- ========================================================= -->
+
+  <g filter="url(#softShadow)">
+
+    <path
+            d="
+        M150 735
+        C270 705 365 720 455 730
+        C550 741 625 742 715 720
+        C800 699 900 712 1040 750
+      "
+            fill="none"
+            stroke="#172846"
+            stroke-width="55"
+            stroke-linecap="round"
+    />
+
+    <path
+            d="
+        M150 725
+        C270 695 365 710 455 720
+        C550 731 625 732 715 710
+        C800 689 900 702 1040 740
+      "
+            fill="none"
+            stroke="url(#branch)"
+            stroke-width="38"
+            stroke-linecap="round"
+    />
+
+    <!-- 树枝纹理 -->
+    <g
+            stroke="#B77748"
+            stroke-width="7"
+            stroke-linecap="round"
+            opacity="0.65"
+    >
+      <path d="M220 713 C260 708 290 711 320 716"/>
+      <path d="M365 717 C395 718 420 722 445 725"/>
+      <path d="M750 704 C785 697 810 698 838 705"/>
+      <path d="M880 708 C910 710 935 719 960 727"/>
+    </g>
+
+    <!-- 树枝小分叉 -->
+    <path
+            d="M245 714 C210 678 187 662 155 650"
+            stroke="#172846"
+            stroke-width="22"
+            stroke-linecap="round"
+    />
+
+    <path
+            d="M245 709 C212 674 189 658 157 647"
+            stroke="#7A4526"
+            stroke-width="13"
+            stroke-linecap="round"
+    />
+
+    <path
+            d="M830 700 C858 664 885 641 918 625"
+            stroke="#172846"
+            stroke-width="22"
+            stroke-linecap="round"
+    />
+
+    <path
+            d="M830 695 C858 660 885 637 918 621"
+            stroke="#7A4526"
+            stroke-width="13"
+            stroke-linecap="round"
+    />
+  </g>
+
+
+  <!-- ========================================================= -->
+  <!-- LEAVES -->
+  <!-- ========================================================= -->
+
+  <g
+          fill="#8CCF32"
+          stroke="#172846"
+          stroke-width="10"
+          stroke-linejoin="round"
+  >
+
+    <path
+            d="
+        M190 675
+        C148 665 125 638 119 606
+        C154 607 183 627 198 659
+        Z
+      "
+    />
+
+    <path
+            d="
+        M290 714
+        C270 678 277 649 302 625
+        C320 657 318 688 290 714
+        Z
+      "
+    />
+
+    <path
+            d="
+        M885 665
+        C900 629 927 609 960 608
+        C954 643 929 666 885 665
+        Z
+      "
+    />
+
+    <path
+            d="
+        M974 733
+        C985 699 1007 682 1036 679
+        C1030 710 1009 732 974 733
+        Z
+      "
+    />
+  </g>
+
+  <!-- 叶脉 -->
+  <g
+          stroke="#5A9C2B"
+          stroke-width="6"
+          stroke-linecap="round"
+  >
+    <path d="M132 616 L186 660"/>
+    <path d="M296 637 L291 697"/>
+    <path d="M950 617 L900 657"/>
+    <path d="M1028 688 L986 723"/>
+  </g>
+
+
+  <!-- ========================================================= -->
+  <!-- SMALL DECORATIONS -->
+  <!-- ========================================================= -->
+
+  <g
+          stroke="#FFD12C"
+          stroke-width="10"
+          stroke-linecap="round"
+  >
+    <path d="M160 340 L140 320"/>
+    <path d="M177 335 L177 305"/>
+    <path d="M194 340 L216 320"/>
+  </g>
+
+  <g
+          fill="#FFD12C"
+          stroke="#172846"
+          stroke-width="7"
+  >
+    <path
+            d="
+        M1020 490
+        L1030 515
+        L1056 525
+        L1030 535
+        L1020 561
+        L1010 535
+        L984 525
+        L1010 515
+        Z
+      "
+    />
+  </g>
+
 </svg>

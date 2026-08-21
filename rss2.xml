@@ -154,21 +154,6 @@
       <pubDate>Tue, 16 Jun 2026 16:00:00 GMT</pubDate>
     </item>
     <item>
-      <title>中文环境配置和中文输入法</title>
-      <link>https://hotcocoacanary.github.io/2026/06/17/linux/05-%E4%B8%AD%E6%96%87%E7%8E%AF%E5%A2%83%E5%92%8C%E8%BE%93%E5%85%A5%E6%B3%95%E9%85%8D%E7%BD%AE/</link>
-      <description>
-        <![CDATA[<h1 id="中文环境配置和中文输入法"><a href="#中文环境配置和中文输入法" class="headerlink"]]>
-      </description>
-      <author>Canary</author>
-      <category domain="https://hotcocoacanary.github.io/categories/linux/">linux</category>
-      <category domain="https://hotcocoacanary.github.io/tags/%E4%B8%AD%E6%96%87%E7%8E%AF%E5%A2%83/">中文环境</category>
-      <category domain="https://hotcocoacanary.github.io/tags/fcitx5/">fcitx5</category>
-      <category domain="https://hotcocoacanary.github.io/tags/ibus/">ibus</category>
-      <category domain="https://hotcocoacanary.github.io/tags/%E8%BE%93%E5%85%A5%E6%B3%95/">输入法</category>
-      <category domain="https://hotcocoacanary.github.io/tags/locale/">locale</category>
-      <pubDate>Tue, 16 Jun 2026 16:00:00 GMT</pubDate>
-    </item>
-    <item>
       <title>niri 和 Hyprland 配置（DMS）</title>
       <link>https://hotcocoacanary.github.io/2026/06/17/linux/04-niri%E5%92%8CHyprland%E9%85%8D%E7%BD%AEDMS/</link>
       <description>
@@ -181,6 +166,21 @@
       <category domain="https://hotcocoacanary.github.io/tags/DMS/">DMS</category>
       <category domain="https://hotcocoacanary.github.io/tags/Wayland/">Wayland</category>
       <category domain="https://hotcocoacanary.github.io/tags/%E7%AA%97%E5%8F%A3%E7%AE%A1%E7%90%86%E5%99%A8/">窗口管理器</category>
+      <pubDate>Tue, 16 Jun 2026 16:00:00 GMT</pubDate>
+    </item>
+    <item>
+      <title>中文环境配置和中文输入法</title>
+      <link>https://hotcocoacanary.github.io/2026/06/17/linux/05-%E4%B8%AD%E6%96%87%E7%8E%AF%E5%A2%83%E5%92%8C%E8%BE%93%E5%85%A5%E6%B3%95%E9%85%8D%E7%BD%AE/</link>
+      <description>
+        <![CDATA[<h1 id="中文环境配置和中文输入法"><a href="#中文环境配置和中文输入法" class="headerlink"]]>
+      </description>
+      <author>Canary</author>
+      <category domain="https://hotcocoacanary.github.io/categories/linux/">linux</category>
+      <category domain="https://hotcocoacanary.github.io/tags/%E4%B8%AD%E6%96%87%E7%8E%AF%E5%A2%83/">中文环境</category>
+      <category domain="https://hotcocoacanary.github.io/tags/fcitx5/">fcitx5</category>
+      <category domain="https://hotcocoacanary.github.io/tags/ibus/">ibus</category>
+      <category domain="https://hotcocoacanary.github.io/tags/%E8%BE%93%E5%85%A5%E6%B3%95/">输入法</category>
+      <category domain="https://hotcocoacanary.github.io/tags/locale/">locale</category>
       <pubDate>Tue, 16 Jun 2026 16:00:00 GMT</pubDate>
     </item>
     <item>
