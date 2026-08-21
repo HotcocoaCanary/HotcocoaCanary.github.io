@@ -1,0 +1,364 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <author>
+    <name>Canary</name>
+  </author>
+  <generator uri="https://hexo.io/">Hexo</generator>
+  <id>https://hotcocoacanary.github.io/</id>
+  <link href="https://hotcocoacanary.github.io/" rel="alternate"/>
+  <link href="https://hotcocoacanary.github.io/atom.xml" rel="self"/>
+  <rights>All rights reserved 2026, Canary</rights>
+  <subtitle>鸢作江虞的小金丝雀</subtitle>
+  <title>𝒞𝒶𝓃𝒶𝓇𝓎</title>
+  <updated>2026-08-19T04:01:39.793Z</updated>
+  <entry>
+    <author>
+      <name>Canary</name>
+    </author>
+    <category term="linux" scheme="https://hotcocoacanary.github.io/categories/linux/"/>
+    <category term="Arch Linux" scheme="https://hotcocoacanary.github.io/tags/Arch-Linux/"/>
+    <category term="WSL" scheme="https://hotcocoacanary.github.io/tags/WSL/"/>
+    <category term="Windows" scheme="https://hotcocoacanary.github.io/tags/Windows/"/>
+    <id>https://hotcocoacanary.github.io/2026/06/17/linux/02-WSL%E5%AE%89%E8%A3%85Arch-Linux/</id>
+    <link href="https://hotcocoacanary.github.io/2026/06/17/linux/02-WSL%E5%AE%89%E8%A3%85Arch-Linux/"/>
+    <published>2026-06-16T16:00:00.000Z</published>
+    <summary>
+      <![CDATA[<h1 id="通过-WSL-安装-Arch-Linux"><a href="#通过-WSL-安装-Arch-Linux" class="headerlink" title="通过 WSL 安装 Arch Linux"></a>通过 WSL 安装 Arch]]>
+    </summary>
+    <title>通过 WSL 安装 Arch Linux</title>
+    <updated>2026-08-19T04:01:39.793Z</updated>
+  </entry>
+  <entry>
+    <author>
+      <name>Canary</name>
+    </author>
+    <category term="linux" scheme="https://hotcocoacanary.github.io/categories/linux/"/>
+    <category term="Java" scheme="https://hotcocoacanary.github.io/tags/Java/"/>
+    <category term="开发环境" scheme="https://hotcocoacanary.github.io/tags/%E5%BC%80%E5%8F%91%E7%8E%AF%E5%A2%83/"/>
+    <category term="yay" scheme="https://hotcocoacanary.github.io/tags/yay/"/>
+    <category term="Neovim" scheme="https://hotcocoacanary.github.io/tags/Neovim/"/>
+    <category term="Docker" scheme="https://hotcocoacanary.github.io/tags/Docker/"/>
+    <category term="Node.js" scheme="https://hotcocoacanary.github.io/tags/Node-js/"/>
+    <category term="Python" scheme="https://hotcocoacanary.github.io/tags/Python/"/>
+    <category term="Go" scheme="https://hotcocoacanary.github.io/tags/Go/"/>
+    <id>https://hotcocoacanary.github.io/2026/06/17/linux/03-%E5%AE%89%E8%A3%85%E9%80%9A%E7%94%A8%E5%BC%80%E5%8F%91%E5%B7%A5%E5%85%B7/</id>
+    <link href="https://hotcocoacanary.github.io/2026/06/17/linux/03-%E5%AE%89%E8%A3%85%E9%80%9A%E7%94%A8%E5%BC%80%E5%8F%91%E5%B7%A5%E5%85%B7/"/>
+    <published>2026-06-16T16:00:00.000Z</published>
+    <summary>
+      <![CDATA[<h1 id="安装通用开发工具"><a href="#安装通用开发工具" class="headerlink" title="安装通用开发工具"></a>安装通用开发工具</h1><blockquote>
+<p><strong>适用读者</strong>：已完成 Arch]]>
+    </summary>
+    <title>安装通用开发工具</title>
+    <updated>2026-08-19T04:01:39.793Z</updated>
+  </entry>
+  <entry>
+    <author>
+      <name>Canary</name>
+    </author>
+    <category term="linux" scheme="https://hotcocoacanary.github.io/categories/linux/"/>
+    <category term="Arch Linux" scheme="https://hotcocoacanary.github.io/tags/Arch-Linux/"/>
+    <category term="archinstall" scheme="https://hotcocoacanary.github.io/tags/archinstall/"/>
+    <category term="安装教程" scheme="https://hotcocoacanary.github.io/tags/%E5%AE%89%E8%A3%85%E6%95%99%E7%A8%8B/"/>
+    <id>https://hotcocoacanary.github.io/2026/06/17/linux/01-archinstall%E5%AE%89%E8%A3%85Arch-Linux/</id>
+    <link href="https://hotcocoacanary.github.io/2026/06/17/linux/01-archinstall%E5%AE%89%E8%A3%85Arch-Linux/"/>
+    <published>2026-06-16T16:00:00.000Z</published>
+    <summary>
+      <![CDATA[<h1 id="通过-archinstall-安装-Arch-Linux"><a href="#通过-archinstall-安装-Arch-Linux" class="headerlink" title="通过 archinstall 安装 Arch]]>
+    </summary>
+    <title>通过 archinstall 安装 Arch Linux</title>
+    <updated>2026-08-19T04:01:39.793Z</updated>
+  </entry>
+  <entry>
+    <author>
+      <name>Canary</name>
+    </author>
+    <category term="linux" scheme="https://hotcocoacanary.github.io/categories/linux/"/>
+    <category term="niri" scheme="https://hotcocoacanary.github.io/tags/niri/"/>
+    <category term="Hyprland" scheme="https://hotcocoacanary.github.io/tags/Hyprland/"/>
+    <category term="DMS" scheme="https://hotcocoacanary.github.io/tags/DMS/"/>
+    <category term="Wayland" scheme="https://hotcocoacanary.github.io/tags/Wayland/"/>
+    <category term="窗口管理器" scheme="https://hotcocoacanary.github.io/tags/%E7%AA%97%E5%8F%A3%E7%AE%A1%E7%90%86%E5%99%A8/"/>
+    <id>https://hotcocoacanary.github.io/2026/06/17/linux/04-niri%E5%92%8CHyprland%E9%85%8D%E7%BD%AEDMS/</id>
+    <link href="https://hotcocoacanary.github.io/2026/06/17/linux/04-niri%E5%92%8CHyprland%E9%85%8D%E7%BD%AEDMS/"/>
+    <published>2026-06-16T16:00:00.000Z</published>
+    <summary>
+      <![CDATA[<h1 id="niri-和-Hyprland-配置（DMS）"><a href="#niri-和-Hyprland-配置（DMS）" class="headerlink" title="niri 和 Hyprland 配置（DMS）"></a>niri 和 Hyprland]]>
+    </summary>
+    <title>niri 和 Hyprland 配置（DMS）</title>
+    <updated>2026-08-19T04:01:39.793Z</updated>
+  </entry>
+  <entry>
+    <author>
+      <name>Canary</name>
+    </author>
+    <category term="linux" scheme="https://hotcocoacanary.github.io/categories/linux/"/>
+    <category term="中文环境" scheme="https://hotcocoacanary.github.io/tags/%E4%B8%AD%E6%96%87%E7%8E%AF%E5%A2%83/"/>
+    <category term="fcitx5" scheme="https://hotcocoacanary.github.io/tags/fcitx5/"/>
+    <category term="ibus" scheme="https://hotcocoacanary.github.io/tags/ibus/"/>
+    <category term="输入法" scheme="https://hotcocoacanary.github.io/tags/%E8%BE%93%E5%85%A5%E6%B3%95/"/>
+    <category term="locale" scheme="https://hotcocoacanary.github.io/tags/locale/"/>
+    <id>https://hotcocoacanary.github.io/2026/06/17/linux/05-%E4%B8%AD%E6%96%87%E7%8E%AF%E5%A2%83%E5%92%8C%E8%BE%93%E5%85%A5%E6%B3%95%E9%85%8D%E7%BD%AE/</id>
+    <link href="https://hotcocoacanary.github.io/2026/06/17/linux/05-%E4%B8%AD%E6%96%87%E7%8E%AF%E5%A2%83%E5%92%8C%E8%BE%93%E5%85%A5%E6%B3%95%E9%85%8D%E7%BD%AE/"/>
+    <published>2026-06-16T16:00:00.000Z</published>
+    <summary>
+      <![CDATA[<h1 id="中文环境配置和中文输入法"><a href="#中文环境配置和中文输入法" class="headerlink"]]>
+    </summary>
+    <title>中文环境配置和中文输入法</title>
+    <updated>2026-08-19T04:01:39.793Z</updated>
+  </entry>
+  <entry>
+    <author>
+      <name>Canary</name>
+    </author>
+    <category term="leetcode" scheme="https://hotcocoacanary.github.io/categories/leetcode/"/>
+    <category term="Java" scheme="https://hotcocoacanary.github.io/tags/Java/"/>
+    <category term="哈希表" scheme="https://hotcocoacanary.github.io/tags/%E5%93%88%E5%B8%8C%E8%A1%A8/"/>
+    <id>https://hotcocoacanary.github.io/2026/02/28/java/LeetCode-1-Two-Sum/</id>
+    <link href="https://hotcocoacanary.github.io/2026/02/28/java/LeetCode-1-Two-Sum/"/>
+    <published>2026-02-27T16:00:00.000Z</published>
+    <summary>
+      <![CDATA[<h2 id="题目描述"><a href="#题目描述" class="headerlink" title="题目描述"></a>题目描述</h2><p>给定一个整数数组 <code>nums</code> 和一个整数目标值]]>
+    </summary>
+    <title>LeetCode 1. Two Sum</title>
+    <updated>2026-08-19T04:01:39.792Z</updated>
+  </entry>
+  <entry>
+    <author>
+      <name>Canary</name>
+    </author>
+    <category term="leetcode" scheme="https://hotcocoacanary.github.io/categories/leetcode/"/>
+    <category term="Java" scheme="https://hotcocoacanary.github.io/tags/Java/"/>
+    <category term="单调栈" scheme="https://hotcocoacanary.github.io/tags/%E5%8D%95%E8%B0%83%E6%A0%88/"/>
+    <category term="链表" scheme="https://hotcocoacanary.github.io/tags/%E9%93%BE%E8%A1%A8/"/>
+    <id>https://hotcocoacanary.github.io/2026/02/28/java/LeetCode-1019-Next-Greater-Node-In-Linked-List/</id>
+    <link href="https://hotcocoacanary.github.io/2026/02/28/java/LeetCode-1019-Next-Greater-Node-In-Linked-List/"/>
+    <published>2026-02-27T16:00:00.000Z</published>
+    <summary>
+      <![CDATA[<h2 id="题目描述"><a href="#题目描述" class="headerlink" title="题目描述"></a>题目描述</h2><p>给定一个长度为 <code>n</code>]]>
+    </summary>
+    <title>LeetCode 1019. Next Greater Node In Linked List</title>
+    <updated>2026-08-19T04:01:39.792Z</updated>
+  </entry>
+  <entry>
+    <author>
+      <name>Canary</name>
+    </author>
+    <category term="leetcode" scheme="https://hotcocoacanary.github.io/categories/leetcode/"/>
+    <category term="Java" scheme="https://hotcocoacanary.github.io/tags/Java/"/>
+    <category term="哈希表" scheme="https://hotcocoacanary.github.io/tags/%E5%93%88%E5%B8%8C%E8%A1%A8/"/>
+    <category term="链表" scheme="https://hotcocoacanary.github.io/tags/%E9%93%BE%E8%A1%A8/"/>
+    <id>https://hotcocoacanary.github.io/2026/02/28/java/LeetCode-138-Copy-List-with-Random-Pointer/</id>
+    <link href="https://hotcocoacanary.github.io/2026/02/28/java/LeetCode-138-Copy-List-with-Random-Pointer/"/>
+    <published>2026-02-27T16:00:00.000Z</published>
+    <summary>
+      <![CDATA[<h2 id="题目描述"><a href="#题目描述" class="headerlink" title="题目描述"></a>题目描述</h2><p>给你一个长度为 n 的链表，每个节点包含一个额外增加的随机指针]]>
+    </summary>
+    <title>LeetCode 138. Copy List with Random Pointer</title>
+    <updated>2026-08-19T04:01:39.792Z</updated>
+  </entry>
+  <entry>
+    <author>
+      <name>Canary</name>
+    </author>
+    <category term="leetcode" scheme="https://hotcocoacanary.github.io/categories/leetcode/"/>
+    <category term="Java" scheme="https://hotcocoacanary.github.io/tags/Java/"/>
+    <category term="哈希表" scheme="https://hotcocoacanary.github.io/tags/%E5%93%88%E5%B8%8C%E8%A1%A8/"/>
+    <category term="数学" scheme="https://hotcocoacanary.github.io/tags/%E6%95%B0%E5%AD%A6/"/>
+    <category term="前缀和" scheme="https://hotcocoacanary.github.io/tags/%E5%89%8D%E7%BC%80%E5%92%8C/"/>
+    <id>https://hotcocoacanary.github.io/2026/02/28/java/LeetCode-1590-Make-Sum-Divisible-by-P/</id>
+    <link href="https://hotcocoacanary.github.io/2026/02/28/java/LeetCode-1590-Make-Sum-Divisible-by-P/"/>
+    <published>2026-02-27T16:00:00.000Z</published>
+    <summary>
+      <![CDATA[<h2 id="题目描述"><a href="#题目描述" class="headerlink" title="题目描述"></a>题目描述</h2><p>给你一个正整数数组]]>
+    </summary>
+    <title>LeetCode 1590. Make Sum Divisible by P</title>
+    <updated>2026-08-19T04:01:39.792Z</updated>
+  </entry>
+  <entry>
+    <author>
+      <name>Canary</name>
+    </author>
+    <category term="leetcode" scheme="https://hotcocoacanary.github.io/categories/leetcode/"/>
+    <category term="Java" scheme="https://hotcocoacanary.github.io/tags/Java/"/>
+    <category term="数组" scheme="https://hotcocoacanary.github.io/tags/%E6%95%B0%E7%BB%84/"/>
+    <category term="前缀和" scheme="https://hotcocoacanary.github.io/tags/%E5%89%8D%E7%BC%80%E5%92%8C/"/>
+    <id>https://hotcocoacanary.github.io/2026/02/28/java/LeetCode-1664-Ways-to-Make-a-Fair-Array/</id>
+    <link href="https://hotcocoacanary.github.io/2026/02/28/java/LeetCode-1664-Ways-to-Make-a-Fair-Array/"/>
+    <published>2026-02-27T16:00:00.000Z</published>
+    <summary>
+      <![CDATA[<h2 id="题目描述"><a href="#题目描述" class="headerlink" title="题目描述"></a>题目描述</h2><p>给你一个整数数组]]>
+    </summary>
+    <title>LeetCode 1664. Ways to Make a Fair Array</title>
+    <updated>2026-08-19T04:01:39.792Z</updated>
+  </entry>
+  <entry>
+    <author>
+      <name>Canary</name>
+    </author>
+    <category term="leetcode" scheme="https://hotcocoacanary.github.io/categories/leetcode/"/>
+    <category term="Java" scheme="https://hotcocoacanary.github.io/tags/Java/"/>
+    <category term="数组" scheme="https://hotcocoacanary.github.io/tags/%E6%95%B0%E7%BB%84/"/>
+    <category term="前缀和" scheme="https://hotcocoacanary.github.io/tags/%E5%89%8D%E7%BC%80%E5%92%8C/"/>
+    <id>https://hotcocoacanary.github.io/2026/02/28/java/LeetCode-1732-Find-the-Highest-Altitude/</id>
+    <link href="https://hotcocoacanary.github.io/2026/02/28/java/LeetCode-1732-Find-the-Highest-Altitude/"/>
+    <published>2026-02-27T16:00:00.000Z</published>
+    <summary>
+      <![CDATA[<h2 id="题目描述"><a href="#题目描述" class="headerlink" title="题目描述"></a>题目描述</h2><p>有一个自行车手打算进行一场公路骑行，这条路线总共由 <code>n + 1</code>]]>
+    </summary>
+    <title>LeetCode 1732. Find the Highest Altitude</title>
+    <updated>2026-08-19T04:01:39.792Z</updated>
+  </entry>
+  <entry>
+    <author>
+      <name>Canary</name>
+    </author>
+    <category term="leetcode" scheme="https://hotcocoacanary.github.io/categories/leetcode/"/>
+    <category term="Java" scheme="https://hotcocoacanary.github.io/tags/Java/"/>
+    <category term="数组" scheme="https://hotcocoacanary.github.io/tags/%E6%95%B0%E7%BB%84/"/>
+    <category term="原地哈希" scheme="https://hotcocoacanary.github.io/tags/%E5%8E%9F%E5%9C%B0%E5%93%88%E5%B8%8C/"/>
+    <id>https://hotcocoacanary.github.io/2026/02/28/java/LeetCode-41-First-Missing-Positive/</id>
+    <link href="https://hotcocoacanary.github.io/2026/02/28/java/LeetCode-41-First-Missing-Positive/"/>
+    <published>2026-02-27T16:00:00.000Z</published>
+    <summary>
+      <![CDATA[<h2 id="题目描述"><a href="#题目描述" class="headerlink" title="题目描述"></a>题目描述</h2><p>给你一个未排序的整数数组 <code>nums</code>，请你找出其中没有出现的最小的正整数。要求时间复杂度 O(n)]]>
+    </summary>
+    <title>LeetCode 41. First Missing Positive</title>
+    <updated>2026-08-19T04:01:39.792Z</updated>
+  </entry>
+  <entry>
+    <author>
+      <name>Canary</name>
+    </author>
+    <category term="leetcode" scheme="https://hotcocoacanary.github.io/categories/leetcode/"/>
+    <category term="Java" scheme="https://hotcocoacanary.github.io/tags/Java/"/>
+    <category term="哈希表" scheme="https://hotcocoacanary.github.io/tags/%E5%93%88%E5%B8%8C%E8%A1%A8/"/>
+    <category term="数学" scheme="https://hotcocoacanary.github.io/tags/%E6%95%B0%E5%AD%A6/"/>
+    <category term="前缀和" scheme="https://hotcocoacanary.github.io/tags/%E5%89%8D%E7%BC%80%E5%92%8C/"/>
+    <id>https://hotcocoacanary.github.io/2026/02/28/java/LeetCode-523-Continuous-Subarray-Sum/</id>
+    <link href="https://hotcocoacanary.github.io/2026/02/28/java/LeetCode-523-Continuous-Subarray-Sum/"/>
+    <published>2026-02-27T16:00:00.000Z</published>
+    <summary>
+      <![CDATA[<h2 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h2><p>给你一个整数数组 <code>nums</code> 和一个整数 <code>k</code>，如果]]>
+    </summary>
+    <title>LeetCode 523. Continuous Subarray Sum</title>
+    <updated>2026-08-19T04:01:39.792Z</updated>
+  </entry>
+  <entry>
+    <author>
+      <name>Canary</name>
+    </author>
+    <category term="leetcode" scheme="https://hotcocoacanary.github.io/categories/leetcode/"/>
+    <category term="Java" scheme="https://hotcocoacanary.github.io/tags/Java/"/>
+    <category term="字符串" scheme="https://hotcocoacanary.github.io/tags/%E5%AD%97%E7%AC%A6%E4%B8%B2/"/>
+    <id>https://hotcocoacanary.github.io/2026/02/25/java/LeetCode-1507-Reformat-Date/</id>
+    <link href="https://hotcocoacanary.github.io/2026/02/25/java/LeetCode-1507-Reformat-Date/"/>
+    <published>2026-02-24T16:00:00.000Z</published>
+    <summary>
+      <![CDATA[<h2 id="题目描述"><a href="#题目描述" class="headerlink" title="题目描述"></a>题目描述</h2><p>给你一个字符串 <code>date</code>，它的格式为 <code>Day Month]]>
+    </summary>
+    <title>LeetCode 1507. Reformat Date</title>
+    <updated>2026-08-19T04:01:39.792Z</updated>
+  </entry>
+  <entry>
+    <author>
+      <name>Canary</name>
+    </author>
+    <category term="leetcode" scheme="https://hotcocoacanary.github.io/categories/leetcode/"/>
+    <category term="Java" scheme="https://hotcocoacanary.github.io/tags/Java/"/>
+    <category term="字符串" scheme="https://hotcocoacanary.github.io/tags/%E5%AD%97%E7%AC%A6%E4%B8%B2/"/>
+    <id>https://hotcocoacanary.github.io/2026/02/25/java/LeetCode-1668-Maximum-Repeating-Substring/</id>
+    <link href="https://hotcocoacanary.github.io/2026/02/25/java/LeetCode-1668-Maximum-Repeating-Substring/"/>
+    <published>2026-02-24T16:00:00.000Z</published>
+    <summary>
+      <![CDATA[<h2 id="题目描述"><a href="#题目描述" class="headerlink" title="题目描述"></a>题目描述</h2><p>给你一个字符串 <code>sequence</code>，如果字符串 <code>word</code> 连续重复]]>
+    </summary>
+    <title>LeetCode 1668. Maximum Repeating Substring</title>
+    <updated>2026-08-19T04:01:39.792Z</updated>
+  </entry>
+  <entry>
+    <author>
+      <name>Canary</name>
+    </author>
+    <category term="leetcode" scheme="https://hotcocoacanary.github.io/categories/leetcode/"/>
+    <category term="堆" scheme="https://hotcocoacanary.github.io/tags/%E5%A0%86/"/>
+    <category term="最小堆" scheme="https://hotcocoacanary.github.io/tags/%E6%9C%80%E5%B0%8F%E5%A0%86/"/>
+    <category term="Java" scheme="https://hotcocoacanary.github.io/tags/Java/"/>
+    <category term="贪心" scheme="https://hotcocoacanary.github.io/tags/%E8%B4%AA%E5%BF%83/"/>
+    <id>https://hotcocoacanary.github.io/2026/02/25/java/LeetCode-1705-Maximum-Number-of-Eaten-Apples/</id>
+    <link href="https://hotcocoacanary.github.io/2026/02/25/java/LeetCode-1705-Maximum-Number-of-Eaten-Apples/"/>
+    <published>2026-02-24T16:00:00.000Z</published>
+    <summary>
+      <![CDATA[<h2 id="题目描述"><a href="#题目描述" class="headerlink" title="题目描述"></a>题目描述</h2><p>有一棵特殊的苹果树，一连 <code>n</code> 天，每天都可以长出若干个苹果。在第 <code>i</code>]]>
+    </summary>
+    <title>LeetCode 1705. Maximum Number of Eaten Apples</title>
+    <updated>2026-08-19T04:01:39.792Z</updated>
+  </entry>
+  <entry>
+    <author>
+      <name>Canary</name>
+    </author>
+    <category term="leetcode" scheme="https://hotcocoacanary.github.io/categories/leetcode/"/>
+    <category term="Java" scheme="https://hotcocoacanary.github.io/tags/Java/"/>
+    <category term="链表" scheme="https://hotcocoacanary.github.io/tags/%E9%93%BE%E8%A1%A8/"/>
+    <category term="递归" scheme="https://hotcocoacanary.github.io/tags/%E9%80%92%E5%BD%92/"/>
+    <id>https://hotcocoacanary.github.io/2026/02/25/java/LeetCode-206-Reverse-Linked-List/</id>
+    <link href="https://hotcocoacanary.github.io/2026/02/25/java/LeetCode-206-Reverse-Linked-List/"/>
+    <published>2026-02-24T16:00:00.000Z</published>
+    <summary>
+      <![CDATA[<h2 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h2><p>给你单链表的头节点 <code>head</code>，请你反转链表，并返回反转后的链表。</p>
+<h2]]>
+    </summary>
+    <title>LeetCode 206. Reverse Linked List</title>
+    <updated>2026-08-19T04:01:39.792Z</updated>
+  </entry>
+  <entry>
+    <author>
+      <name>Canary</name>
+    </author>
+    <category term="leetcode" scheme="https://hotcocoacanary.github.io/categories/leetcode/"/>
+    <category term="Java" scheme="https://hotcocoacanary.github.io/tags/Java/"/>
+    <category term="链表" scheme="https://hotcocoacanary.github.io/tags/%E9%93%BE%E8%A1%A8/"/>
+    <id>https://hotcocoacanary.github.io/2026/02/25/java/LeetCode-328-Odd-Even-Linked-List/</id>
+    <link href="https://hotcocoacanary.github.io/2026/02/25/java/LeetCode-328-Odd-Even-Linked-List/"/>
+    <published>2026-02-24T16:00:00.000Z</published>
+    <summary>
+      <![CDATA[<h2 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h2><p>给定单链表的头节点]]>
+    </summary>
+    <title>LeetCode 328. Odd Even Linked List</title>
+    <updated>2026-08-19T04:01:39.792Z</updated>
+  </entry>
+  <entry>
+    <author>
+      <name>Canary</name>
+    </author>
+    <category term="leetcode" scheme="https://hotcocoacanary.github.io/categories/leetcode/"/>
+    <category term="Java" scheme="https://hotcocoacanary.github.io/tags/Java/"/>
+    <category term="数学" scheme="https://hotcocoacanary.github.io/tags/%E6%95%B0%E5%AD%A6/"/>
+    <category term="字符串" scheme="https://hotcocoacanary.github.io/tags/%E5%AD%97%E7%AC%A6%E4%B8%B2/"/>
+    <id>https://hotcocoacanary.github.io/2026/02/25/java/LeetCode-459-Repeated-Substring-Pattern/</id>
+    <link href="https://hotcocoacanary.github.io/2026/02/25/java/LeetCode-459-Repeated-Substring-Pattern/"/>
+    <published>2026-02-24T16:00:00.000Z</published>
+    <summary>
+      <![CDATA[<h2 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h2><p>给定一个非空的字符串 <code>s</code>，检查是否可以通过由它的一个子串重复多次构成。</p>
+<h2]]>
+    </summary>
+    <title>LeetCode 459. Repeated Substring Pattern</title>
+    <updated>2026-08-19T04:01:39.792Z</updated>
+  </entry>
+  <entry>
+    <author>
+      <name>Canary</name>
+    </author>
+    <category term="leetcode" scheme="https://hotcocoacanary.github.io/categories/leetcode/"/>
+    <category term="Java" scheme="https://hotcocoacanary.github.io/tags/Java/"/>
+    <category term="字符串" scheme="https://hotcocoacanary.github.io/tags/%E5%AD%97%E7%AC%A6%E4%B8%B2/"/>
+    <id>https://hotcocoacanary.github.io/2026/02/25/java/LeetCode-686-Repeated-String-Match/</id>
+    <link href="https://hotcocoacanary.github.io/2026/02/25/java/LeetCode-686-Repeated-String-Match/"/>
+    <published>2026-02-24T16:00:00.000Z</published>
+    <summary>
+      <![CDATA[<h2 id="题目描述"><a href="#题目描述" class="headerlink" title="题目描述"></a>题目描述</h2><p>给定两个字符串 <code>a</code> 和 <code>b</code>，寻找重复叠加字符串]]>
+    </summary>
+    <title>LeetCode 686. Repeated String Match</title>
+    <updated>2026-08-19T04:01:39.792Z</updated>
+  </entry>
+</feed>

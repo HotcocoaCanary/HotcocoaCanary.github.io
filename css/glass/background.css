@@ -68,19 +68,74 @@ body::before {
 body::after {
   content: "";
   position: fixed;
-  inset: -10%;
+  /* Sized for the drift rather than for the viewport. The layer travels one
+     tile left and two tiles up over a cycle, so it has to reach that far past
+     the right and bottom edges or it uncovers them on the way across. */
+  top: -10%;
+  left: -10%;
+  right: -400px;
+  bottom: -800px;
   pointer-events: none;
   z-index: -1;
-  opacity: 0.62;
+  opacity: 0.78;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400' viewBox='0 0 400 400'%3E%3Cdefs%3E%3CradialGradient id='glow'%3E%3Cstop offset='0%25' stop-color='%23e8973c' stop-opacity='0.55'/%3E%3Cstop offset='100%25' stop-color='%23e8973c' stop-opacity='0'/%3E%3C/radialGradient%3E%3CradialGradient id='glow2'%3E%3Cstop offset='0%25' stop-color='%23f2c46b' stop-opacity='0.4'/%3E%3Cstop offset='100%25' stop-color='%23f2c46b' stop-opacity='0'/%3E%3C/radialGradient%3E%3C/defs%3E%3Cg fill='none' stroke='%23c9713f'%3E%3C!-- large rings --%3E%3Ccircle cx='72' cy='68' r='56' stroke-width='1.4'/%3E%3Ccircle cx='72' cy='68' r='38' stroke-width='0.8'/%3E%3Ccircle cx='72' cy='68' r='20' stroke-width='0.5'/%3E%3Ccircle cx='280' cy='100' r='82' stroke-width='1.2'/%3E%3Ccircle cx='280' cy='100' r='60' stroke-width='0.7'/%3E%3Ccircle cx='280' cy='100' r='34' stroke-width='0.5'/%3E%3Ccircle cx='140' cy='260' r='64' stroke-width='1.3'/%3E%3Ccircle cx='140' cy='260' r='44' stroke-width='0.8'/%3E%3Ccircle cx='340' cy='290' r='48' stroke-width='1.0'/%3E%3Ccircle cx='340' cy='290' r='28' stroke-width='0.6'/%3E%3Ccircle cx='50' cy='310' r='36' stroke-width='1.0'/%3E%3Ccircle cx='50' cy='310' r='18' stroke-width='0.5'/%3E%3Ccircle cx='340' cy='50' r='44' stroke-width='1.0'/%3E%3Ccircle cx='340' cy='50' r='24' stroke-width='0.5'/%3E%3C!-- medium rings --%3E%3Ccircle cx='190' cy='52' r='28' stroke-width='0.9'/%3E%3Ccircle cx='190' cy='52' r='14' stroke-width='0.5'/%3E%3Ccircle cx='360' cy='170' r='32' stroke-width='0.8'/%3E%3Ccircle cx='360' cy='170' r='16' stroke-width='0.4'/%3E%3Ccircle cx='20' cy='160' r='24' stroke-width='0.8'/%3E%3Ccircle cx='100' cy='370' r='30' stroke-width='0.8'/%3E%3Ccircle cx='240' cy='340' r='22' stroke-width='0.7'/%3E%3Ccircle cx='310' cy='220' r='26' stroke-width='0.8'/%3E%3C!-- ripples --%3E%3Ccircle cx='120' cy='130' r='12' stroke-width='0.6'/%3E%3Ccircle cx='120' cy='130' r='20' stroke-width='0.4'/%3E%3Ccircle cx='120' cy='130' r='28' stroke-width='0.25'/%3E%3Ccircle cx='300' cy='320' r='10' stroke-width='0.6'/%3E%3Ccircle cx='300' cy='320' r='18' stroke-width='0.4'/%3E%3Ccircle cx='300' cy='320' r='26' stroke-width='0.25'/%3E%3Ccircle cx='200' cy='200' r='14' stroke-width='0.5'/%3E%3Ccircle cx='200' cy='200' r='22' stroke-width='0.3'/%3E%3Ccircle cx='200' cy='200' r='32' stroke-width='0.2'/%3E%3C!-- sine waves --%3E%3Cpath d='M0 170 Q80 118 160 170 T320 170 T400 170' stroke-width='1.0'/%3E%3Cpath d='M0 190 Q80 138 160 190 T320 190 T400 190' stroke-width='0.5'/%3E%3Cpath d='M0 310 Q80 258 160 310 T320 310 T400 310' stroke-width='0.9'/%3E%3Cpath d='M0 24 Q80 -28 160 24 T320 24 T400 24' stroke-width='0.7'/%3E%3Cpath d='M0 44 Q80 -8 160 44 T320 44 T400 44' stroke-width='0.4'/%3E%3Cpath d='M0 370 Q80 318 160 370 T320 370 T400 370' stroke-width='0.7'/%3E%3C/g%3E%3C!-- light spots --%3E%3Ccircle cx='72' cy='68' r='60' fill='url(%23glow)'/%3E%3Ccircle cx='280' cy='100' r='86' fill='url(%23glow)'/%3E%3Ccircle cx='140' cy='260' r='68' fill='url(%23glow)'/%3E%3Ccircle cx='340' cy='290' r='52' fill='url(%23glow2)'/%3E%3Ccircle cx='50' cy='310' r='40' fill='url(%23glow2)'/%3E%3Ccircle cx='120' cy='130' r='32' fill='url(%23glow2)'/%3E%3Ccircle cx='300' cy='320' r='30' fill='url(%23glow2)'/%3E%3Ccircle cx='200' cy='200' r='36' fill='url(%23glow)'/%3E%3C/svg%3E");
   background-size: 400px 400px;
-  animation: g-scroll 90s linear infinite;
+  animation: g-drift 90s linear infinite;
 }
 
-@keyframes g-scroll {
-  from { background-position:    0px    0px; }
-  to   { background-position: -400px -800px; }
+/* Transform, not background-position.
+   -------------------------------------------------------------------------
+   Animating background-position repaints this layer every frame, and it is a
+   full-viewport fixed layer with every glass surface in the blog sitting on
+   top of it -- so each of those repaints also forces ~30 backdrop-filters,
+   SVG displacement filters included, to re-sample and re-run. It was the most
+   expensive thing on the page by a wide margin, and it ran forever, on every
+   page, whether or not anything else was happening.
+
+   A translate3d of the same distance looks identical and is compositor-only:
+   the tile grid is rasterised once and then moved. The element is not given
+   will-change -- a running transform animation already earns its own layer,
+   and pinning one permanently would keep the cost after
+   [data-glass-bg="static"] switches the animation off at the minimal tier.
+
+   The distance has to be a whole number of tiles or the loop visibly jumps
+   when it restarts. 400/800 against a 400px tile is exactly 1 and 2. */
+@keyframes g-drift {
+  from { transform: translate3d(0, 0, 0); }
+  to   { transform: translate3d(-400px, -800px, 0); }
 }
+
+/* ---- Decoration: lattice ------------------------------------------------
+   High frequency, low contrast, and it exists for one reason: refraction is
+   only visible when there is structure behind it to bend. The radial lights
+   are almost flat at the scale of a bezel, and the ornament's rings are large
+   and sparse -- a 100px band of glass can sit entirely inside one and show
+   nothing at all. A fine lattice guarantees several features inside every
+   bezel wherever a surface happens to land, which is what makes the edge read
+   as glass rather than as a tinted border.
+
+   Between the base light (-3) and the ornament (-1) so the ornament still
+   reads on top of it, and calmed right down on article pages where it would
+   otherwise sit under body text. */
+
+html::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: -2;
+  opacity: 0.30;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24'%3E%3Cg stroke='%23c9713f' fill='none'%3E%3Cpath d='M0 12H24M12 0V24' stroke-width='0.4' opacity='0.45'/%3E%3Cpath d='M0 0H24M0 0V24' stroke-width='0.7' opacity='0.28'/%3E%3C/g%3E%3Ccircle cx='12' cy='12' r='1.15' fill='%23b3562e' opacity='0.55'/%3E%3C/svg%3E");
+  background-size: 24px 24px;
+}
+
+@media (prefers-color-scheme: dark) {
+  html:not([data-theme="light"])::before { opacity: 0.16; }
+}
+
+html[data-theme="dark"]::before { opacity: 0.16; }
+
+html:has(#body-wrap.post)::before { opacity: 0.12; }
 
 /* ---- Decoration: grain --------------------------------------------------
    Breaks up the gradient banding and gives the glass something fine-grained
@@ -111,7 +166,7 @@ html::after {
       radial-gradient(48% 42% at 16% 88%, rgba(206, 112,  56, 0.50), transparent 62%),
       radial-gradient(38% 34% at 50% 48%, rgba(244, 186, 118, 0.34), transparent 66%);
   }
-  :root:not([data-theme="light"]) body::after { opacity: 0.34; }
+  :root:not([data-theme="light"]) body::after { opacity: 0.44; }
   html:not([data-theme="light"])::after  { opacity: 0.22; mix-blend-mode: overlay; }
 }
 
@@ -123,7 +178,7 @@ html::after {
     radial-gradient(48% 42% at 16% 88%, rgba(206, 112,  56, 0.50), transparent 62%),
     radial-gradient(38% 34% at 50% 48%, rgba(244, 186, 118, 0.34), transparent 66%);
 }
-[data-theme="dark"] body::after { opacity: 0.34; }
+[data-theme="dark"] body::after { opacity: 0.44; }
 html[data-theme="dark"]::after  { opacity: 0.22; mix-blend-mode: overlay; }
 
 /* ---- Article pages: calm it down ----------------------------------------
@@ -133,9 +188,21 @@ html[data-theme="dark"]::after  { opacity: 0.22; mix-blend-mode: overlay; }
    nicety to lose, not a break. */
 
 body:has(#body-wrap.post)::after {
-  opacity: 0.26;
+  opacity: 0.34;
   background-size: 600px 600px;   /* lower frequency near body text */
+  /* The tile is larger here, so the drift needs its own keyframes: reusing
+     g-drift would travel 400/800 against a 600px tile, which is not a whole
+     number of tiles and lands the loop on a visible jump. (The old
+     background-position version had exactly that bug -- one jump every 160s.) */
+  right: -600px;
+  bottom: -1200px;
+  animation-name: g-drift-post;
   animation-duration: 160s;
+}
+
+@keyframes g-drift-post {
+  from { transform: translate3d(0, 0, 0); }
+  to   { transform: translate3d(-600px, -1200px, 0); }
 }
 
 html:has(#body-wrap.post)::after {

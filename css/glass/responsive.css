@@ -41,12 +41,36 @@
     padding: 0 16px !important;
   }
 
-  #nav .menus_items {
+  /* Icons only. There is no room in a phone-width bar for four labels, a
+     search label and a title, and the labels are the part that is already
+     carried by the icon. Butterfly decides *whether* the row survives at all
+     (it collapses into the hamburger below 768); this only decides what a
+     surviving item looks like. */
+  #page-header #nav .menus_items .site-page > span,
+  #page-header #nav #search-button .site-page > span {
     display: none;
   }
 
-  #nav #toggle-menu {
-    display: inline-flex !important;
+  #page-header #nav .site-page,
+  #page-header #nav #toggle-menu .site-page,
+  #nav .site-page {
+    gap: 0;
+    padding: 0.34em 0.5em;
+    font-size: 1em;
+  }
+
+  /* The hover underline is sized off the label's padding; with no label there
+     is nothing left for it to underline. */
+  #page-header #nav .site-page:not(.child)::after {
+    display: none;
+  }
+
+  /* The aside stacks under the content below 900px, where it is a full-width
+     block — not the 300px column it is beside the article. Without this it
+     kept the desktop cap and sat in the left third of the page. */
+  .layout > .aside-content {
+    max-width: none !important;
+    width: 100% !important;
   }
 
   #page-header.nav-fixed #nav.glass {
@@ -107,6 +131,45 @@
     font-size: 0.92rem !important;
   }
 
+  /* The post title in the bar has nowhere to go at this width: it is either
+     truncated to two or three characters or it squeezes the site name out of
+     the bar entirely. Below 768 the article's own <h1> is a few pixels down
+     the page, so the bar keeps the site name and drops the page title. */
+  #nav .nav-page-title {
+    display: none !important;
+  }
+
+  /* Once scrolled, the theme swaps the site title out for the page title it
+     is about to show. With the page title gone the bar would simply be empty
+     on the left, so the swap is cancelled and the site name stays put. */
+  #page-header.nav-fixed #nav #blog-info > a:first-child {
+    display: inline-block;
+  }
+
+  #nav #blog-info {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  /* Full-screen search on phones is the theme's own layout. It needs the
+     material to stop rounding a panel that has no corners on screen, and a
+     firmer tint for the same reason the drawer gets one: at full-screen size
+     a 12% wash leaves the post list underneath perfectly readable, and the
+     results have nothing to sit against. */
+  #local-search .search-dialog.glass,
+  .search-dialog.glass {
+    --g-radius: 0;
+    --g-tint: rgba(255, 250, 243, 0.66);
+    border-radius: 0;
+    border: none;
+  }
+
+  [data-theme="dark"] #local-search .search-dialog.glass,
+  [data-theme="dark"] .search-dialog.glass {
+    --g-tint: rgba(28, 20, 15, 0.66);
+  }
+
 
 
   #recent-posts .recent-post-item .recent-post-info {
@@ -121,6 +184,14 @@
     /* Wide tables scroll inside the glass, never widen the page. */
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* The untouched-visitor half of the full-screen search tint above. */
+@media (max-width: 768px) and (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) #local-search .search-dialog.glass,
+  :root:not([data-theme="light"]) .search-dialog.glass {
+    --g-tint: rgba(28, 20, 15, 0.66);
   }
 }
 

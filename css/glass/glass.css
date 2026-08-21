@@ -1,7 +1,7 @@
 /* ==========================================================================
    Liquid Glass Design System — the material
    --------------------------------------------------------------------------
-   One material, five weights. Every surface in the blog is `.glass` plus a
+   One material, six weights. Every surface in the blog is `.glass` plus a
    modifier; nothing in components.css re-implements the look, it only picks
    a weight and a radius.
 
@@ -144,6 +144,22 @@
   border: 1px solid var(--g-edge);
   border-radius: var(--g-radius, var(--g-r-lg));
   box-shadow: var(--g-shine), var(--g-shadow);
+
+  /* Butterfly reaches most of these shells through `transition: all` --
+     .cardHover in _global/function.styl, and a dozen more in _layout. `all`
+     registers a transition for every animatable longhand, layout ones
+     included: border widths, padding, margin, height. A home page carried
+     over 400 of them, so any unrelated style change -- a theme flip, a
+     performance tier stepping down, a resize -- animated layout properties on
+     every surface at once, and each of those surfaces is running a
+     backdrop-filter. Restating the material's own four here, at the
+     specificity the rest of this block already needed, confines it to the
+     properties the design actually animates. */
+  transition:
+    background-color var(--g-dur) var(--g-ease),
+    box-shadow       var(--g-dur) var(--g-ease),
+    transform        var(--g-dur) var(--g-spring),
+    border-radius    var(--g-dur) var(--g-spring);
 }
 
 #nav.glass--interactive:hover,
@@ -174,13 +190,14 @@
      strong          high       med        high   high     article, post cards
      dense           low        low        high   high     code, table, quote
      floating        high       high       high   high     modal, search
+     lens            high       highest     none   high     avatar dome
    ========================================================================== */
 
 .glass--soft {
   --g-radius: var(--g-r-pill);
   --g-blur: 0px;
-  --glass-refraction: 30;
-  --glass-bezel-width: 14;
+  --glass-refraction: 34;
+  --glass-bezel-width: 20;
   --glass-edge-depth: 2.2;
   --glass-chromatic: 0.030;
   --g-tint: rgba(255, 249, 240, 0.07);
@@ -190,8 +207,8 @@
 .glass--medium {
   --g-radius: var(--g-r-lg);
   --g-blur: 0px;
-  --glass-refraction: 52;
-  --glass-bezel-width: 56;
+  --glass-refraction: 60;
+  --glass-bezel-width: 74;
   --glass-edge-depth: 1.65;
   --glass-chromatic: 0.028;
 }
@@ -199,8 +216,8 @@
 .glass--strong {
   --g-radius: var(--g-r-xl);
   --g-blur: 0px;
-  --glass-refraction: 80;
-  --glass-bezel-width: 76;
+  --glass-refraction: 94;
+  --glass-bezel-width: 100;
   --glass-edge-depth: 1.55;
   --glass-chromatic: 0.026;
   --g-tint: rgba(255, 250, 243, 0.09);
@@ -211,8 +228,8 @@
   --g-radius: var(--g-r-md);
   --g-blur: 2px;
   /* §24 — high opacity, low distortion, but still a refracting bezel. */
-  --glass-refraction: 24;
-  --glass-bezel-width: 16;
+  --glass-refraction: 28;
+  --glass-bezel-width: 22;
   --glass-edge-depth: 2.8;
   --glass-chromatic: 0.015;
   --g-tint: rgba(46, 32, 24, 0.72);
@@ -224,8 +241,8 @@
 .glass--floating {
   --g-radius: var(--g-r-xl);
   --g-blur: 0px;
-  --glass-refraction: 72;
-  --glass-bezel-width: 67;
+  --glass-refraction: 84;
+  --glass-bezel-width: 88;
   --glass-edge-depth: 1.6;
   --glass-chromatic: 0.030;
   --g-tint: rgba(255, 250, 243, 0.12);
@@ -304,9 +321,13 @@
   to   { opacity: 1; transform: scale(1); }
 }
 
+/* The drawer is deliberately not in this list. It opens by transform — the
+   theme slides it in from off-screen — and an animation on `transform` wins
+   over the class that does the sliding, so morphing it meant the panel hung
+   off the right edge for the length of the animation and then snapped into
+   place. Its own slide is the morph. */
 #local-search .search-dialog.glass-morph-in,
-.search-dialog.glass-morph-in,
-#sidebar-menus.glass-morph-in {
+.search-dialog.glass-morph-in {
   animation: g-morph-in 0.42s var(--g-spring);
 }
 

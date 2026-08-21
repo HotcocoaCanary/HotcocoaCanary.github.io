@@ -56,7 +56,6 @@
    *   refraction    peak displacement in px             (--glass-refraction)
    *   ior           index of refraction                 (--glass-ior)
    *   edgeDepth     falloff exponent, higher = tighter  (--glass-edge-depth)
-   *   offsetX/Y     lens centre shift in px (pointer-driven deformation)
    */
   function buildMap(options) {
     var w = options.w;
@@ -77,11 +76,32 @@
 
     var depth = Math.max(1, options.edgeDepth || 3);
 
-    /* Clamp the lens shift so the deformation never escapes the rim and
-       starts warping the middle of the surface. */
-    var maxShift = bezel * 0.35;
-    var sx = Math.max(-maxShift, Math.min(maxShift, (options.offsetX || 0) * 0.18));
-    var sy = Math.max(-maxShift, Math.min(maxShift, (options.offsetY || 0) * 0.18));
+    /* Bevel cross-section.
+       -------------------------------------------------------------------
+       This used to be pow(smoothstep(-bezel, 0, d), depth). smoothstep is an
+       S-curve, so its slope is zero at *both* ends -- including at the rim.
+       Refraction follows the slope of the glass surface, so a profile that
+       flattens at the rim describes a chamfer: a flat cut running parallel to
+       the face, which is exactly how the edge was reading. A real bevel is
+       curved and its slope is greatest right at the rim, where the surface
+       turns over.
+
+       So the band is a circular cross-section instead:
+
+           t(u) = u * sqrt((1 - K) / (1 - u^2 * K))
+
+       with u running 0 at the inner edge of the band to 1 at the rim. t(0)=0
+       and t(1)=1 as before, but the slope at the rim is 1 + K/(1-K) rather
+       than 0 -- the displacement keeps climbing all the way out instead of
+       levelling off. K comes from --glass-edge-depth so the existing per-
+       weight tuning still means "how tightly the edge turns over".
+
+       u is linear in d, not another smoothstep: nesting one would put a zero
+       slope back at the rim through the chain rule and undo the whole point.
+       The inner end is gated separately below, where t is near zero anyway. */
+    var lensK = 1 - 1 / (1 + depth * depth);
+    var lensNorm = Math.sqrt(1 - lensK);
+    var innerGate = bezel * 0.35;
 
     var offs = new Float32Array(mw * mh * 2);
     var peak = 0;
@@ -92,19 +112,39 @@
       for (var i = 0; i < mw; i++) {
         var px = ((i + 0.5) / mw) * w - hw;
 
-        var d = roundedRectSDF(px - sx, py - sy, hw, hh, r);
+        var d = roundedRectSDF(px, py, hw, hh, r);
 
-        /* 0 deep inside -> 1 at the edge, then raised to `depth` so the bend
-           stays concentrated in the bezel instead of washing over the face. */
-        var t = smoothStep(-bezel, 0, d);
-        t = Math.pow(t, depth);
+        /* 0 deep inside -> 1 at the rim, along the bevel's curve. */
+        var u = (d + bezel) / bezel;
+        if (u <= 0) continue;
+        if (u > 1) u = 1;
+
+        var t = u * lensNorm / Math.sqrt(1 - u * u * lensK);
+
+        /* Ease the inner end on. A linear u starts with a non-zero slope, and
+           left bare that draws a faint line where the band begins. Gating
+           only the inner third leaves the rim untouched. */
+        if (d + bezel < innerGate) {
+          var g = (d + bezel) / innerGate;
+          t *= g * g * (3 - 2 * g);
+        }
         if (t <= 0.0005) continue;
 
-        /* Outward normal = gradient of the SDF. */
-        var gx = roundedRectSDF(px + e - sx, py - sy, hw, hh, r) -
-                 roundedRectSDF(px - e - sx, py - sy, hw, hh, r);
-        var gy = roundedRectSDF(px - sx, py + e - sy, hw, hh, r) -
-                 roundedRectSDF(px - sx, py - e - sy, hw, hh, r);
+        /* Outward normal = gradient of the SDF.
+           Central-differenced rather than taken analytically, deliberately.
+           The closed form is one evaluation per pixel instead of five, but
+           the rounded-rect field has a genuine ridge running diagonally in
+           from each corner where two edges are equidistant, and the exact
+           gradient flips through 90 degrees across it. Sampling +/-1px blurs
+           that flip into a smooth rotation; the exact version creases every
+           corner, which is where the displacement is strongest and any
+           artefact is most visible. Measured saving was 1-2ms per page load
+           -- buildMap is cached per geometry and runs a handful of times, not
+           per frame -- so the trade is not worth taking. */
+        var gx = roundedRectSDF(px + e, py, hw, hh, r) -
+                 roundedRectSDF(px - e, py, hw, hh, r);
+        var gy = roundedRectSDF(px, py + e, hw, hh, r) -
+                 roundedRectSDF(px, py - e, hw, hh, r);
         var len = Math.sqrt(gx * gx + gy * gy);
         if (len < 1e-6) continue;
 

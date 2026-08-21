@@ -1,0 +1,128 @@
+/* ==========================================================================
+   Liquid Glass — preloader
+   --------------------------------------------------------------------------
+   Butterfly's fullpage-loading ships two counter-rotating squares in salmon
+   and cyan. It is a fine spinner and it belongs to a different blog: the first
+   thing a reader sees should be the material the rest of the site is made of.
+
+   The markup is fixed (layout/includes/loading/fullpage-loading.pug):
+
+     #loading-box
+       .loading-left-bg          two panels that slide apart on load
+       .loading-right-bg
+       .spinner-box
+         .configure-border-1 > .configure-core
+         .configure-border-2 > .configure-core
+         .loading-word
+
+   The two .configure-border-* squares are retired and the spinner is redrawn
+   on .spinner-box's own pseudo-elements: a glass bead with a fixed top-left
+   highlight, and a specular sweep rotating behind it.
+
+   This file loads with the design tokens, before the glass engine runs -- the
+   loader is on screen precisely while the JS has not started -- so everything
+   here is plain CSS. No backdrop-filter either: the panels behind it are flat,
+   so there would be nothing to refract.
+   ========================================================================== */
+
+#loading-box .loading-left-bg,
+#loading-box .loading-right-bg {
+  background-color: var(--g-bg);
+}
+
+/* Retire the stock spinner. */
+#loading-box .configure-border-1,
+#loading-box .configure-border-2 {
+  display: none;
+}
+
+#loading-box .spinner-box {
+  position: fixed;
+  z-index: 1001;
+  flex-direction: column;
+  gap: 26px;
+}
+
+/* The bead. */
+#loading-box .spinner-box::before {
+  content: "";
+  width: 104px;
+  height: 104px;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 34% 28%, rgba(255, 255, 255, 0.55), transparent 52%),
+    var(--g-tint);
+  box-shadow: var(--g-shine), var(--g-shadow);
+}
+
+/* The sweep: one bright arc travelling around the rim, masked to a ring so it
+   reads as light running around the edge of the bead rather than a spinning
+   disc sitting on top of it. */
+#loading-box .spinner-box::after {
+  content: "";
+  position: absolute;
+  width: 104px;
+  height: 104px;
+  /* Sits on the bead, which is the first of the two flex children. */
+  margin-bottom: 66px;
+  border-radius: 50%;
+  background: conic-gradient(
+    from 0turn,
+    transparent 0deg,
+    rgba(255, 255, 255, 0.00) 30deg,
+    rgba(255, 255, 255, 0.62) 78deg,
+    rgba(255, 236, 202, 0.30) 104deg,
+    transparent 150deg,
+    transparent 360deg
+  );
+  -webkit-mask: radial-gradient(circle, transparent 60%, #000 66%, #000 100%);
+  mask: radial-gradient(circle, transparent 60%, #000 66%, #000 100%);
+  animation: g-loading-sweep 1.5s linear infinite;
+}
+
+@keyframes g-loading-sweep {
+  to { transform: rotate(1turn); }
+}
+
+#loading-box .loading-word {
+  position: static;
+  color: var(--g-ink-dim, var(--g-ink));
+  font-size: 0.92rem;
+  letter-spacing: 0.08em;
+  opacity: 0.78;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) #loading-box .spinner-box::after {
+    background: conic-gradient(
+      from 0turn,
+      transparent 0deg,
+      rgba(255, 236, 212, 0.00) 30deg,
+      rgba(255, 236, 212, 0.52) 78deg,
+      rgba(255, 190, 130, 0.26) 104deg,
+      transparent 150deg,
+      transparent 360deg
+    );
+  }
+}
+
+:root[data-theme="dark"] #loading-box .spinner-box::after {
+  background: conic-gradient(
+    from 0turn,
+    transparent 0deg,
+    rgba(255, 236, 212, 0.00) 30deg,
+    rgba(255, 236, 212, 0.52) 78deg,
+    rgba(255, 190, 130, 0.26) 104deg,
+    transparent 150deg,
+    transparent 360deg
+  );
+}
+
+/* A spinner is the one animation a reader cannot opt out of by not scrolling,
+   so honour the preference: keep the bead, stop the sweep. */
+@media (prefers-reduced-motion: reduce) {
+  #loading-box .spinner-box::after {
+    animation: none;
+    opacity: 0.5;
+  }
+}

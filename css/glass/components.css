@@ -124,11 +124,20 @@
 #page-header #nav #menus {
   display: flex;
   align-items: center;
+  flex: 0 0 auto;
 }
 
-#page-header #nav .menus_items {
+/* Butterfly collapses the menu into the hamburger by putting .hide-menu on
+   #nav, and its own rule for that (`#nav.hide-menu .menus_items`) is one id
+   short of ours — so the row stayed visible on phones and squeezed the title
+   out of the bar. Exclude the collapsed state here rather than fight it. */
+#page-header #nav:not(.hide-menu) .menus_items {
   display: flex;
   align-items: center;
+}
+
+#page-header #nav.hide-menu .menus_items {
+  display: none;
 }
 
 #page-header #nav #search-button,
@@ -269,19 +278,19 @@ html[data-theme="dark"].glass-scrolled #nav.glass {
   width: auto !important;
   height: 100% !important;
   margin: 0 !important;
-  padding: 8px !important;
+  padding: 12px !important;
   overflow: hidden;
 }
 
 #recent-posts .recent-post-item .post_cover {
   width: 100% !important;
   height: auto !important;
-  aspect-ratio: 16 / 9;
+  aspect-ratio: 3 / 2;
   flex: none !important;
   order: -1 !important;
   padding: 0 !important;
   margin: 0 !important;
-  border-radius: calc(var(--g-radius) - 8px);
+  border-radius: calc(var(--g-radius) - 12px);
   overflow: hidden;
 }
 
@@ -311,8 +320,8 @@ html[data-theme="dark"].glass-scrolled #nav.glass {
 }
 
 #recent-posts .recent-post-item .article-title {
-  font-size: 1.26rem;
-  line-height: 1.42;
+  font-size: 1.4rem;
+  line-height: 1.4;
   font-weight: 700;
   color: var(--g-ink);
   display: -webkit-box;
@@ -323,12 +332,12 @@ html[data-theme="dark"].glass-scrolled #nav.glass {
 }
 
 #recent-posts .recent-post-item .content {
-  font-size: 0.9rem;
-  line-height: 1.72;
+  font-size: 0.95rem;
+  line-height: 1.75;
   color: var(--g-ink-dim);
   display: -webkit-box;
-  -webkit-line-clamp: 3;
-  line-clamp: 3;
+  -webkit-line-clamp: 4;
+  line-clamp: 4;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
@@ -364,14 +373,12 @@ html[data-theme="dark"].glass-scrolled #nav.glass {
   text-align: center;
 }
 
+/* The portrait is left as Butterfly draws it -- upstream already clips it to
+   a circle. It briefly carried a glass dome of its own; a refracting lens
+   sitting on a face fights the face, and it has been removed. The margin is
+   kept because the card's spacing was tuned around it. */
 #aside-content .card-info .avatar-img {
-  border-radius: 50%;
-  overflow: hidden;
-  transition: transform 0.6s var(--g-spring);
-}
-
-#aside-content .card-info:hover .avatar-img {
-  transform: scale(1.06) rotate(3deg);
+  margin: 6px auto 16px;
 }
 
 #aside-content .card-info .author-info-name {
@@ -601,10 +608,21 @@ html[data-theme="dark"].glass-scrolled #nav.glass {
    Overlays — search, mobile drawer
    ========================================================================== */
 
+/* `.glass` and `.search-dialog` have the same specificity, and the material
+   loads last — so its `position: relative` quietly beat the theme's
+   `position: fixed` and the dialog rendered in flow at the very bottom of the
+   document instead of over it. Every other geometry declaration the theme
+   makes (top, left, margin, size, and its own 768px full-screen block) is
+   still in force; only the positioning scheme has to be handed back. */
 #local-search .search-dialog.glass,
 .search-dialog.glass {
+  position: fixed;
   border: 1px solid var(--g-edge);
   overflow: hidden;
+}
+
+#search-mask {
+  background: rgba(24, 14, 8, 0.42);
 }
 
 .search-dialog .search-nav {
@@ -620,15 +638,72 @@ html[data-theme="dark"].glass-scrolled #nav.glass {
   padding: 0.5em 1em;
 }
 
+/* Two ids on the theme's side (`#sidebar #sidebar-menus`) against one on
+   ours, so the drawer kept its flat --sidebar-bg fill and was the one surface
+   in the blog that was not glass. Restate the material at matching
+   specificity; the geometry below stays where it was. */
+#sidebar #sidebar-menus.glass,
 #sidebar-menus.glass {
+  /* Firmer than the floating weight it inherits. Every other overlay in the
+     blog covers a few hundred pixels of page; the drawer covers the full
+     height of it, so the menu has to stay readable against whatever happens
+     to be behind it — a paragraph, a code block, a cover image. */
+  --g-tint: rgba(255, 250, 243, 0.62);
   --g-radius: var(--g-r-xl) 0 0 var(--g-r-xl);
   border-radius: var(--g-r-xl) 0 0 var(--g-r-xl);
+  background: var(--g-tint);
+  background-image: none;
+  border: 1px solid var(--g-edge);
   border-right: none;
+  box-shadow: var(--g-shine), var(--g-shadow-lift);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) #sidebar #sidebar-menus.glass {
+    --g-tint: rgba(34, 24, 18, 0.62);
+  }
+}
+
+[data-theme="dark"] #sidebar #sidebar-menus.glass {
+  --g-tint: rgba(34, 24, 18, 0.62);
+}
+
+/* The menu block inside the drawer is a second opaque panel in the theme.
+   It stays a panel — a wash on top of the drawer's own, so it reads as glass
+   resting on glass rather than a second sheet of it. */
+#sidebar #sidebar-menus .menus_items {
+  background: rgba(255, 255, 255, 0.34);
+  border: 1px solid var(--g-edge);
+  border-radius: var(--g-r-md);
+  box-shadow: var(--g-shine);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) #sidebar #sidebar-menus .menus_items {
+    background: rgba(255, 246, 235, 0.10);
+  }
+}
+
+[data-theme="dark"] #sidebar #sidebar-menus .menus_items {
+  background: rgba(255, 246, 235, 0.10);
 }
 
 #sidebar-menus .sidebar-menu-item a,
-#sidebar-menus .site-data a {
+#sidebar-menus .site-data a,
+#sidebar-menus .menus_items .site-page {
   color: var(--g-ink);
+}
+
+#sidebar-menus .menus_items .site-page:hover {
+  background: var(--g-tint-hover);
+  color: var(--g-accent);
+  box-shadow: none;
+}
+
+/* The scrim behind the drawer is 80% black upstream, which leaves the glass
+   nothing to refract. Lighten it until the page still reads through. */
+#sidebar #menu-mask {
+  background: rgba(24, 14, 8, 0.55);
 }
 
 /* Butterfly spins the avatar a full turn on hover, and the social icons with

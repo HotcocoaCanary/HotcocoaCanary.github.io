@@ -71,9 +71,10 @@
      --------------------------------------------------------------------- */
 
   function watchMorph() {
+    /* The mobile drawer is not here: it opens by sliding itself in, and a
+       morph animation on transform would fight the slide (see glass.css). */
     var flags = [
-      { selector: '#local-search, .search-dialog', cls: 'glass-morph-in' },
-      { selector: '#sidebar-menus', cls: 'glass-morph-in' }
+      { selector: '#local-search, .search-dialog', cls: 'glass-morph-in' }
     ];
 
     new MutationObserver(function () {

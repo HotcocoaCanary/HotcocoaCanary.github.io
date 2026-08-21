@@ -83,11 +83,35 @@
   /* Three inset layers: a bright catch along the top-left, a softer return
      along the bottom-right, a hairline around the whole rim, and a tight
      inner shadow that reads as the thickness of the slab. */
+  /* The rim is lighting, not an outline.
+     -----------------------------------------------------------------------
+     Each layer had a zero blur, which makes a box-shadow a hard 1px stroke --
+     and a 0.95 white stroke around all four sides reads as a drawn border, not
+     as light catching a bevel. Giving the two directional layers a small blur
+     with a negative spread turns each into a soft band hugging its edge, and
+     dropping the uniform ring to a hint keeps the top-left/bottom-right
+     asymmetry (light source above left) legible instead of flattening it.
+     The ring cannot go to zero: it is the only thing holding the silhouette
+     together where neither directional layer reaches. */
   --g-shine:
-    inset 1px 1px 0 0 rgba(255, 255, 255, 0.95),
-    inset -1px -1px 0 0 rgba(255, 255, 255, 0.70),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.30),
-    inset 0 0 10px -6px rgba(120, 62, 24, 0.16);
+    /* specular catch where the light lands */
+    inset 1px 1px 1.5px -0.5px rgba(255, 255, 255, 0.80),
+    /* the dimmer bounce off the far rim */
+    inset -1px -1px 2px -1px rgba(255, 255, 255, 0.50),
+    /* just enough definition to hold the silhouette */
+    inset 0 0 0 1px rgba(255, 255, 255, 0.16),
+    /* Fresnel. The reference WebGL implementation weights this at 1.0 by
+       default -- its single strongest term -- and it is the cue we had none
+       of. At a rim you are looking through the glass at a grazing angle, so
+       reflectivity climbs and the whole perimeter brightens, falling off
+       inward over the thickness of the bevel. Two hard directional lines plus
+       a uniform hairline give a lit edge but no thickness behind it; this
+       fills the gap between that hairline and where the displacement band
+       begins, which is exactly where the edge was reading as a cut rather
+       than a curve. */
+    inset 0 0 22px -11px rgba(255, 255, 255, 0.75),
+    /* thickness */
+    inset 0 0 12px -7px rgba(120, 62, 24, 0.18);
   --g-edge: rgba(255, 255, 255, 0.50);
 
   --g-shadow:
@@ -142,10 +166,11 @@
     --g-contrast:   1.05;
 
     --g-shine:
-      inset 1px 1px 0 0 rgba(255, 236, 212, 0.72),
-      inset -1px -1px 0 0 rgba(255, 236, 212, 0.42),
-      inset 0 0 0 1px rgba(255, 236, 212, 0.18),
-      inset 0 0 10px -6px rgba(0, 0, 0, 0.30);
+      inset 1px 1px 1.5px -0.5px rgba(255, 236, 212, 0.60),
+      inset -1px -1px 2px -1px rgba(255, 236, 212, 0.32),
+      inset 0 0 0 1px rgba(255, 236, 212, 0.11),
+      inset 0 0 22px -11px rgba(255, 236, 212, 0.42),
+      inset 0 0 12px -7px rgba(0, 0, 0, 0.32);
     --g-edge: rgba(255, 236, 212, 0.34);
 
     --g-shadow:
@@ -175,10 +200,11 @@
   --g-contrast:   1.05;
 
   --g-shine:
-    inset 1px 1px 0 0 rgba(255, 236, 212, 0.72),
-    inset -1px -1px 0 0 rgba(255, 236, 212, 0.42),
-    inset 0 0 0 1px rgba(255, 236, 212, 0.18),
-    inset 0 0 10px -6px rgba(0, 0, 0, 0.30);
+    inset 1px 1px 1.5px -0.5px rgba(255, 236, 212, 0.60),
+    inset -1px -1px 2px -1px rgba(255, 236, 212, 0.32),
+    inset 0 0 0 1px rgba(255, 236, 212, 0.11),
+    inset 0 0 22px -11px rgba(255, 236, 212, 0.42),
+    inset 0 0 12px -7px rgba(0, 0, 0, 0.32);
   --g-edge: rgba(255, 236, 212, 0.34);
 
   --g-shadow:

@@ -4,6 +4,13 @@
  * Spec §30 (Rendering Engine API), §31 (Renderer Interface), §32 (Progressive
  * Enhancement), §33 (Safari / Firefox), §11 (Chromatic Aberration).
  *
+ * Filters here are static: one per distinct geometry, cached and shared. There
+ * is no per-frame path. An earlier revision kept a second, per-element "live"
+ * filter that the pointer deformation rebuilt as the cursor moved; every
+ * rebuild is a canvas plus a toDataURL, which is far too expensive to run at
+ * frame rate, and it has been removed along with the interaction that drove
+ * it.
+ *
  * The point of this file is that nothing above it knows how the glass is
  * drawn. Butterfly talks to three functions:
  *
@@ -307,42 +314,6 @@
     element.style.removeProperty('--g-filter');
   };
 
-  /* Per-element live filter used by the pointer deformation (§13, §14).
-     One node, reassigned — only ever a single element deforms at a time. */
-  SvgGlassRenderer.prototype.LIVE_ID = 'glass-live';
-
-  SvgGlassRenderer.prototype.ensureLive = function () {
-    if (this.liveNode && this.liveNode.isConnected) return;
-    this.liveNode = el('filter', {
-      id: this.LIVE_ID,
-      filterUnits: 'userSpaceOnUse',
-      'color-interpolation-filters': 'sRGB'
-    });
-    this.liveChain = null;
-    ensureHost().firstChild.appendChild(this.liveNode);
-  };
-
-  SvgGlassRenderer.prototype.live = function (element, options) {
-    this.ensureLive();
-    var map = window.GlassSDF.buildMap(options);
-    if (!map) return false;
-
-    var chain = buildFilterChain(this.liveNode, map, options.aberration);
-    sizeFilter(this.liveNode, chain.feImage, options.w, options.h);
-    element.style.setProperty('--g-filter', 'url(#' + this.LIVE_ID + ')');
-    return true;
-  };
-
-  SvgGlassRenderer.prototype.restore = function (element) {
-    var key = this.held.get(element);
-    var entry = key ? this.cache.get(key) : null;
-    if (entry) {
-      element.style.setProperty('--g-filter', 'url(#' + entry.id + ')');
-    } else {
-      element.style.removeProperty('--g-filter');
-    }
-  };
-
   /* ---- CSS: edge ring, no displacement (§34) -------------------------- */
 
   function CssGlassRenderer() {}
@@ -452,8 +423,6 @@
       ior: num(cs, '--glass-ior', 1.485),
       edgeDepth: num(cs, '--glass-edge-depth', 3),
       aberration: num(cs, '--glass-chromatic', 0) * quality.aberration,
-      offsetX: 0,
-      offsetY: 0,
       rect: rect
     };
 
@@ -499,27 +468,11 @@
     });
   }
 
-  /* Pointer-tracked deformation, delegated to the renderer when it can do it. */
-  function deform(element, offsetX, offsetY) {
-    var r = renderer();
-    if (!r.live || !mounted.has(element)) return false;
-    var o = resolve(element, { offsetX: offsetX, offsetY: offsetY });
-    if (!o) return false;
-    return r.live(element, o);
-  }
-
-  function undeform(element) {
-    var r = renderer();
-    if (r.restore && element) r.restore(element);
-  }
-
   window.GlassCore = {
     createGlass: createGlass,
     updateGlass: updateGlass,
     destroyGlass: destroyGlass,
     refreshAll: refreshAll,
-    deform: deform,
-    undeform: undeform,
     select: select,
     setQuality: setQuality,
     get quality() { return quality; },
