@@ -58,9 +58,9 @@
        --glass-edge-depth    falloff exponent; higher = bend hugs the rim
        --glass-ior           index of refraction, ~1.45-1.52 for glass (§10)
        --glass-chromatic     dispersion; must stay subtle (§11)            */
-  --glass-refraction:  50;
-  --glass-bezel-width: 26;
-  --glass-edge-depth:  2.4;
+  --glass-refraction:  53;
+  --glass-bezel-width: 57;
+  --glass-edge-depth:  1.8;
   --glass-ior:         1.485;
   --glass-chromatic:   0.035;
 
@@ -96,9 +96,6 @@
   --g-shadow-lift:
     0 20px 46px rgba(96, 50, 20, 0.30),
     0 3px 10px  rgba(96, 50, 20, 0.18);
-
-  /* Specular sheen that tracks the pointer (see glass.css / .glass::after) */
-  --g-sheen: rgba(255, 255, 255, 0.28);
 
   /* ---- Radius --------------------------------------------------------- */
   --g-r-sm:   14px;
@@ -158,7 +155,6 @@
       0 16px 38px rgba(0, 0, 0, 0.58),
       0 2px 8px   rgba(0, 0, 0, 0.40);
 
-    --g-sheen: rgba(255, 220, 180, 0.22);
   }
 }
 
@@ -192,7 +188,6 @@
     0 16px 38px rgba(0, 0, 0, 0.58),
     0 2px 8px   rgba(0, 0, 0, 0.40);
 
-  --g-sheen: rgba(255, 220, 180, 0.22);
 }
 
 /* Bridge our tokens into Butterfly's own variables so untouched theme

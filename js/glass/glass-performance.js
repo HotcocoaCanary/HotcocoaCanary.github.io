@@ -6,8 +6,8 @@
  * The hard rule from §41: when the page gets slow we shed *optical extras*, in
  * a fixed order, and we never fall back to "ordinary frosted glass".
  *
- *     dynamic light -> chromatic aberration -> animation
- *                   -> distortion -> background animation
+ *     chromatic aberration -> animation
+ *                          -> distortion -> background animation
  *
  * Tiers, driven by a rolling FPS average (§41):
  *
@@ -61,7 +61,6 @@
     /* §41 degradation order is expressed as data attributes the CSS keys off,
        so shedding an effect never means rewriting a rule. */
     var idx = TIERS.indexOf(tier);
-    root.setAttribute('data-glass-light', idx >= 1 ? 'off' : 'on');
     root.setAttribute('data-glass-motion', idx >= 1 ? 'reduced' : 'full');
     root.setAttribute('data-glass-bg', idx >= 3 ? 'static' : 'animated');
 
@@ -180,7 +179,6 @@
 
     root.classList.add('glass-tier-' + initial);
     tier = initial;
-    root.setAttribute('data-glass-light', initial === 'full' ? 'on' : 'off');
     root.setAttribute('data-glass-motion', initial === 'full' ? 'full' : 'reduced');
     root.setAttribute('data-glass-bg', 'animated');
     if (window.GlassCore) window.GlassCore.setQuality(QUALITY[initial]);

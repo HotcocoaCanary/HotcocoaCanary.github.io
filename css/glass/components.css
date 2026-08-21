@@ -60,9 +60,12 @@
 }
 
 #nav.glass {
-  --g-radius: var(--g-r-pill);
+  /* Square at the top, rounded at the bottom: the bar hangs off the viewport
+     edge instead of floating below it. */
+  --g-radius: 0 0 var(--g-r-xl) var(--g-r-xl);
+  border-top: 0;
   position: fixed !important;
-  top: 14px !important;
+  top: 0 !important;
   left: 0 !important;
   right: 0 !important;
   margin-inline: auto;
@@ -83,7 +86,7 @@
 
 /* Butterfly toggles these on scroll; we only want the size change. */
 #page-header.nav-fixed #nav.glass {
-  top: 10px !important;
+  top: 0 !important;
   height: 52px;
 }
 
@@ -113,17 +116,83 @@
   text-shadow: none !important;
 }
 
+/* Butterfly lays the nav out with inline boxes at three different font sizes:
+   menu items and the search button at .78em, the collapsed hamburger at the
+   nav's own size. Inline boxes of different sizes sit on a shared baseline,
+   not a shared centre line, so the buttons came out at visibly different
+   heights. One flex row, one font size, everything centred. */
+#page-header #nav #menus {
+  display: flex;
+  align-items: center;
+}
+
+#page-header #nav .menus_items {
+  display: flex;
+  align-items: center;
+}
+
+#page-header #nav #search-button,
+#page-header #nav .menus_item {
+  display: inline-flex;
+  align-items: center;
+  padding: 0 0 0 14px;
+}
+
+/* The hamburger only ever shows in the collapsed layout (responsive.css sets
+   its display there); here it just gets the same box as the other buttons.
+   Butterfly pins it to inline-block with !important, so unlike the search
+   button it keeps a text strut — making its span block-level drops the strut
+   and the two icon buttons land on exactly the same centre line. */
+#page-header #nav #toggle-menu {
+  align-items: center;
+  padding: 0 0 0 14px;
+}
+
+/* Two ids to beat Butterfly's `#page-header #nav .site-page` (otherwise its
+   padding-bottom survives our shorthand and the box sits lopsided), and three
+   on the hamburger to beat `#nav.hide-menu #toggle-menu .site-page`, which
+   resets it to the nav's full font size — the mismatched-height culprit. */
+#page-header #nav .site-page,
+#page-header #nav #toggle-menu .site-page,
 #nav .site-page {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35em;
   border-radius: var(--g-r-sm);
   padding: 0.32em 0.75em;
+  font-size: 0.86em;
+  line-height: 1.5;
   transition:
     background-color var(--g-dur-fast) var(--g-ease),
     transform var(--g-dur-fast) var(--g-spring);
 }
 
+#page-header #nav #toggle-menu .site-page {
+  display: flex;
+}
+
+#page-header #nav .site-page:hover,
 #nav .site-page:hover {
-  background-color: color-mix(in srgb, var(--g-accent) 22%, transparent);
   transform: translateY(-1px);
+}
+
+/* One hover indicator, and it is the underline. Butterfly's own bar is kept
+   but restated in the warm accent and pinned to a shared baseline — items and
+   the search button have different box heights, so `bottom: 0` alone put the
+   bars at two different heights. */
+#page-header #nav .site-page:not(.child)::after {
+  bottom: 2px;
+  left: 0.75em;
+  z-index: 0;
+  width: 0;
+  height: 3px;
+  border-radius: var(--g-r-pill);
+  background-color: var(--g-accent);
+  transition: width var(--g-dur-fast) var(--g-ease);
+}
+
+#page-header #nav .site-page:not(.child):hover::after {
+  width: calc(100% - 1.5em);
 }
 
 #nav .menus_item_child {
@@ -452,6 +521,41 @@ html[data-theme="dark"].glass-scrolled #nav.glass {
   border-color: var(--g-terracotta);
 }
 
+/* Butterfly draws the timeline node on the row's ::before — the same pseudo
+   the glass material uses for its top-light. On a glass row the two collide:
+   `inset: 0` pulls the node off the rail and onto the panel's own left edge,
+   and the highlight shrinks to the node's 6px box. So ::before goes back to
+   being glass, and the node is redrawn on the row's free ::after. */
+#archive .article-sort-item.glass::before {
+  inset: 0;
+  width: auto;
+  height: auto;
+  border: 0;
+  border-radius: inherit;
+  background: var(--g-highlight);
+  transform: none;
+}
+
+#archive .article-sort-item.glass::after {
+  content: "";
+  position: absolute;
+  /* 20px of rail padding + 17px back over the row's own offset, the same
+     geometry Butterfly uses, so glass rows and year markers share a rail. */
+  left: calc(-20px - 17px);
+  top: 50%;
+  width: 6px;
+  height: 6px;
+  border: 3px solid var(--g-accent);
+  border-radius: 6px;
+  background: var(--g-bg);
+  transform: translateY(-50%);
+  transition: border-color var(--g-dur-fast) var(--g-ease);
+}
+
+#archive .article-sort-item.glass:hover::after {
+  border-color: var(--g-terracotta);
+}
+
 .article-sort-item-title,
 .article-sort-title {
   color: var(--g-ink);
@@ -463,6 +567,34 @@ html[data-theme="dark"].glass-scrolled #nav.glass {
 
 .article-sort-item-img {
   border-radius: var(--g-r-sm);
+}
+
+/* Each timeline row is a glass panel, and Butterfly gives the row no padding
+   of its own — so the date and title sat straight on the rim. At the soft
+   weight's pill radius the rounded ends then cut across the text entirely.
+   Card radius plus a real inset puts the content back inside the panel. */
+#archive .article-sort-item.glass {
+  --g-radius: var(--g-r-md);
+  box-sizing: border-box;
+  padding: 14px 22px;
+  gap: 4px;
+}
+
+/* The cover-less row is pinned to 80px upstream; with padding added that
+   squeezes the two lines, so it becomes a floor instead of a fixed height. */
+#archive .article-sort-item.no-article-cover.glass {
+  height: auto;
+  min-height: 78px;
+}
+
+/* The node dot is positioned against the row box, which has not moved — but
+   the covered row's own inner padding now doubles up with ours. */
+#archive .article-sort-item.glass .article-sort-item-info {
+  padding: 0 0 0 16px;
+}
+
+#archive .article-sort-item.no-article-cover.glass .article-sort-item-info {
+  padding: 0;
 }
 
 /* ==========================================================================
@@ -497,6 +629,13 @@ html[data-theme="dark"].glass-scrolled #nav.glass {
 #sidebar-menus .sidebar-menu-item a,
 #sidebar-menus .site-data a {
   color: var(--g-ink);
+}
+
+/* Butterfly spins the avatar a full turn on hover, and the social icons with
+   it. The glass system's hover language is lift and tint, not rotation. */
+.avatar-img img:hover,
+#aside-content .card-info-social-icons i:hover {
+  transform: none;
 }
 
 /* ==========================================================================
@@ -546,8 +685,7 @@ html[data-theme="dark"].glass-scrolled #nav.glass {
 #tag.glass,
 #category.glass {
   /* `backwards` holds the hidden state through the stagger delay but releases
-     after the entrance, so the pointer-tracked magnetic transform can take
-     over (a `both`/`forwards` fill would pin transform:none forever). */
+     after the entrance instead of pinning transform forever. */
   animation: g-rise 0.62s var(--g-ease) backwards;
 }
 

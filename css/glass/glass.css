@@ -10,7 +10,6 @@
      background-color   the tint  — a wash so text always has contrast
      backdrop-filter    the body  — blur + saturation + (Chromium) refraction
      ::before           the depth — top-light gradient + inner edge glow
-     ::after            the sheen — specular highlight tracking the pointer
      box-shadow         the rim   — inset shine + cast shadow
 
    The refraction itself comes from an SVG displacement map generated per
@@ -50,21 +49,16 @@
 }
 
 /* Depth. A single top-light gradient does most of the work of making a flat
-   translucent rectangle read as a solid piece of glass with thickness. */
-.glass::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  pointer-events: none;
-  border-radius: inherit;
-  /* §12 — the highlight is independent of refraction. Its overall strength is
-     the one optical knob that can be read straight out of CSS, which keeps the
-     PoC control panel and future tuning panels free of any JS coupling. */
-  opacity: var(--glass-highlight-intensity, 0.9);
+   translucent rectangle read as a solid piece of glass with thickness.
+
+   The gradient lives in --g-highlight rather than inline on ::before, because
+   themes with their own :before on a surface (Butterfly's archive node is one)
+   have to restate it to take the pseudo back, and a variable is the only way
+   to do that without copying the ramp around. */
+:root {
   /* A narrow streak, not a wash: light glancing off a curved top edge.
      A full-surface gradient here is what makes glass look like frost. */
-  background:
+  --g-highlight:
     linear-gradient(
       158deg,
       rgba(255, 255, 255, 0.60) 0%,
@@ -76,35 +70,9 @@
     );
 }
 
-/* Specular sheen. --g-mx/--g-my are written by the pointer tracker; before
-   the pointer ever enters they default to the top-left, which matches the
-   lighting direction of ::before.
-
-   It rests at partial opacity rather than zero. Hiding it until :hover meant
-   a surface at rest had no specular at all — the dynamic light of §13 only
-   existed under the cursor, and on a still page (or a screenshot) the glass
-   read as flat. */
-.glass::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  pointer-events: none;
-  border-radius: inherit;
-  opacity: 0.55;
-  background: radial-gradient(
-    32rem 32rem at var(--g-mx, 20%) var(--g-my, 0%),
-    var(--g-sheen),
-    transparent 60%
-  );
-  transition: opacity var(--g-dur) var(--g-ease);
-}
-
-.glass:hover::after { opacity: 1; }
-
 @media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) .glass::before {
-    background:
+  :root:not([data-theme="light"]) {
+    --g-highlight:
       linear-gradient(
         158deg,
         rgba(255, 236, 212, 0.30) 0%,
@@ -116,8 +84,8 @@
   }
 }
 
-[data-theme="dark"] .glass::before {
-  background:
+:root[data-theme="dark"] {
+  --g-highlight:
     linear-gradient(
       158deg,
       rgba(255, 236, 212, 0.30) 0%,
@@ -126,6 +94,20 @@
       rgba(255, 255, 255, 0.00) 82%,
       rgba(255, 190, 130, 0.12) 100%
     );
+}
+
+.glass::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  border-radius: inherit;
+  /* §12 — the highlight is independent of refraction. Its overall strength is
+     the one optical knob that can be read straight out of CSS, which keeps the
+     PoC control panel and future tuning panels free of any JS coupling. */
+  opacity: var(--glass-highlight-intensity, 0.9);
+  background: var(--g-highlight);
 }
 
 
@@ -208,18 +190,18 @@
 .glass--medium {
   --g-radius: var(--g-r-lg);
   --g-blur: 0px;
-  --glass-refraction: 48;
-  --glass-bezel-width: 24;
-  --glass-edge-depth: 2.1;
+  --glass-refraction: 52;
+  --glass-bezel-width: 56;
+  --glass-edge-depth: 1.65;
   --glass-chromatic: 0.028;
 }
 
 .glass--strong {
   --g-radius: var(--g-r-xl);
   --g-blur: 0px;
-  --glass-refraction: 72;
-  --glass-bezel-width: 32;
-  --glass-edge-depth: 2.0;
+  --glass-refraction: 80;
+  --glass-bezel-width: 76;
+  --glass-edge-depth: 1.55;
   --glass-chromatic: 0.026;
   --g-tint: rgba(255, 250, 243, 0.09);
   --g-tint-hover: rgba(255, 250, 243, 0.18);
@@ -242,9 +224,9 @@
 .glass--floating {
   --g-radius: var(--g-r-xl);
   --g-blur: 0px;
-  --glass-refraction: 66;
-  --glass-bezel-width: 30;
-  --glass-edge-depth: 2.1;
+  --glass-refraction: 72;
+  --glass-bezel-width: 67;
+  --glass-edge-depth: 1.6;
   --glass-chromatic: 0.030;
   --g-tint: rgba(255, 250, 243, 0.12);
   --g-shadow: var(--g-shadow-lift);
@@ -292,33 +274,15 @@
 
 .glass--interactive {
   cursor: pointer;
-  /* Magnetic shift (§15). --g-pull-x / --g-pull-y are written by the pointer
-     tracker (glass-motion.js) and capped hard at 2px. When the pointer is not
-     over the surface the vars fall back to 0, so the surface sits still. */
-  transform: translate(var(--g-pull-x, 0px), var(--g-pull-y, 0px));
 }
 
 .glass--interactive:hover {
   background-color: var(--g-tint-hover);
   box-shadow: var(--g-shine), var(--g-shadow-lift);
-  /* §49 — no big translateY. A barely-there scale + the magnetic pull. */
-  transform:
-    translate(var(--g-pull-x, 0px), var(--g-pull-y, 0px))
-    scale(1.005);
-}
-
-/* Pills only brighten and rise slightly — growing their radius does nothing
-   when it is already 999px. */
-.glass--soft.glass--interactive:hover {
-  transform:
-    translate(var(--g-pull-x, 0px), var(--g-pull-y, 0px))
-    scale(1.01);
 }
 
 .glass--interactive:active {
-  transform:
-    translate(var(--g-pull-x, 0px), var(--g-pull-y, 0px))
-    scale(0.985);
+  transform: scale(0.985);
   transition-duration: var(--g-dur-fast);
 }
 

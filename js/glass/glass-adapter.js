@@ -37,7 +37,9 @@
     ['#recent-posts .recent-post-item', 'glass--strong glass--interactive'],
     ['#post, #page, #archive, #tag, #category', 'glass--strong'],
     ['.relatedPosts .relatedPosts-list > div', 'glass--soft glass--interactive'],
-    ['#archive .article-sort-item', 'glass--soft glass--interactive'],
+    /* The year rows are markers on the rail, not entries — giving them a
+       panel of their own turns the timeline into a stack of bars. */
+    ['#archive .article-sort-item:not(.year)', 'glass--soft glass--interactive'],
 
     /* Dense: high-contrast inserts inside prose (§24, §25). */
     ['#article-container figure.highlight', 'glass--dense'],

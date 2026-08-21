@@ -1,162 +1,14 @@
 /*
  * Liquid Glass — Motion & Interaction
  * ---------------------------------------------------------------------------
- * Spec §13 (dynamic light), §14 (viscosity), §15 (magnetic), §16 (morphing),
- * §43 (touch), §44 (reduced motion), §46 (scroll edge effect), §49 (card hover).
+ * Spec §16 (morphing), §43 (touch), §44 (reduced motion), §46 (scroll edge).
  *
- * The forbidden interaction is `transform: translateY(-10px)` on hover (§49).
- * What happens instead:
- *
- *     pointer moves
- *         -> specular highlight follows      (--g-mx / --g-my)
- *         -> surface leans 1-2px toward it   (magnetic, §15)
- *         -> the bezel deforms under it      (live displacement, §14)
- *     pointer leaves
- *         -> everything springs back slowly  (viscous return)
- *
- * All of it is written as CSS custom properties inside a single rAF, never as
- * layout-affecting DOM work (§39, §40).
+ * Pointer-tracked light, magnetic pull, hover scale and live bezel deformation
+ * have been removed pending a redesign of the mouse interaction model.
  */
 
 (function () {
   'use strict';
-
-  var mqHover = window.matchMedia('(hover: hover) and (pointer: fine)');
-  var mqMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
-
-  /* Pointer offset is quantised before it triggers a filter rebuild — without
-     this every mouse pixel would regenerate a displacement map. */
-  var LIVE_GRID = 12;
-
-  var target = null;         /* surface currently under the pointer */
-  var deformed = null;       /* surface currently holding the live filter */
-  var lastGx = null;
-  var lastGy = null;
-
-  var pending = null;
-  var frame = 0;
-
-  function motionAllowed() {
-    if (mqMotion.matches) return false;
-    return document.documentElement.getAttribute('data-glass-motion') !== 'off';
-  }
-
-  function lightAllowed() {
-    return document.documentElement.getAttribute('data-glass-light') !== 'off';
-  }
-
-  /* Magnetic pull, capped hard at 2px (§15: "严禁大幅移动"). */
-  function magnet(element, nx, ny) {
-    if (!motionAllowed() || !element.classList.contains('glass--interactive')) {
-      element.style.removeProperty('--g-pull-x');
-      element.style.removeProperty('--g-pull-y');
-      return;
-    }
-    var limit = 2;
-    element.style.setProperty('--g-pull-x', (nx * limit).toFixed(2) + 'px');
-    element.style.setProperty('--g-pull-y', (ny * limit).toFixed(2) + 'px');
-  }
-
-  function flush() {
-    frame = 0;
-    var job = pending;
-    pending = null;
-    if (!job) return;
-
-    var element = job.element;
-    if (!element.isConnected) return;
-
-    /* Highlight position, in percent of the surface (§13). */
-    element.style.setProperty('--g-mx', job.px.toFixed(1) + '%');
-    element.style.setProperty('--g-my', job.py.toFixed(1) + '%');
-
-    magnet(element, job.nx, job.ny);
-
-    /* Bezel deformation (§6, §14) — only when the tier still allows it and
-       only for one surface at a time. */
-    if (!window.GlassCore) return;
-
-    var gx = Math.round(job.ox / LIVE_GRID) * LIVE_GRID;
-    var gy = Math.round(job.oy / LIVE_GRID) * LIVE_GRID;
-
-    if (deformed === element && gx === lastGx && gy === lastGy) return;
-
-    if (deformed && deformed !== element) {
-      window.GlassCore.undeform(deformed);
-      deformed = null;
-    }
-
-    if (!motionAllowed()) return;
-    if (window.GlassPerformance && window.GlassPerformance.tier === 'minimal') return;
-
-    if (window.GlassCore.deform(element, job.ox, job.oy)) {
-      deformed = element;
-      lastGx = gx;
-      lastGy = gy;
-    }
-  }
-
-  function releaseTarget() {
-    if (target) {
-      target.style.removeProperty('--g-pull-x');
-      target.style.removeProperty('--g-pull-y');
-      target = null;
-    }
-    if (deformed && window.GlassCore) {
-      window.GlassCore.undeform(deformed);
-      deformed = null;
-      lastGx = lastGy = null;
-    }
-  }
-
-  function onPointerMove(ev) {
-    if (!mqHover.matches) return;
-
-    var element = ev.target instanceof Element ? ev.target.closest('.glass') : null;
-    if (!element || element.classList.contains('glass--dormant')) {
-      releaseTarget();
-      return;
-    }
-
-    if (target && target !== element) {
-      target.style.removeProperty('--g-pull-x');
-      target.style.removeProperty('--g-pull-y');
-    }
-    target = element;
-
-    var rect = element.getBoundingClientRect();
-    if (!rect.width || !rect.height) return;
-
-    var lx = ev.clientX - rect.left;
-    var ly = ev.clientY - rect.top;
-
-    pending = {
-      element: element,
-      px: (lx / rect.width) * 100,
-      py: (ly / rect.height) * 100,
-      /* Offset from the centre, element px — drives the lens shift. */
-      ox: lx - rect.width / 2,
-      oy: ly - rect.height / 2,
-      /* Normalised -1..1 for the magnetic lean. */
-      nx: (lx / rect.width) * 2 - 1,
-      ny: (ly / rect.height) * 2 - 1
-    };
-
-    if (!frame) frame = requestAnimationFrame(flush);
-    if (!lightAllowed()) {
-      element.style.removeProperty('--g-mx');
-      element.style.removeProperty('--g-my');
-    }
-  }
-
-  document.addEventListener('pointermove', onPointerMove, { passive: true });
-  document.addEventListener('pointerleave', releaseTarget);
-  document.addEventListener('blur', releaseTarget);
-  window.addEventListener('scroll', function () {
-    /* A surface that scrolls out from under a stationary pointer would keep a
-       stale deformation otherwise. */
-    if (deformed) releaseTarget();
-  }, { passive: true });
 
   /* ---------------------------------------------------------------------
      Touch: press / compress / spring back (§43)
@@ -248,9 +100,7 @@
   }
 
   window.GlassMotion = {
-    get target() { return target; },
-    get deformed() { return deformed; },
-    release: releaseTarget,
+    release: function () {},
     EDGE_RANGE: EDGE_RANGE
   };
 })();

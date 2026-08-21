@@ -431,7 +431,16 @@
     var h = Math.ceil(rect.height / SIZE_STEP) * SIZE_STEP;
 
     var cs = getComputedStyle(element);
-    var radius = parseFloat(cs.borderTopLeftRadius) || 0;
+    /* The displacement map is a single rounded rect, so a surface with mixed
+       corners (the navbar is square on top, round on the bottom) has to pick
+       one. The largest corner is the right pick: it is the one whose bezel
+       would be visibly wrong if the map disagreed with the painted edge. */
+    var radius = Math.max(
+      parseFloat(cs.borderTopLeftRadius) || 0,
+      parseFloat(cs.borderTopRightRadius) || 0,
+      parseFloat(cs.borderBottomRightRadius) || 0,
+      parseFloat(cs.borderBottomLeftRadius) || 0
+    );
     if (radius > Math.min(w, h) / 2) radius = Math.min(w, h) / 2;
 
     var o = {
